@@ -2,6 +2,19 @@
 import React from 'react';
 import Navbar from '../components/NavBar';
 
+import { useEffect } from 'react';
+
+export default function Home() {
+  useEffect(() => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/ping`)
+      .then(res => res.json())
+      .then(data => console.log("✅ Backend says:", data))
+      .catch(err => console.error("❌ Failed to reach backend:", err));
+  }, []);
+
+  return <h1>FitFlex Home</h1>;
+}
+
 /**
  * The Home page content starts below the fixed navbar by adding `pt-24`
  * (padding-top: 6rem = height of navbar). This avoids overlap.
