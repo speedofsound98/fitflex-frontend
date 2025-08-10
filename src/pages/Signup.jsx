@@ -19,34 +19,34 @@ export default function Signup() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  
+  const endpoint = role === 'user' ? '/signup/user' : '/signup/studio';
+  const payload = role === 'user'
+    ? { name, email, password }
+    : { studio_name, location, email, password };
 
-    if (!isValidPassword(formData.password)) {
-      setError('Password must be at least 8 characters and include letters and numbers.');
-      return;
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.message);
+      // Redirect to home
+      window.location.href = '/';
+    } else {
+      alert(data.error);
     }
+  } catch (err) {
+    console.error(err);
+    alert('Network error');
+  }
+};
 
-    try {
-      const endpoint = role === 'user' ? '/signup/user' : '/signup/studio';
-      const response = await fetch(`http://localhost:3000${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        const resText = await response.text();
-        throw new Error(resText || 'Signup failed');
-      }
-
-      localStorage.setItem('userName', formData.name);
-      localStorage.setItem('userRole', role);
-      setError('');
-      navigate('/home');
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
   return (
     <div>
