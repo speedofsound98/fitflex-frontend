@@ -1,12 +1,77 @@
-# React + Vite
+---
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## **📄 README for Frontend (fitflex-frontend/README.md)**
 
-Currently, two official plugins are available:
+```markdown
+# FitFlex Frontend
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This is the frontend for the FitFlex project, built with **React**, **Vite**, and **Tailwind CSS**.
 
-## Expanding the ESLint configuration
+## Tech Stack
+- [React](https://reactjs.org/)
+- [Vite](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [React Router](https://reactrouter.com/)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## 📂 Folder Structure
+
+fitflex-frontend/
+├── public/
+├── src/
+│   ├── pages/
+│   │   └── Home.jsx
+│   │   └── Signup.jsx
+│   │   └── Login.jsx
+│   │   └── Dashboard.jsx
+│   ├── components/
+│   │   └── Navbar.jsx
+│   │   └── SignupForm.jsx
+│   ├── App.jsx
+│   └── main.jsx
+├── tailwind.config.js
+├── index.html
+|── package.json
+├── .env # Environment variables (VITE_API_URL, etc.)
+└── README.md
+
+
+---
+
+## Setup
+
+### Install dependencies
+```bash
+npm install
+
+Environment variables
+Create .env in the frontend folder:
+VITE_API_URL=http://localhost:3000
+
+Running Locally
+npm run dev
+
+App runs on:
+http://localhost:5173
+
+Git Workflow
+git add .
+git commit -m "Describe your change"
+git pull origin main   # Pull before pushing
+git push origin main
+
+Checklist for Starting Work
+Open Terminal in fitflex-frontend
+Ensure backend is already running
+Start frontend:
+npm run dev
+Visit:
+http://localhost:5173
+
+Deployment
+Frontend is deployed on Vercel:
+https://fitflex-frontend.vercel.app
+To redeploy:
+
+Push changes to main branch in GitHub — Vercel auto-redeploys.
