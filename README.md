@@ -1,8 +1,8 @@
 ---
 
-## **📄 README for Frontend (fitflex-frontend/README.md)**
+## **README for Frontend (fitflex-frontend/README.md)**
 
-```markdown
+''markdown
 # FitFlex Frontend
 
 This is the frontend for the FitFlex project, built with **React**, **Vite**, and **Tailwind CSS**.
