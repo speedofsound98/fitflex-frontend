@@ -75,3 +75,6 @@ https://fitflex-frontend.vercel.app
 To redeploy:
 
 Push changes to main branch in GitHub — Vercel auto-redeploys.
+
+Author:
+Nadav Hardof
