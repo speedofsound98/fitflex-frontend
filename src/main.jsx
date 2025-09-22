@@ -6,6 +6,8 @@ import './index.css';
 import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
+import StudioDashboard from './pages/StudioDashboard';
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -14,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/studio" element={<StudioDashboard />} /> {/* <-- add this */}
       </Routes>
     </Router>
   </React.StrictMode>

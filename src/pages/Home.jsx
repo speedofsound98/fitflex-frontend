@@ -1,44 +1,34 @@
 // src/pages/Home.jsx
-import React from 'react';
-import Navbar from '../components/NavBar';
-
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 export default function Home() {
+  // Optional: ping the backend so you can see it's reachable in the console
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/ping`)
-      .then(res => res.json())
-      .then(data => console.log("✅ Backend says:", data))
-      .catch(err => console.error("❌ Failed to reach backend:", err));
+    const base = import.meta.env.VITE_API_URL; // e.g. http://localhost:3000/api
+    if (!base) return;
+    fetch(`${base}/ping`)
+      .then(r => r.json())
+      .then(d => console.log('✅ backend ping:', d))
+      .catch(e => console.error('❌ backend ping failed:', e));
   }, []);
 
-  return <h1>FitFlex Home</h1>;
-}
-
-/**
- * The Home page content starts below the fixed navbar by adding `pt-24`
- * (padding-top: 6rem = height of navbar). This avoids overlap.
- */
-export default function Home() {
   const userName = localStorage.getItem('userName');
   const userRole = localStorage.getItem('userRole');
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Navbar />
-      <div className="pt-24 px-4"> {/* pushes content below fixed navbar */}
-        <div className="p-8 max-w-xl mx-auto text-center bg-white rounded-xl shadow-md">
-          <h1 className="text-3xl font-bold mb-4 text-gray-800">Welcome to FitFlex!</h1>
-          {userName && userRole ? (
-            <p className="text-lg text-gray-700">
-              You are signed in as <strong>{userName}</strong> ({userRole})
-            </p>
-          ) : (
-            <p className="text-lg text-gray-700">
-              Please sign up or log in to get started.
-            </p>
-          )}
-        </div>
+    <div style={{ padding: 24 }}>
+      <h1>Welcome to FitFlex</h1>
+      {userName ? (
+        <p>You are signed in as <strong>{userName}</strong> ({userRole || 'user'})</p>
+      ) : (
+        <p>Please <a href="/signup">sign up</a> or <a href="/login">log in</a>.</p>
+      )}
+
+      <div style={{ marginTop: 16 }}>
+        <a href="/">Home</a> ·{' '}
+        <a href="/signup">Signup</a> ·{' '}
+        <a href="/login">Login</a> ·{' '}
+        <a href="/studio">Studio Dashboard</a>
       </div>
     </div>
   );
