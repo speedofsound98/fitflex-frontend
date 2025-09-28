@@ -24,7 +24,12 @@ export default function Login() {
 
       localStorage.setItem('userName', data.user?.name || data.user?.email || 'User');
       localStorage.setItem('userRole', data.user?.role || 'user');
-      navigate('/');
+      localStorage.setItem('userId', String(data.user?.id || ''));
+      if (data.user?.role === 'studio') {
+        navigate('/studio');
+      } else {
+      navigate('/dashboard');
+      }
     } catch (e2) {
       console.error(e2);
       setErr(e2.message);

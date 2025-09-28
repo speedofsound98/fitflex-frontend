@@ -40,9 +40,14 @@ export default function Signup() {
       if (!res.ok) throw new Error(data.error || 'Signup failed');
 
       // optional: store basic identity for the navbar/home
-      localStorage.setItem('userName', data.user?.name || formData.name);
-      localStorage.setItem('userRole', role);
-      navigate('/');
+      localStorage.setItem('userName', data.user?.name || data.user?.email || 'User');
+      localStorage.setItem('userRole', data.user?.role || 'user');
+      localStorage.setItem('userId', String(data.user?.id || ''));
+      if (data.user?.role === 'studio') {
+        navigate('/studio');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       console.error(err);
       setError(err.message);
