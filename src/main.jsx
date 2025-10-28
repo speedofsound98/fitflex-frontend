@@ -9,6 +9,9 @@ import Login from './pages/Login';
 import StudioDashboard from './pages/StudioDashboard';
 import UserDashboard from './pages/UserDashboard';
 import RoleRoute from './components/RoleRoute';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -17,6 +20,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot" element={<ForgotPassword />} />
+        <Route path="/reset" element={<ResetPassword />} />
 
         {/* Only studios can access /studio */}
         <Route
