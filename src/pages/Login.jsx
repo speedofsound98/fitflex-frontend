@@ -21,8 +21,9 @@ body: JSON.stringify({ email, password })
 const data = await res.json();
 if (!res.ok) throw new Error(data.error || 'Login failed');
 // Save minimal session info (later: token)
-localStorage.setItem('userName', data.name || 'User');
-localStorage.setItem('userRole', data.role || 'user');
+localStorage.setItem('userName', data.user.name || 'User');
+localStorage.setItem('userRole', data.user.role || 'user');
+localStorage.setItem('userId', data.user.id);
 navigate('/');
 } catch (err) {
 setError(err.message);

@@ -21,14 +21,15 @@ try {
 const endpoint = role === 'user' ? '/signup/user' : '/signup/studio';
 const payload = role === 'user'
 ? { name: formData.name, email: formData.email, password: formData.password }
-: { studio_name: formData.name, location: formData.location, email: formData.email, password: formData.password };
+: { name: formData.name, location: formData.location, email: formData.email, password: formData.password };
 const res = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
 });
 const data = await res.json();
 if (!res.ok) throw new Error(data.error || 'Signup failed');
-localStorage.setItem('userName', formData.name);
-localStorage.setItem('userRole', role);
+localStorage.setItem('userName', data.user?.name || formData.name);
+localStorage.setItem('userRole', data.user?.role || role);
+localStorage.setItem('userId', data.user?.id);
 setError('');
 navigate('/');
 } catch (err) { setError(err.message); }
