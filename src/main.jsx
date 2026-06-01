@@ -7,11 +7,13 @@ import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import StudioDashboard from './pages/StudioDashboard';
+import StudioSettings from './pages/StudioSettings';
+import StudioProfile from './pages/StudioProfile';
 import UserDashboard from './pages/UserDashboard';
+import UserSettings from './pages/UserSettings';
 import RoleRoute from './components/RoleRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -23,25 +25,16 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/reset" element={<ResetPassword />} />
 
-        {/* Only studios can access /studio */}
-        <Route
-          path="/studio"
-          element={
-            <RoleRoute allow={['studio']}>
-              <StudioDashboard />
-            </RoleRoute>
-          }
-        />
+        {/* Public studio profile */}
+        <Route path="/studios/:id" element={<StudioProfile />} />
 
-        {/* Only users can access /dashboard */}
-        <Route
-          path="/dashboard"
-          element={
-            <RoleRoute allow={['user']}>
-              <UserDashboard />
-            </RoleRoute>
-          }
-        />
+        {/* Studio-only routes */}
+        <Route path="/studio" element={<RoleRoute allow={['studio']}><StudioDashboard /></RoleRoute>} />
+        <Route path="/studio/settings" element={<RoleRoute allow={['studio']}><StudioSettings /></RoleRoute>} />
+
+        {/* User-only routes */}
+        <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />
+        <Route path="/settings" element={<RoleRoute allow={['user']}><UserSettings /></RoleRoute>} />
       </Routes>
     </Router>
   </React.StrictMode>

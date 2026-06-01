@@ -1,6 +1,6 @@
 // src/pages/UserDashboard.jsx
 import React, { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 
 const SPORT_ICONS = {
@@ -24,7 +24,7 @@ function ClassCard({ cls, onBook, bookedIds }) {
         <div>
           <span className="text-2xl">{sportIcon(cls.sport_type)}</span>
           <h3 className="font-bold text-gray-800 text-lg mt-1">{cls.name}</h3>
-          <p className="text-sm text-blue-600 font-medium">{cls.studio_name}</p>
+          <Link to={`/studios/${cls.studio_id}`} className="text-sm text-blue-600 font-medium hover:underline">{cls.studio_name}</Link>
         </div>
         <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full">
           {cls.credit_cost} credit{cls.credit_cost !== 1 ? 's' : ''}
