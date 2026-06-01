@@ -1,80 +1,119 @@
----
-
-## **README for Frontend (fitflex-frontend/README.md)**
-
-''markdown
 # FitFlex Frontend
 
-This is the frontend for the FitFlex project, built with **React**, **Vite**, and **Tailwind CSS**.
+React + Vite + Tailwind CSS frontend for the FitFlex fitness marketplace.
+
+---
 
 ## Tech Stack
-- [React](https://reactjs.org/)
-- [Vite](https://vitejs.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [React Router](https://reactrouter.com/)
+
+- [React 19](https://react.dev/)
+- [Vite 7](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/) (via `@tailwindcss/vite`)
+- [React Router 7](https://reactrouter.com/)
 
 ---
 
-## 📂 Folder Structure
+## Folder Structure
 
+```
 fitflex-frontend/
-├── public/
 ├── src/
+│   ├── main.jsx              ← Router entry point
+│   ├── index.css             ← Global styles + Tailwind import
 │   ├── pages/
-│   │   └── Home.jsx
-│   │   └── Signup.jsx
-│   │   └── Login.jsx
-│   │   └── Dashboard.jsx
-│   ├── components/
-│   │   └── Navbar.jsx
-│   │   └── SignupForm.jsx
-│   ├── App.jsx
-│   └── main.jsx
-├── tailwind.config.js
-├── index.html
-|── package.json
-├── .env # Environment variables (VITE_API_URL, etc.)
-└── README.md
-
+│   │   ├── Home.jsx          ← Landing page
+│   │   ├── Login.jsx         ← Login form
+│   │   ├── Signup.jsx        ← Signup (user / studio toggle)
+│   │   ├── UserDashboard.jsx ← Browse and book classes
+│   │   ├── StudioDashboard.jsx ← Create and manage classes
+│   │   ├── ForgotPassword.jsx
+│   │   └── ResetPassword.jsx
+│   └── components/
+│       ├── NavBar.jsx        ← Header with auth state + logout
+│       └── RoleRoute.jsx     ← Route guard by role
+├── .env                      ← VITE_API_URL
+├── vite.config.js
+└── package.json
+```
 
 ---
 
-## Setup
+## Local Setup
 
-### Install dependencies
+**1. Install dependencies**
 ```bash
 npm install
+```
 
-Environment variables
-Create .env in the frontend folder:
-VITE_API_URL=http://localhost:3000
+**2. Create `.env`**
+```
+VITE_API_URL=http://localhost:3000/api
+```
 
-Running Locally
+**3. Make sure the backend is running first**
+```bash
+# In the fitflex-backend folder:
+node server.js
+```
+
+**4. Start the dev server**
+```bash
 npm run dev
+# → http://localhost:5173
+```
 
-App runs on:
-http://localhost:5173
+---
 
-Git Workflow
-git add .
+## Routes
+
+| Path | Page | Who can access |
+|------|------|----------------|
+| `/` | Home | Anyone |
+| `/login` | Login | Anyone |
+| `/signup` | Signup | Anyone |
+| `/forgot` | Forgot Password | Anyone |
+| `/reset?token=X` | Reset Password | Anyone |
+| `/dashboard` | User Dashboard | Logged-in users only |
+| `/studio` | Studio Dashboard | Logged-in studios only |
+
+Route guards are enforced by `RoleRoute.jsx` using `localStorage.userRole`.
+
+---
+
+## Session Storage
+
+After login or signup, three keys are saved to `localStorage`:
+
+| Key | Value |
+|-----|-------|
+| `userId` | Numeric ID from the database |
+| `userName` | Display name |
+| `userRole` | `"user"` or `"studio"` |
+
+Logout clears all three.
+
+---
+
+## Git Workflow
+
+```bash
+git add <files>
 git commit -m "Describe your change"
-git pull origin main   # Pull before pushing
+git pull origin main
 git push origin main
+```
 
-Checklist for Starting Work
-Open Terminal in fitflex-frontend
-Ensure backend is already running
-Start frontend:
-npm run dev
-Visit:
-http://localhost:5173
+Vercel auto-redeploys on push to `main`.
 
-Deployment
-Frontend is deployed on Vercel:
-https://fitflex-frontend.vercel.app
-To redeploy:
+---
 
-Push changes to main branch in GitHub — Vercel auto-redeploys.
+## Deployment (Vercel)
 
-Author:
-Nadav Hardof
+1. Connect the `fitflex-frontend` GitHub repo to Vercel
+2. Add environment variable in Vercel dashboard:
+   ```
+   VITE_API_URL=https://<your-render-backend-url>/api
+   ```
+3. Push to `main` — Vercel builds and deploys automatically
+
+See `../DEPLOY_WORKFLOW.md` for full step-by-step instructions.
