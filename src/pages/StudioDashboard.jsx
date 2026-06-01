@@ -43,9 +43,17 @@ export default function StudioDashboard() {
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'profile'
 
+  // Guard: must be a studio with a valid numeric ID
+  const studioIdNum = Number(studioId);
   useEffect(() => {
-    if (role !== 'studio' || !studioId) navigate('/login');
-  }, [role, studioId, navigate]);
+    if (role !== 'studio' || !studioId || !Number.isFinite(studioIdNum) || studioIdNum <= 0) {
+      // Clear any stale/corrupt session and force re-login
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      localStorage.removeItem('userRole');
+      navigate('/login');
+    }
+  }, [role, studioId, studioIdNum, navigate]);
 
   // ── Fetch classes ──
   const fetchClasses = useCallback(async () => {
