@@ -243,8 +243,8 @@ export default function StudioDashboard() {
                 </label>
 
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">Credit cost</span>
-                  <input type="number" min="1" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  <span className="text-sm font-medium text-gray-700">Credit cost <span className="text-gray-400 text-xs">(0 = free)</span></span>
+                  <input type="number" min="0" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                     value={form.credit_cost} onChange={e => setForm({...form, credit_cost: e.target.value})} />
                 </label>
 
@@ -293,8 +293,8 @@ export default function StudioDashboard() {
                             </select>
                           </label>
                           <label className="flex flex-col gap-1">
-                            <span className="text-xs font-medium text-gray-500">Credit cost</span>
-                            <input type="number" min="1" className="border border-gray-200 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                            <span className="text-xs font-medium text-gray-500">Credit cost (0 = free)</span>
+                            <input type="number" min="0" className="border border-gray-200 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                               value={editForm.credit_cost} onChange={e => setEditForm({...editForm, credit_cost: e.target.value})} />
                           </label>
                           <label className="flex flex-col gap-1 md:col-span-2">
