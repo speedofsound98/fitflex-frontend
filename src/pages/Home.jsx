@@ -117,7 +117,7 @@ export default function Home() {
           List your classes on FitFlex and reach thousands of fitness enthusiasts looking for their next workout.
         </p>
         <Link
-          to="/signup"
+          to="/signup?role=studio"
           className="bg-white text-blue-600 font-semibold px-8 py-3 rounded-full hover:bg-blue-50 transition"
         >
           Join as a Studio

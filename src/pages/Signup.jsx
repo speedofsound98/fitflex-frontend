@@ -1,10 +1,11 @@
 // src/pages/Signup.jsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 
 export default function Signup() {
-const [role, setRole] = useState('user');
+const [searchParams] = useSearchParams();
+const [role, setRole] = useState(searchParams.get('role') === 'studio' ? 'studio' : 'user');
 const [formData, setFormData] = useState({ name: '', email: '', password: '', location: '' });
 const [error, setError] = useState('');
 const navigate = useNavigate();
