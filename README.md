@@ -35,7 +35,6 @@ fitflex-frontend/
 │   │   ├── StudioDashboard.jsx    ← /studio — manage classes, analytics, messaging
 │   │   ├── StudioSettings.jsx     ← /studio/settings — profile, enquiries toggle, password
 │   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page + enquiry form
-│   │   ├── AdminDashboard.jsx     ← /admin — secret-gated admin panel
 │   │   ├── ForgotPassword.jsx
 │   │   └── ResetPassword.jsx
 │   └── components/
