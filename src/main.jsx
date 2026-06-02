@@ -14,6 +14,7 @@ import UserSettings from './pages/UserSettings';
 import RoleRoute from './components/RoleRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import AdminDashboard from './pages/AdminDashboard';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -31,6 +32,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Studio-only routes */}
         <Route path="/studio" element={<RoleRoute allow={['studio']}><StudioDashboard /></RoleRoute>} />
         <Route path="/studio/settings" element={<RoleRoute allow={['studio']}><StudioSettings /></RoleRoute>} />
+
+        {/* Admin */}
+        <Route path="/admin" element={<AdminDashboard />} />
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />

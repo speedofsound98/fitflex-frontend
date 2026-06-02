@@ -116,6 +116,24 @@ export default function UserDashboard() {
     });
   }, [classes, search, locationFilter]);
 
+  async function cancelBooking(bookingId) {
+    if (!confirm('Cancel this booking? Your credits will be refunded.')) return;
+    setMsg('');
+    try {
+      const res = await fetch(`${api}/bookings/${bookingId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Cancellation failed');
+      setMsgType('success');
+      setMsg('Booking cancelled. Credits refunded! 💸');
+      fetch(`${api}/users/${userId}/bookings`)
+        .then(r => r.json())
+        .then(d => setBookings(d.bookings || []));
+    } catch (e) {
+      setMsgType('error');
+      setMsg(e.message);
+    }
+  }
+
   async function book(classId) {
     setMsg('');
     try {
@@ -234,22 +252,35 @@ export default function UserDashboard() {
           ) : (
             <div className="bg-white rounded-2xl shadow overflow-hidden">
               <ul className="divide-y divide-gray-100">
-                {bookings.map(b => (
-                  <li key={b.id} className="flex items-center justify-between px-5 py-4">
-                    <div>
-                      <p className="font-semibold text-gray-800">{b.class_name}</p>
-                      <p className="text-sm text-gray-500">
-                        {b.studio_name}
-                        {b.studio_location ? ` · ${b.studio_location}` : ''}
-                        {' · '}{new Date(b.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                        {' '}{new Date(b.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${new Date(b.datetime) < new Date() ? 'bg-gray-100 text-gray-500' : 'bg-green-100 text-green-700'}`}>
-                      {new Date(b.datetime) < new Date() ? 'Completed' : 'Upcoming'}
-                    </span>
-                  </li>
-                ))}
+                {bookings.map(b => {
+                  const isPast = new Date(b.datetime) < new Date();
+                  return (
+                    <li key={b.id} className="flex items-center justify-between px-5 py-4">
+                      <div>
+                        <p className="font-semibold text-gray-800">{b.class_name}</p>
+                        <p className="text-sm text-gray-500">
+                          {b.studio_name}
+                          {b.studio_location ? ` · ${b.studio_location}` : ''}
+                          {' · '}{new Date(b.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          {' '}{new Date(b.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${isPast ? 'bg-gray-100 text-gray-500' : 'bg-green-100 text-green-700'}`}>
+                          {isPast ? 'Completed' : 'Upcoming'}
+                        </span>
+                        {!isPast && (
+                          <button
+                            onClick={() => cancelBooking(b.id)}
+                            className="text-xs text-red-500 hover:text-red-700 font-semibold"
+                          >
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
