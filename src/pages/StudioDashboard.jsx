@@ -244,7 +244,7 @@ export default function StudioDashboard() {
         {/* Tabs */}
         <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit flex-wrap">
           <button className={tabClass('classes')} onClick={() => setActiveTab('classes')}>🗓 Classes</button>
-          <button className={tabClass('analytics')} onClick={() => setActiveTab('analytics')}>📊 Analytics</button>
+          <button className={tabClass('analytics')} onClick={() => { setActiveTab('analytics'); fetchAnalytics(); }}>📊 Analytics</button>
           <button className={tabClass('profile')} onClick={() => setActiveTab('profile')}>🏢 Studio Profile</button>
         </div>
 

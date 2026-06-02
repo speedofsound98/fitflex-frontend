@@ -17,11 +17,15 @@ export default function StudioProfile() {
   const { id } = useParams();
   const api = import.meta.env.VITE_API_URL;
 
-  usePageTitle(studio ? studio.name : 'Studio');
   const [studio, setStudio] = useState(null);
+  usePageTitle(studio ? studio.name : 'Studio');
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [enquiryOpen, setEnquiryOpen] = useState(false);
+  const [enquiryMsg, setEnquiryMsg] = useState('');
+  const [enquiryStatus, setEnquiryStatus] = useState('');
+  const userRole = localStorage.getItem('userRole');
 
   useEffect(() => {
     Promise.all([
@@ -43,6 +47,25 @@ export default function StudioProfile() {
       <div className="pt-32 text-center text-gray-400">Loading…</div>
     </div>
   );
+
+  async function sendEnquiry(e) {
+    e.preventDefault();
+    if (!enquiryMsg.trim()) return;
+    try {
+      const res = await fetch(`${api}/studios/${id}/enquire`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ message: enquiryMsg.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send');
+      setEnquiryStatus('success');
+      setEnquiryMsg('');
+    } catch (err) {
+      setEnquiryStatus(err.message);
+    }
+  }
 
   if (notFound) return (
     <div className="min-h-screen bg-gray-50">
@@ -85,7 +108,44 @@ export default function StudioProfile() {
             </div>
           </div>
           {studio.about && <p className="mt-4 text-blue-50 max-w-xl">{studio.about}</p>}
+          {studio.accepts_enquiries && userRole === 'user' && (
+            <button
+              onClick={() => { setEnquiryOpen(o => !o); setEnquiryStatus(''); }}
+              className="mt-4 inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-5 py-2 rounded-full hover:bg-blue-50 transition text-sm"
+            >
+              💬 Enquire for custom time
+            </button>
+          )}
         </div>
+
+        {/* Enquiry form */}
+        {enquiryOpen && studio.accepts_enquiries && (
+          <div className="bg-white rounded-2xl shadow p-6 mb-8">
+            <h3 className="font-bold text-gray-800 mb-1">Send an enquiry</h3>
+            <p className="text-sm text-gray-500 mb-4">Ask {studio.name} about custom or private session times.</p>
+            {enquiryStatus === 'success' ? (
+              <div className="bg-green-100 text-green-700 rounded-xl p-4 text-sm font-medium">
+                Enquiry sent! The studio will be in touch. ✅
+              </div>
+            ) : (
+              <form onSubmit={sendEnquiry} className="space-y-3">
+                {enquiryStatus && <p className="text-red-600 text-sm">{enquiryStatus}</p>}
+                <textarea
+                  rows={3}
+                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="e.g. I'm looking for a private yoga session on weekday mornings..."
+                  value={enquiryMsg}
+                  onChange={e => setEnquiryMsg(e.target.value)}
+                  required
+                />
+                <div className="flex gap-2">
+                  <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">Send</button>
+                  <button type="button" onClick={() => setEnquiryOpen(false)} className="text-gray-500 px-4 py-2 rounded-xl text-sm hover:bg-gray-100 transition">Cancel</button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
 
         {/* Upcoming classes */}
         <h2 className="text-xl font-bold text-gray-800 mb-4">Upcoming Classes</h2>

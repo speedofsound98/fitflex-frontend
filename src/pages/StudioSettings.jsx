@@ -11,7 +11,7 @@ export default function StudioSettings() {
 
   const [studio, setStudio] = useState(null);
   const [profileForm, setProfileForm] = useState({
-    about: '', phone: '', website: '', instagram: '', city: '', neighbourhood: '',
+    about: '', phone: '', website: '', instagram: '', city: '', neighbourhood: '', accepts_enquiries: false,
   });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [activeTab, setActiveTab] = useState('profile');
@@ -36,6 +36,7 @@ export default function StudioSettings() {
             instagram: d.studio.instagram || '',
             city: d.studio.city || '',
             neighbourhood: d.studio.neighbourhood || '',
+            accepts_enquiries: d.studio.accepts_enquiries || false,
           });
         }
       })
@@ -143,6 +144,26 @@ export default function StudioSettings() {
                   )}
                 </label>
               ))}
+              {/* Enquiry toggle */}
+              <label className="flex items-center justify-between p-4 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50">
+                <div>
+                  <p className="text-sm font-medium text-gray-800">Accept custom time enquiries</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {profileForm.accepts_enquiries
+                      ? '💬 Users can send you enquiry messages from your studio page'
+                      : '🔒 Enquiry button is hidden on your public page'}
+                  </p>
+                </div>
+                <div
+                  onClick={() => setProfileForm(f => ({...f, accepts_enquiries: !f.accepts_enquiries}))}
+                  className={`w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 flex-shrink-0 ml-4
+                    ${profileForm.accepts_enquiries ? 'bg-blue-600' : 'bg-gray-200'}`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200
+                    ${profileForm.accepts_enquiries ? 'translate-x-5' : 'translate-x-0'}`} />
+                </div>
+              </label>
+
               <button type="submit" className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">
                 Save Profile
               </button>
