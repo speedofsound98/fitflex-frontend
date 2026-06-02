@@ -90,7 +90,6 @@ npm run dev
 | `/settings` | User Settings | Users only |
 | `/studio` | Studio Dashboard | Studios only |
 | `/studio/settings` | Studio Settings | Studios only |
-| `/admin` | Admin Dashboard | Secret-gated |
 
 ---
 
@@ -129,6 +128,4 @@ npm run dev
 - `vercel.json` handles SPA routing (all paths served by `index.html`)
 - Set `VITE_API_URL=https://fitflex-backend-jdd2.onrender.com/api` in Vercel environment variables
 
-**Live URLs:**
-- Frontend: https://your-portfolio-g56q.vercel.app
-- Admin: https://your-portfolio-g56q.vercel.app/admin
+**Live URL:** https://your-portfolio-g56q.vercel.app
