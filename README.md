@@ -4,12 +4,13 @@ React + Vite + Tailwind CSS frontend for the FitFlex fitness marketplace.
 
 ---
 
-## Tech Stack
+## Stack
 
-- [React 19](https://react.dev/)
-- [Vite 7](https://vitejs.dev/)
-- [Tailwind CSS](https://tailwindcss.com/) (via `@tailwindcss/vite`)
-- [React Router 7](https://reactrouter.com/)
+- React 19
+- Vite 7 + @tailwindcss/vite
+- Tailwind CSS
+- React Router 7
+- JWT auth via `Authorization: Bearer` header (token stored in localStorage)
 
 ---
 
@@ -18,20 +19,30 @@ React + Vite + Tailwind CSS frontend for the FitFlex fitness marketplace.
 ```
 fitflex-frontend/
 ├── src/
-│   ├── main.jsx              ← Router entry point
-│   ├── index.css             ← Global styles + Tailwind import
+│   ├── main.jsx                   ← Router + all routes registered here
+│   ├── index.css                  ← Tailwind import
+│   ├── hooks/
+│   │   └── usePageTitle.js        ← Sets document.title per page
+│   ├── utils/
+│   │   └── authFetch.js           ← fetch wrapper that adds Authorization header
 │   ├── pages/
-│   │   ├── Home.jsx          ← Landing page
-│   │   ├── Login.jsx         ← Login form
-│   │   ├── Signup.jsx        ← Signup (user / studio toggle)
-│   │   ├── UserDashboard.jsx ← Browse and book classes
-│   │   ├── StudioDashboard.jsx ← Create and manage classes
+│   │   ├── Home.jsx               ← Landing page
+│   │   ├── Login.jsx              ← Login form
+│   │   ├── Signup.jsx             ← Signup (user / studio, supports ?role=studio)
+│   │   ├── Pricing.jsx            ← /pricing — credit packs + Stripe checkout
+│   │   ├── UserDashboard.jsx      ← /dashboard — browse + book classes
+│   │   ├── UserSettings.jsx       ← /settings — profile, credits, password
+│   │   ├── StudioDashboard.jsx    ← /studio — manage classes, analytics, messaging
+│   │   ├── StudioSettings.jsx     ← /studio/settings — profile, enquiries toggle, password
+│   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page + enquiry form
+│   │   ├── AdminDashboard.jsx     ← /admin — secret-gated admin panel
 │   │   ├── ForgotPassword.jsx
 │   │   └── ResetPassword.jsx
 │   └── components/
-│       ├── NavBar.jsx        ← Header with auth state + logout
-│       └── RoleRoute.jsx     ← Route guard by role
-├── .env                      ← VITE_API_URL
+│       ├── NavBar.jsx             ← Header, notification bell, hamburger menu
+│       └── RoleRoute.jsx          ← Route guard by role
+├── vercel.json                    ← SPA routing (all paths → index.html)
+├── .env                           ← VITE_API_URL
 ├── vite.config.js
 └── package.json
 ```
@@ -50,10 +61,10 @@ npm install
 VITE_API_URL=http://localhost:3000/api
 ```
 
-**3. Make sure the backend is running first**
+**3. Start the backend first**
 ```bash
-# In the fitflex-backend folder:
-node server.js
+# In fitflex-backend/:
+brew services start postgresql && node server.js
 ```
 
 **4. Start the dev server**
@@ -66,54 +77,58 @@ npm run dev
 
 ## Routes
 
-| Path | Page | Who can access |
-|------|------|----------------|
-| `/` | Home | Anyone |
-| `/login` | Login | Anyone |
-| `/signup` | Signup | Anyone |
-| `/forgot` | Forgot Password | Anyone |
-| `/reset?token=X` | Reset Password | Anyone |
-| `/dashboard` | User Dashboard | Logged-in users only |
-| `/studio` | Studio Dashboard | Logged-in studios only |
+| Path | Page | Access |
+|------|------|--------|
+| `/` | Home | Public |
+| `/login` | Login | Public |
+| `/signup` | Signup | Public |
+| `/pricing` | Credit Packs | Public |
+| `/studios/:id` | Studio Profile | Public |
+| `/forgot` | Forgot Password | Public |
+| `/reset` | Reset Password | Public |
+| `/dashboard` | User Dashboard | Users only |
+| `/settings` | User Settings | Users only |
+| `/studio` | Studio Dashboard | Studios only |
+| `/studio/settings` | Studio Settings | Studios only |
+| `/admin` | Admin Dashboard | Secret-gated |
 
-Route guards are enforced by `RoleRoute.jsx` using `localStorage.userRole`.
+---
+
+## Auth
+
+- On login/signup, JWT is saved to `localStorage` as `authToken`
+- `authFetch` wrapper automatically adds `Authorization: Bearer <token>` to all authenticated requests
+- `localStorage` also stores `userId`, `userName`, `userRole` for display/routing
+- Logout clears all four keys + calls `POST /api/logout` to clear the server cookie
 
 ---
 
 ## Session Storage
 
-After login or signup, three keys are saved to `localStorage`:
-
 | Key | Value |
 |-----|-------|
-| `userId` | Numeric ID from the database |
+| `userId` | Numeric DB id |
 | `userName` | Display name |
 | `userRole` | `"user"` or `"studio"` |
-
-Logout clears all three.
+| `authToken` | JWT (7-day expiry) |
 
 ---
 
-## Git Workflow
+## Notification Bell
 
-```bash
-git add <files>
-git commit -m "Describe your change"
-git pull origin main
-git push origin main
-```
-
-Vercel auto-redeploys on push to `main`.
+- Polls `GET /api/notifications` every 30 seconds when logged in
+- Shows unread badge count
+- Click to open dropdown; clicking marks all as read
+- Notification types: `booking`, `cancellation`, `message`, `enquiry`
 
 ---
 
 ## Deployment (Vercel)
 
-1. Connect the `fitflex-frontend` GitHub repo to Vercel
-2. Add environment variable in Vercel dashboard:
-   ```
-   VITE_API_URL=https://<your-render-backend-url>/api
-   ```
-3. Push to `main` — Vercel builds and deploys automatically
+- Auto-deploys on push to `main`
+- `vercel.json` handles SPA routing (all paths served by `index.html`)
+- Set `VITE_API_URL=https://fitflex-backend-jdd2.onrender.com/api` in Vercel environment variables
 
-See `../DEPLOY_WORKFLOW.md` for full step-by-step instructions.
+**Live URLs:**
+- Frontend: https://your-portfolio-g56q.vercel.app
+- Admin: https://your-portfolio-g56q.vercel.app/admin
