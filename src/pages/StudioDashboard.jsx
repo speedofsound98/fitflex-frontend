@@ -42,6 +42,8 @@ export default function StudioDashboard() {
   const [err, setErr] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'profile'
+  const [messagingClassId, setMessagingClassId] = useState(null);
+  const [messageText, setMessageText] = useState('');
 
   // Guard: must be a studio with a valid numeric ID
   const studioIdNum = Number(studioId);
@@ -167,6 +169,24 @@ export default function StudioDashboard() {
       if (!res.ok) throw new Error(data.error || 'Failed to delete class');
       setClasses(prev => prev.filter(c => c.id !== id));
       flash('Class deleted.');
+    } catch (e) { flash(e.message, 'error'); }
+  }
+
+  // ── Send class message ──
+  async function sendMessage(classId) {
+    if (!messageText.trim()) { flash('Please enter a message', 'error'); return; }
+    try {
+      const res = await fetch(`${api}/classes/${classId}/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ message: messageText.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send');
+      setMessagingClassId(null);
+      setMessageText('');
+      flash(`Message sent to ${data.sent} booked user${data.sent !== 1 ? 's' : ''}! 📣`);
     } catch (e) { flash(e.message, 'error'); }
   }
 
@@ -325,9 +345,27 @@ export default function StudioDashboard() {
                           </div>
                           <div className="flex gap-2 ml-4 shrink-0">
                             <button onClick={() => startEdit(cls)} className="text-blue-600 text-sm hover:underline">Edit</button>
+                            <button onClick={() => { setMessagingClassId(cls.id); setMessageText(''); }} className="text-purple-600 text-sm hover:underline">Message</button>
                             <button onClick={() => deleteClass(cls.id)} className="text-red-500 text-sm hover:underline">Delete</button>
                           </div>
                         </div>
+                        {/* Message panel */}
+                        {messagingClassId === cls.id && (
+                          <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4">
+                            <p className="text-sm font-medium text-purple-800 mb-2">📣 Message all booked users</p>
+                            <textarea
+                              rows={3}
+                              className="w-full border border-purple-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white mb-2"
+                              placeholder="e.g. Please bring a yoga mat and wear comfortable clothing. See you there!"
+                              value={messageText}
+                              onChange={e => setMessageText(e.target.value)}
+                            />
+                            <div className="flex gap-2">
+                              <button onClick={() => sendMessage(cls.id)} className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition">Send</button>
+                              <button onClick={() => setMessagingClassId(null)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100 transition">Cancel</button>
+                            </div>
+                          </div>
+                        )}
                       )}
                     </li>
                   ))}

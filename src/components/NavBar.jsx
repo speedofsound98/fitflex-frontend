@@ -39,6 +39,7 @@ export default function Navbar() {
       <Link to="/" className="text-xl font-bold text-blue-600">FitFlex</Link>
 
       <div className="flex items-center gap-3">
+        <Link to="/pricing" className="text-sm text-gray-600 hover:text-blue-600 hidden sm:block">Pricing</Link>
         {authed ? (
           <>
             <Link to={dashboardPath} className="text-sm text-gray-600 hover:text-blue-600 hidden sm:block">Dashboard</Link>

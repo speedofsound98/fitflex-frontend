@@ -16,8 +16,9 @@ export default function UserSettings() {
   const api = import.meta.env.VITE_API_URL;
 
   const [user, setUser] = useState(null);
-  const [form, setForm] = useState({ name: '', bio: '', public_fields: 'name' });
+  const [form, setForm] = useState({ name: '', bio: '', public_fields: 'name', phone: '' });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
+  const [purchases, setPurchases] = useState([]);
   const [activeTab, setActiveTab] = useState('profile');
   const [success, setSuccess] = useState('');
   const [err, setErr] = useState('');
@@ -37,9 +38,15 @@ export default function UserSettings() {
             name: d.user.name || '',
             bio: d.user.bio || '',
             public_fields: d.user.public_fields || 'name',
+            phone: d.user.phone || '',
           });
         }
       })
+      .catch(() => {});
+
+    fetch(`${api}/users/${userId}/purchases`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => setPurchases(d.purchases || []))
       .catch(() => {});
   }, [api, userId]);
 
@@ -65,7 +72,7 @@ export default function UserSettings() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ name: form.name, bio: form.bio, public_fields: form.public_fields }),
+        body: JSON.stringify({ name: form.name, bio: form.bio, public_fields: form.public_fields, phone: form.phone }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to save');
@@ -114,6 +121,7 @@ export default function UserSettings() {
         {/* Tabs */}
         <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit">
           <button className={tabClass('profile')} onClick={() => setActiveTab('profile')}>👤 Profile</button>
+          <button className={tabClass('credits')} onClick={() => setActiveTab('credits')}>🎟️ Credits</button>
           <button className={tabClass('password')} onClick={() => setActiveTab('password')}>🔒 Password</button>
         </div>
 
@@ -141,6 +149,17 @@ export default function UserSettings() {
                 <textarea rows={3} className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
                   placeholder="Tell others a little about yourself..."
                   value={form.bio} onChange={e => setForm(f => ({...f, bio: e.target.value}))} />
+              </label>
+
+              <label className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">Phone number <span className="text-gray-400 text-xs">(optional — for WhatsApp class messages)</span></span>
+                <input
+                  type="tel"
+                  className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="+1 234 567 8900"
+                  value={form.phone}
+                  onChange={e => setForm(f => ({...f, phone: e.target.value}))}
+                />
               </label>
 
               {/* Credit balance (read only) */}
@@ -177,6 +196,47 @@ export default function UserSettings() {
                 Save Profile
               </button>
             </form>
+          </div>
+        )}
+
+        {/* ── Credits tab ── */}
+        {activeTab === 'credits' && (
+          <div className="space-y-6">
+            {/* Balance + buy link */}
+            <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Current balance</p>
+                <p className="text-4xl font-bold text-blue-600">{user?.credits ?? '—'} <span className="text-lg font-normal text-gray-500">credits</span></p>
+              </div>
+              <a href="/pricing" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition text-sm">
+                Buy Credits →
+              </a>
+            </div>
+
+            {/* Purchase history */}
+            <div className="bg-white rounded-2xl shadow overflow-hidden">
+              <div className="px-6 py-4 border-b">
+                <h2 className="font-bold text-gray-800">Purchase history</h2>
+              </div>
+              {purchases.length === 0 ? (
+                <p className="px-6 py-8 text-gray-400 text-sm">No purchases yet.</p>
+              ) : (
+                <ul className="divide-y divide-gray-100">
+                  {purchases.map(p => (
+                    <li key={p.id} className="flex items-center justify-between px-6 py-4">
+                      <div>
+                        <p className="font-semibold text-gray-800">{p.credits} credits</p>
+                        <p className="text-sm text-gray-400">
+                          Purchased {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          {' · '}Expires {new Date(p.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </p>
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">${(p.amount_cents / 100).toFixed(2)}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         )}
 

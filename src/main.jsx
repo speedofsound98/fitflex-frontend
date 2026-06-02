@@ -15,6 +15,7 @@ import RoleRoute from './components/RoleRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AdminDashboard from './pages/AdminDashboard';
+import Pricing from './pages/Pricing';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -35,6 +36,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
         {/* Admin */}
         <Route path="/admin" element={<AdminDashboard />} />
+
+        {/* Public */}
+        <Route path="/pricing" element={<Pricing />} />
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />
