@@ -332,40 +332,42 @@ export default function StudioDashboard() {
                         </form>
                       ) : (
                         /* ── Class row ── */
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-semibold text-gray-800">{cls.name}</p>
-                            <p className="text-sm text-gray-500 mt-0.5">
-                              {new Date(cls.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                              {' · '}{new Date(cls.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                              {cls.sport_type && ` · ${cls.sport_type}`}
-                              {' · '}{cls.credit_cost} credit{cls.credit_cost !== 1 ? 's' : ''}
-                              {cls.capacity ? ` · ${cls.capacity} spots` : ''}
-                            </p>
-                          </div>
-                          <div className="flex gap-2 ml-4 shrink-0">
-                            <button onClick={() => startEdit(cls)} className="text-blue-600 text-sm hover:underline">Edit</button>
-                            <button onClick={() => { setMessagingClassId(cls.id); setMessageText(''); }} className="text-purple-600 text-sm hover:underline">Message</button>
-                            <button onClick={() => deleteClass(cls.id)} className="text-red-500 text-sm hover:underline">Delete</button>
-                          </div>
-                        </div>
-                        {/* Message panel */}
-                        {messagingClassId === cls.id && (
-                          <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4">
-                            <p className="text-sm font-medium text-purple-800 mb-2">📣 Message all booked users</p>
-                            <textarea
-                              rows={3}
-                              className="w-full border border-purple-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white mb-2"
-                              placeholder="e.g. Please bring a yoga mat and wear comfortable clothing. See you there!"
-                              value={messageText}
-                              onChange={e => setMessageText(e.target.value)}
-                            />
-                            <div className="flex gap-2">
-                              <button onClick={() => sendMessage(cls.id)} className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition">Send</button>
-                              <button onClick={() => setMessagingClassId(null)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100 transition">Cancel</button>
+                        <>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="font-semibold text-gray-800">{cls.name}</p>
+                              <p className="text-sm text-gray-500 mt-0.5">
+                                {new Date(cls.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                                {' · '}{new Date(cls.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                {cls.sport_type && ` · ${cls.sport_type}`}
+                                {' · '}{cls.credit_cost} credit{cls.credit_cost !== 1 ? 's' : ''}
+                                {cls.capacity ? ` · ${cls.capacity} spots` : ''}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 ml-4 shrink-0">
+                              <button onClick={() => startEdit(cls)} className="text-blue-600 text-sm hover:underline">Edit</button>
+                              <button onClick={() => { setMessagingClassId(cls.id); setMessageText(''); }} className="text-purple-600 text-sm hover:underline">Message</button>
+                              <button onClick={() => deleteClass(cls.id)} className="text-red-500 text-sm hover:underline">Delete</button>
                             </div>
                           </div>
-                        )}
+                          {/* Message panel */}
+                          {messagingClassId === cls.id && (
+                            <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4">
+                              <p className="text-sm font-medium text-purple-800 mb-2">📣 Message all booked users</p>
+                              <textarea
+                                rows={3}
+                                className="w-full border border-purple-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white mb-2"
+                                placeholder="e.g. Please bring a yoga mat and wear comfortable clothing. See you there!"
+                                value={messageText}
+                                onChange={e => setMessageText(e.target.value)}
+                              />
+                              <div className="flex gap-2">
+                                <button onClick={() => sendMessage(cls.id)} className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-purple-700 transition">Send</button>
+                                <button onClick={() => setMessagingClassId(null)} className="text-gray-500 px-4 py-2 rounded-lg text-sm hover:bg-gray-100 transition">Cancel</button>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
                     </li>
                   ))}
