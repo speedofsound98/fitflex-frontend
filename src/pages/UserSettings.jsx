@@ -1,3 +1,4 @@
+import authFetch from '../utils/authFetch';
 // src/pages/UserSettings.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +32,7 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (!userId) return;
-    fetch(`${api}/users/${userId}/settings`, { credentials: 'include' })
+    authFetch(`${api}/users/${userId}/settings`, { })
       .then(r => r.json())
       .then(d => {
         if (d.user) {
@@ -46,7 +47,7 @@ export default function UserSettings() {
       })
       .catch(() => {});
 
-    fetch(`${api}/users/${userId}/purchases`, { credentials: 'include' })
+    authFetch(`${api}/users/${userId}/purchases`, { })
       .then(r => r.json())
       .then(d => setPurchases(d.purchases || []))
       .catch(() => {});
@@ -70,10 +71,9 @@ export default function UserSettings() {
   async function saveProfile(e) {
     e.preventDefault();
     try {
-      const res = await fetch(`${api}/users/${userId}/settings`, {
+      const res = await authFetch(`${api}/users/${userId}/settings`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ name: form.name, bio: form.bio, public_fields: form.public_fields, phone: form.phone }),
       });
       const data = await res.json();
@@ -89,10 +89,9 @@ export default function UserSettings() {
     if (pwForm.newPassword !== pwForm.confirm) { flash('New passwords do not match', 'error'); return; }
     if (pwForm.newPassword.length < 8) { flash('New password must be at least 8 characters', 'error'); return; }
     try {
-      const res = await fetch(`${api}/users/${userId}/password`, {
+      const res = await authFetch(`${api}/users/${userId}/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }),
       });
       const data = await res.json();

@@ -1,3 +1,4 @@
+import authFetch from '../utils/authFetch';
 // src/pages/UserDashboard.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -74,12 +75,12 @@ export default function UserDashboard() {
   }, [userRole, userId, navigate]);
 
   useEffect(() => {
-    fetch(`${api}/classes`, { credentials: 'include' })
+    authFetch(`${api}/classes`, { })
       .then(r => r.json())
       .then(d => setClasses(d.classes || []))
       .catch(() => {});
 
-    fetch(`${api}/users/${userId}/bookings`, { credentials: 'include' })
+    authFetch(`${api}/users/${userId}/bookings`, { })
       .then(r => r.json())
       .then(d => setBookings(d.bookings || []))
       .catch(() => {});
@@ -122,12 +123,12 @@ export default function UserDashboard() {
     if (!confirm('Cancel this booking? Your credits will be refunded.')) return;
     setMsg('');
     try {
-      const res = await fetch(`${api}/bookings/${bookingId}`, { method: 'DELETE', credentials: 'include' });
+      const res = await authFetch(`${api}/bookings/${bookingId}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Cancellation failed');
       setMsgType('success');
       setMsg('Booking cancelled. Credits refunded! 💸');
-      fetch(`${api}/users/${userId}/bookings`, { credentials: 'include' })
+      authFetch(`${api}/users/${userId}/bookings`, { })
         .then(r => r.json())
         .then(d => setBookings(d.bookings || []));
     } catch (e) {
@@ -139,10 +140,9 @@ export default function UserDashboard() {
   async function book(classId) {
     setMsg('');
     try {
-      const res = await fetch(`${api}/book`, {
+      const res = await authFetch(`${api}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ user_id: Number(userId), class_id: Number(classId) }),
       });
       const data = await res.json();
@@ -150,7 +150,7 @@ export default function UserDashboard() {
       setMsgType('success');
       setMsg('Class booked! 🎉');
       // Refresh bookings
-      fetch(`${api}/users/${userId}/bookings`, { credentials: 'include' })
+      authFetch(`${api}/users/${userId}/bookings`, { })
         .then(r => r.json())
         .then(d => setBookings(d.bookings || []));
     } catch (e) {

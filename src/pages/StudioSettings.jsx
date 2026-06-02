@@ -1,4 +1,5 @@
 // src/pages/StudioSettings.jsx
+import authFetch from '../utils/authFetch';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
@@ -24,7 +25,7 @@ export default function StudioSettings() {
 
   useEffect(() => {
     if (!studioId) return;
-    fetch(`${api}/studios/${studioId}`)
+    authFetch(`${api}/studios/${studioId}`)
       .then(r => r.json())
       .then(d => {
         if (d.studio) {
@@ -52,10 +53,9 @@ export default function StudioSettings() {
   async function saveProfile(e) {
     e.preventDefault();
     try {
-      const res = await fetch(`${api}/studios/${studioId}`, {
+      const res = await authFetch(`${api}/studios/${studioId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(profileForm),
       });
       const data = await res.json();
@@ -70,10 +70,9 @@ export default function StudioSettings() {
     if (pwForm.newPassword !== pwForm.confirm) { flash('New passwords do not match', 'error'); return; }
     if (pwForm.newPassword.length < 8) { flash('New password must be at least 8 characters', 'error'); return; }
     try {
-      const res = await fetch(`${api}/studios/${studioId}/password`, {
+      const res = await authFetch(`${api}/studios/${studioId}/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }),
       });
       const data = await res.json();

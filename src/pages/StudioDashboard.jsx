@@ -1,4 +1,5 @@
 // src/pages/StudioDashboard.jsx
+import authFetch from '../utils/authFetch';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
@@ -65,7 +66,7 @@ export default function StudioDashboard() {
     if (!studioId) return;
     setClassesLoading(true);
     try {
-      const res = await fetch(`${api}/studios/${studioId}/classes`, { credentials: 'include' });
+      const res = await authFetch(`${api}/studios/${studioId}/classes`, { });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setClasses(data.classes || []);
@@ -77,7 +78,7 @@ export default function StudioDashboard() {
   const fetchProfile = useCallback(async () => {
     if (!studioId) return;
     try {
-      const res = await fetch(`${api}/studios/${studioId}`);
+      const res = await authFetch(`${api}/studios/${studioId}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setProfile(data.studio);
@@ -95,7 +96,7 @@ export default function StudioDashboard() {
   const fetchAnalytics = useCallback(async () => {
     if (!studioId) return;
     try {
-      const res = await fetch(`${api}/studios/${studioId}/analytics`, { credentials: 'include' });
+      const res = await authFetch(`${api}/studios/${studioId}/analytics`, { });
       const data = await res.json();
       if (res.ok) setAnalytics(data);
     } catch { /* ignore */ }
@@ -116,10 +117,9 @@ export default function StudioDashboard() {
     const parsedDate = new Date(form.datetime);
     if (isNaN(parsedDate.getTime())) { flash('Invalid date/time', 'error'); return; }
     try {
-      const res = await fetch(`${api}/studios/${studioId}/classes`, {
+      const res = await authFetch(`${api}/studios/${studioId}/classes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           name: form.name.trim(),
           datetime: parsedDate.toISOString(),
@@ -151,10 +151,9 @@ export default function StudioDashboard() {
   async function saveEdit(e) {
     e.preventDefault();
     try {
-      const res = await fetch(`${api}/classes/${editingId}`, {
+      const res = await authFetch(`${api}/classes/${editingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           name: editForm.name.trim(),
           datetime: new Date(editForm.datetime).toISOString(),
@@ -176,7 +175,7 @@ export default function StudioDashboard() {
   async function deleteClass(id) {
     if (!confirm('Delete this class?')) return;
     try {
-      const res = await fetch(`${api}/classes/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await authFetch(`${api}/classes/${id}`, { method: 'DELETE' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete class');
       setClasses(prev => prev.filter(c => c.id !== id));
@@ -188,10 +187,9 @@ export default function StudioDashboard() {
   async function sendMessage(classId) {
     if (!messageText.trim()) { flash('Please enter a message', 'error'); return; }
     try {
-      const res = await fetch(`${api}/classes/${classId}/message`, {
+      const res = await authFetch(`${api}/classes/${classId}/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ message: messageText.trim() }),
       });
       const data = await res.json();
@@ -206,10 +204,9 @@ export default function StudioDashboard() {
   async function saveProfile(e) {
     e.preventDefault();
     try {
-      const res = await fetch(`${api}/studios/${studioId}`, {
+      const res = await authFetch(`${api}/studios/${studioId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify(profileForm),
       });
       const data = await res.json();

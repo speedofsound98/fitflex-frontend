@@ -25,6 +25,7 @@ if (!res.ok) throw new Error(data.error || 'Login failed');
 localStorage.setItem('userName', data.user.name || 'User');
 localStorage.setItem('userRole', data.user.role || 'user');
 localStorage.setItem('userId', data.user.id);
+if (data.token) localStorage.setItem('authToken', data.token);
 const dest = data.user.role === 'studio' ? '/studio' : '/dashboard';
 navigate(dest);
 } catch (err) {

@@ -1,3 +1,4 @@
+import authFetch from '../utils/authFetch';
 // src/pages/Pricing.jsx
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
@@ -17,7 +18,7 @@ export default function Pricing() {
   const isUser = userRole === 'user' && userId;
 
   useEffect(() => {
-    fetch(`${api}/credit-packs`)
+    authFetch(`${api}/credit-packs`)
       .then(r => r.json())
       .then(d => setPacks(d.packs || []));
 
@@ -36,10 +37,9 @@ export default function Pricing() {
     setLoading(true);
     setMsg('');
     try {
-      const res = await fetch(`${api}/payments/create-session`, {
+      const res = await authFetch(`${api}/payments/create-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ pack_id: packId, user_id: Number(userId) }),
       });
       const data = await res.json();

@@ -31,6 +31,7 @@ if (!res.ok) throw new Error(data.error || 'Signup failed');
 localStorage.setItem('userName', data.user?.name || formData.name);
 localStorage.setItem('userRole', data.user?.role || role);
 localStorage.setItem('userId', data.user?.id);
+if (data.token) localStorage.setItem('authToken', data.token);
 setError('');
 navigate('/');
 } catch (err) { setError(err.message); }

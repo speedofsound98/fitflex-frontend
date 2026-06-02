@@ -122,6 +122,7 @@ export default function Navbar() {
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
+    localStorage.removeItem('authToken');
     setAuthed(false);
     setRole('');
     setMenuOpen(false);

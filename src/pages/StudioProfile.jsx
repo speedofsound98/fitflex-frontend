@@ -1,3 +1,4 @@
+import authFetch from '../utils/authFetch';
 // src/pages/StudioProfile.jsx  — public view
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
@@ -29,8 +30,8 @@ export default function StudioProfile() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`${api}/studios/${id}`).then(r => r.json()),
-      fetch(`${api}/studios/${id}/classes`).then(r => r.json()),
+      authFetch(`${api}/studios/${id}`).then(r => r.json()),
+      authFetch(`${api}/studios/${id}/classes`).then(r => r.json()),
     ]).then(([studioData, classData]) => {
       if (studioData.error) { setNotFound(true); }
       else {
@@ -52,10 +53,9 @@ export default function StudioProfile() {
     e.preventDefault();
     if (!enquiryMsg.trim()) return;
     try {
-      const res = await fetch(`${api}/studios/${id}/enquire`, {
+      const res = await authFetch(`${api}/studios/${id}/enquire`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ message: enquiryMsg.trim() }),
       });
       const data = await res.json();
