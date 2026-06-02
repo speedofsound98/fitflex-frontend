@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
+import usePageTitle from '../hooks/usePageTitle';
 
 const FEATURES = [
   {
@@ -28,6 +29,7 @@ const HOW_IT_WORKS = [
 ];
 
 export default function Home() {
+  usePageTitle(null); // use default full title
   useEffect(() => {
     const base = import.meta.env.VITE_API_URL;
     if (!base) return;

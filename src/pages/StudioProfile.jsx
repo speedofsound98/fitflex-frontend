@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
+import usePageTitle from '../hooks/usePageTitle';
 
 const SPORT_ICONS = {
   yoga: '🧘', pilates: '🤸', hiit: '🔥', cycling: '🚴', boxing: '🥊',
@@ -16,6 +17,7 @@ export default function StudioProfile() {
   const { id } = useParams();
   const api = import.meta.env.VITE_API_URL;
 
+  usePageTitle(studio ? studio.name : 'Studio');
   const [studio, setStudio] = useState(null);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(true);

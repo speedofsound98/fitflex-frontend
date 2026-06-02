@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
+import usePageTitle from '../hooks/usePageTitle';
 
 const SPORT_TYPES = [
   'Yoga', 'Pilates', 'HIIT', 'Cycling', 'Boxing',
@@ -41,7 +42,9 @@ export default function StudioDashboard() {
   // ── Feedback ──
   const [err, setErr] = useState('');
   const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'profile'
+  const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'analytics' | 'profile'
+  const [analytics, setAnalytics] = useState(null);
+  usePageTitle('Studio Dashboard');
   const [messagingClassId, setMessagingClassId] = useState(null);
   const [messageText, setMessageText] = useState('');
 
@@ -89,7 +92,16 @@ export default function StudioDashboard() {
     } catch (e) { /* profile might not exist yet */ }
   }, [api, studioId]);
 
-  useEffect(() => { fetchClasses(); fetchProfile(); }, [fetchClasses, fetchProfile]);
+  const fetchAnalytics = useCallback(async () => {
+    if (!studioId) return;
+    try {
+      const res = await fetch(`${api}/studios/${studioId}/analytics`, { credentials: 'include' });
+      const data = await res.json();
+      if (res.ok) setAnalytics(data);
+    } catch { /* ignore */ }
+  }, [api, studioId]);
+
+  useEffect(() => { fetchClasses(); fetchProfile(); fetchAnalytics(); }, [fetchClasses, fetchProfile, fetchAnalytics]);
 
   function flash(msg, type = 'success') {
     if (type === 'success') { setSuccess(msg); setErr(''); }
@@ -230,8 +242,9 @@ export default function StudioDashboard() {
         {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-xl text-sm">{success}</div>}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit">
+        <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit flex-wrap">
           <button className={tabClass('classes')} onClick={() => setActiveTab('classes')}>🗓 Classes</button>
+          <button className={tabClass('analytics')} onClick={() => setActiveTab('analytics')}>📊 Analytics</button>
           <button className={tabClass('profile')} onClick={() => setActiveTab('profile')}>🏢 Studio Profile</button>
         </div>
 
@@ -375,6 +388,68 @@ export default function StudioDashboard() {
               )}
             </div>
           </>
+        )}
+
+        {/* ══════════════ ANALYTICS TAB ══════════════ */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            {/* Summary cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="bg-white rounded-2xl shadow p-5 text-center">
+                <p className="text-3xl font-bold text-blue-600">{analytics?.totalBookings ?? '—'}</p>
+                <p className="text-sm text-gray-500 mt-1">Total Bookings</p>
+              </div>
+              <div className="bg-white rounded-2xl shadow p-5 text-center">
+                <p className="text-3xl font-bold text-blue-600">{analytics?.totalRevenue ?? '—'}</p>
+                <p className="text-sm text-gray-500 mt-1">Credits Earned</p>
+              </div>
+              <div className="bg-white rounded-2xl shadow p-5 text-center col-span-2 md:col-span-1">
+                <p className="text-3xl font-bold text-blue-600">{analytics?.classes?.length ?? '—'}</p>
+                <p className="text-sm text-gray-500 mt-1">Classes Created</p>
+              </div>
+            </div>
+
+            {/* Per-class breakdown */}
+            <div className="bg-white rounded-2xl shadow overflow-hidden">
+              <div className="px-6 py-4 border-b">
+                <h2 className="font-bold text-gray-800">Bookings per class</h2>
+              </div>
+              {!analytics?.classes?.length ? (
+                <p className="px-6 py-8 text-gray-400 text-sm">No classes yet.</p>
+              ) : (
+                <ul className="divide-y divide-gray-100">
+                  {analytics.classes.map(cls => {
+                    const fillPct = cls.capacity ? Math.round((cls.booking_count / cls.capacity) * 100) : null;
+                    return (
+                      <li key={cls.id} className="px-6 py-4">
+                        <div className="flex items-center justify-between mb-1">
+                          <div>
+                            <p className="font-semibold text-gray-800 text-sm">{cls.name}</p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(cls.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                              {' · '}{new Date(cls.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-bold text-gray-800 text-sm">{cls.booking_count} booked</p>
+                            {cls.capacity && <p className="text-xs text-gray-400">of {cls.capacity} spots</p>}
+                          </div>
+                        </div>
+                        {fillPct !== null && (
+                          <div className="w-full bg-gray-100 rounded-full h-1.5 mt-2">
+                            <div
+                              className={`h-1.5 rounded-full ${fillPct >= 80 ? 'bg-green-500' : fillPct >= 40 ? 'bg-blue-500' : 'bg-gray-300'}`}
+                              style={{ width: `${Math.min(fillPct, 100)}%` }}
+                            />
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
         )}
 
         {/* ══════════════ PROFILE TAB ══════════════ */}

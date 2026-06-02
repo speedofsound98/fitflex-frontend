@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
+import usePageTitle from '../hooks/usePageTitle';
 
 const ALL_FIELDS = [
   { key: 'name', label: 'Display name' },
@@ -15,6 +16,7 @@ export default function UserSettings() {
   const userRole = localStorage.getItem('userRole');
   const api = import.meta.env.VITE_API_URL;
 
+  usePageTitle('Account Settings');
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ name: '', bio: '', public_fields: 'name', phone: '' });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });

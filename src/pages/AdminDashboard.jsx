@@ -193,8 +193,8 @@ export default function AdminDashboard() {
                 onChange={e => setUserSearch(e.target.value)}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-white rounded-2xl shadow overflow-hidden overflow-x-auto">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="text-left px-5 py-3 text-gray-500 font-semibold">ID</th>
@@ -244,8 +244,8 @@ export default function AdminDashboard() {
                 onChange={e => setStudioSearch(e.target.value)}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-white rounded-2xl shadow overflow-hidden overflow-x-auto">
+              <table className="w-full text-sm min-w-[640px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="text-left px-5 py-3 text-gray-500 font-semibold">ID</th>
@@ -299,8 +299,8 @@ export default function AdminDashboard() {
         {tab === 'bookings' && (
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-4">All Bookings <span className="text-gray-400 font-normal text-base">({bookings.length})</span></h2>
-            <div className="bg-white rounded-2xl shadow overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="bg-white rounded-2xl shadow overflow-hidden overflow-x-auto">
+              <table className="w-full text-sm min-w-[640px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="text-left px-5 py-3 text-gray-500 font-semibold">ID</th>

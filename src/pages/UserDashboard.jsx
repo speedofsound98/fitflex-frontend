@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '../components/NavBar';
+import usePageTitle from '../hooks/usePageTitle';
 
 const SPORT_ICONS = {
   yoga: '🧘', pilates: '🤸', hiit: '🔥', cycling: '🚴', boxing: '🥊',
@@ -60,6 +61,7 @@ export default function UserDashboard() {
   const userRole = localStorage.getItem('userRole');
   const api = import.meta.env.VITE_API_URL;
 
+  usePageTitle('Dashboard');
   const [classes, setClasses] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState('');
