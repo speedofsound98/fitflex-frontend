@@ -54,6 +54,7 @@ export default function StudioSettings() {
       const res = await fetch(`${api}/studios/${studioId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(profileForm),
       });
       const data = await res.json();
@@ -71,6 +72,7 @@ export default function StudioSettings() {
       const res = await fetch(`${api}/studios/${studioId}/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }),
       });
       const data = await res.json();

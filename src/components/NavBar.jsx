@@ -16,7 +16,13 @@ export default function Navbar() {
     setRole(userRole || '');
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch { /* ignore network errors */ }
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');

@@ -24,7 +24,7 @@ const payload = role === 'user'
 ? { name: formData.name, email: formData.email, password: formData.password }
 : { name: formData.name, location: formData.location, email: formData.email, password: formData.password };
 const res = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
-method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(payload)
 });
 const data = await res.json();
 if (!res.ok) throw new Error(data.error || 'Signup failed');

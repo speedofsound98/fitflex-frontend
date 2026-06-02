@@ -72,12 +72,12 @@ export default function UserDashboard() {
   }, [userRole, userId, navigate]);
 
   useEffect(() => {
-    fetch(`${api}/classes`)
+    fetch(`${api}/classes`, { credentials: 'include' })
       .then(r => r.json())
       .then(d => setClasses(d.classes || []))
       .catch(() => {});
 
-    fetch(`${api}/users/${userId}/bookings`)
+    fetch(`${api}/users/${userId}/bookings`, { credentials: 'include' })
       .then(r => r.json())
       .then(d => setBookings(d.bookings || []))
       .catch(() => {});
@@ -120,12 +120,12 @@ export default function UserDashboard() {
     if (!confirm('Cancel this booking? Your credits will be refunded.')) return;
     setMsg('');
     try {
-      const res = await fetch(`${api}/bookings/${bookingId}`, { method: 'DELETE' });
+      const res = await fetch(`${api}/bookings/${bookingId}`, { method: 'DELETE', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Cancellation failed');
       setMsgType('success');
       setMsg('Booking cancelled. Credits refunded! 💸');
-      fetch(`${api}/users/${userId}/bookings`)
+      fetch(`${api}/users/${userId}/bookings`, { credentials: 'include' })
         .then(r => r.json())
         .then(d => setBookings(d.bookings || []));
     } catch (e) {
@@ -140,6 +140,7 @@ export default function UserDashboard() {
       const res = await fetch(`${api}/book`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ user_id: Number(userId), class_id: Number(classId) }),
       });
       const data = await res.json();
@@ -147,7 +148,7 @@ export default function UserDashboard() {
       setMsgType('success');
       setMsg('Class booked! 🎉');
       // Refresh bookings
-      fetch(`${api}/users/${userId}/bookings`)
+      fetch(`${api}/users/${userId}/bookings`, { credentials: 'include' })
         .then(r => r.json())
         .then(d => setBookings(d.bookings || []));
     } catch (e) {

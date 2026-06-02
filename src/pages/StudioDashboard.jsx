@@ -60,7 +60,7 @@ export default function StudioDashboard() {
     if (!studioId) return;
     setClassesLoading(true);
     try {
-      const res = await fetch(`${api}/studios/${studioId}/classes`);
+      const res = await fetch(`${api}/studios/${studioId}/classes`, { credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setClasses(data.classes || []);
@@ -105,6 +105,7 @@ export default function StudioDashboard() {
       const res = await fetch(`${api}/studios/${studioId}/classes`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           name: form.name.trim(),
           datetime: parsedDate.toISOString(),
@@ -139,6 +140,7 @@ export default function StudioDashboard() {
       const res = await fetch(`${api}/classes/${editingId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           name: editForm.name.trim(),
           datetime: new Date(editForm.datetime).toISOString(),
@@ -160,7 +162,7 @@ export default function StudioDashboard() {
   async function deleteClass(id) {
     if (!confirm('Delete this class?')) return;
     try {
-      const res = await fetch(`${api}/classes/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${api}/classes/${id}`, { method: 'DELETE', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to delete class');
       setClasses(prev => prev.filter(c => c.id !== id));
@@ -175,6 +177,7 @@ export default function StudioDashboard() {
       const res = await fetch(`${api}/studios/${studioId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(profileForm),
       });
       const data = await res.json();

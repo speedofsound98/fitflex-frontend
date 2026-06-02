@@ -28,7 +28,7 @@ export default function UserSettings() {
 
   useEffect(() => {
     if (!userId) return;
-    fetch(`${api}/users/${userId}/settings`)
+    fetch(`${api}/users/${userId}/settings`, { credentials: 'include' })
       .then(r => r.json())
       .then(d => {
         if (d.user) {
@@ -64,6 +64,7 @@ export default function UserSettings() {
       const res = await fetch(`${api}/users/${userId}/settings`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ name: form.name, bio: form.bio, public_fields: form.public_fields }),
       });
       const data = await res.json();
@@ -82,6 +83,7 @@ export default function UserSettings() {
       const res = await fetch(`${api}/users/${userId}/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ currentPassword: pwForm.currentPassword, newPassword: pwForm.newPassword }),
       });
       const data = await res.json();
