@@ -147,6 +147,7 @@ export default function Navbar() {
             <>
               <Link to={dashboardPath} className="text-sm text-gray-600 hover:text-blue-600">Dashboard</Link>
               <Link to={settingsPath} className="text-sm text-gray-600 hover:text-blue-600">Settings</Link>
+              <Link to="/messages" className="text-sm text-gray-600 hover:text-blue-600">Messages</Link>
               <NotificationBell role={role} />
               <span className="text-sm text-gray-400">|</span>
               <span className="text-sm text-gray-600">Hi, {name}</span>
@@ -193,6 +194,7 @@ export default function Navbar() {
               <p className="text-xs text-gray-400">Hi, {name}</p>
               <Link to={dashboardPath} onClick={closeMenu} className="text-sm text-gray-700 py-2 border-b">Dashboard</Link>
               <Link to={settingsPath} onClick={closeMenu} className="text-sm text-gray-700 py-2 border-b">Settings</Link>
+              <Link to="/messages" onClick={closeMenu} className="text-sm text-gray-700 py-2 border-b">Messages</Link>
               <button onClick={handleLogout} className="w-full py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition">
                 Logout
               </button>

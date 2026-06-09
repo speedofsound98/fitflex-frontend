@@ -1,7 +1,7 @@
 import authFetch from '../utils/authFetch';
 // src/pages/StudioProfile.jsx  — public view
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 
@@ -16,6 +16,7 @@ function sportIcon(type) {
 
 export default function StudioProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const api = import.meta.env.VITE_API_URL;
 
   const [studio, setStudio] = useState(null);
@@ -108,14 +109,24 @@ export default function StudioProfile() {
             </div>
           </div>
           {studio.about && <p className="mt-4 text-blue-50 max-w-xl">{studio.about}</p>}
-          {studio.accepts_enquiries && userRole === 'user' && (
-            <button
-              onClick={() => { setEnquiryOpen(o => !o); setEnquiryStatus(''); }}
-              className="mt-4 inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-5 py-2 rounded-full hover:bg-blue-50 transition text-sm"
-            >
-              💬 Enquire for custom time
-            </button>
-          )}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {studio.accepts_enquiries && userRole === 'user' && (
+              <button
+                onClick={() => { setEnquiryOpen(o => !o); setEnquiryStatus(''); }}
+                className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-5 py-2 rounded-full hover:bg-blue-50 transition text-sm"
+              >
+                💬 Enquire for custom time
+              </button>
+            )}
+            {userRole === 'user' && (
+              <button
+                onClick={() => navigate(`/messages?type=studio&id=${id}&name=${encodeURIComponent(studio.name)}`)}
+                className="inline-flex items-center gap-2 bg-white/20 text-white font-semibold px-5 py-2 rounded-full hover:bg-white/30 transition text-sm"
+              >
+                ✉️ Send message
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Enquiry form */}

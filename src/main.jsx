@@ -19,6 +19,7 @@ import Pricing from './pages/Pricing';
 import Groups from './pages/Groups';
 import GroupProfile from './pages/GroupProfile';
 import EventDetail from './pages/EventDetail';
+import Messages from './pages/Messages';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -45,6 +46,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/groups" element={<Groups />} />
         <Route path="/groups/:id" element={<GroupProfile />} />
         <Route path="/events/:eventId" element={<EventDetail />} />
+        <Route path="/messages" element={<Messages />} />
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />
