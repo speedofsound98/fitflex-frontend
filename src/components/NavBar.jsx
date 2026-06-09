@@ -41,7 +41,7 @@ function NotificationBell({ role }) {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }
 
-  const typeIcon = { booking: '📅', cancellation: '❌', message: '📣', enquiry: '💬' };
+  const typeIcon = { booking: '📅', cancellation: '❌', message: '📣', enquiry: '💬', dm: '💬', follow: '👤', event: '🎉', post: '📝', comment: '💬', broadcast: '📣' };
   const timeAgo = (date) => {
     const mins = Math.floor((Date.now() - new Date(date)) / 60000);
     if (mins < 1) return 'just now';
