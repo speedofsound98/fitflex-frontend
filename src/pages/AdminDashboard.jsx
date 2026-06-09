@@ -145,7 +145,14 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-3">
           <Link to="/" className="text-sm text-blue-600 hover:underline">← Back to site</Link>
           <button
-            onClick={() => { setAuthed(false); setSecret(''); }}
+            onClick={() => {
+              setAuthed(false);
+              setSecret('');
+              localStorage.removeItem('userId');
+              localStorage.removeItem('userName');
+              localStorage.removeItem('userRole');
+              localStorage.removeItem('authToken');
+            }}
             className="px-4 py-2 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600 transition"
           >
             Logout
