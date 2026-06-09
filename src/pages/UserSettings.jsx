@@ -9,6 +9,7 @@ const ALL_FIELDS = [
   { key: 'name', label: 'Display name' },
   { key: 'bio', label: 'Bio' },
   { key: 'credits', label: 'Credit balance' },
+  { key: 'bookings', label: 'Booked classes' },
 ];
 
 export default function UserSettings() {
