@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
+import AppointmentMatrix from '../components/AppointmentMatrix';
 
 const SPORT_ICONS = {
   yoga: '🧘', pilates: '🤸', hiit: '🔥', cycling: '🚴', boxing: '🥊',
@@ -118,7 +119,7 @@ export default function StudioProfile() {
                 💬 Enquire for custom time
               </button>
             )}
-            {userRole === 'user' && (
+            {userRole && !(userRole === 'studio' && localStorage.getItem('userId') === id) && (
               <button
                 onClick={() => navigate(`/messages?type=studio&id=${id}&name=${encodeURIComponent(studio.name)}`)}
                 className="inline-flex items-center gap-2 bg-white/20 text-white font-semibold px-5 py-2 rounded-full hover:bg-white/30 transition text-sm"
@@ -155,6 +156,19 @@ export default function StudioProfile() {
                 </div>
               </form>
             )}
+          </div>
+        )}
+
+        {/* Appointment slots */}
+        {studio.offers_appointments && (
+          <div className="mb-10">
+            <h2 className="text-xl font-bold text-gray-800 mb-1">Book an Appointment</h2>
+            <p className="text-sm text-gray-500 mb-4">Reserve a private session slot directly with {studio.name}.</p>
+            <AppointmentMatrix
+              studioId={id}
+              mode="view"
+              userId={localStorage.getItem('userRole') === 'user' ? localStorage.getItem('userId') : null}
+            />
           </div>
         )}
 

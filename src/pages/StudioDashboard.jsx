@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
+import AppointmentMatrix from '../components/AppointmentMatrix';
 
 const SPORT_TYPES = [
   'Yoga', 'Pilates', 'HIIT', 'Cycling', 'Boxing',
@@ -43,7 +44,8 @@ export default function StudioDashboard() {
   // ── Feedback ──
   const [err, setErr] = useState('');
   const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'analytics' | 'profile'
+  const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'appointments' | 'analytics' | 'profile'
+  const [offersAppointments, setOffersAppointments] = useState(false);
   const [analytics, setAnalytics] = useState(null);
   usePageTitle('Studio Dashboard');
   const [messagingClassId, setMessagingClassId] = useState(null);
@@ -90,6 +92,7 @@ export default function StudioDashboard() {
         city: data.studio.city || '',
         neighbourhood: data.studio.neighbourhood || '',
       });
+      if (data.studio) setOffersAppointments(data.studio.offers_appointments || false);
     } catch (e) { /* profile might not exist yet */ }
   }, [api, studioId]);
 
@@ -241,6 +244,7 @@ export default function StudioDashboard() {
         {/* Tabs */}
         <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit flex-wrap">
           <button className={tabClass('classes')} onClick={() => setActiveTab('classes')}>🗓 Classes</button>
+          <button className={tabClass('appointments')} onClick={() => setActiveTab('appointments')}>📆 Appointments</button>
           <button className={tabClass('analytics')} onClick={() => { setActiveTab('analytics'); fetchAnalytics(); }}>📊 Analytics</button>
           <button className={tabClass('profile')} onClick={() => setActiveTab('profile')}>🏢 Studio Profile</button>
         </div>
@@ -385,6 +389,48 @@ export default function StudioDashboard() {
               )}
             </div>
           </>
+        )}
+
+        {/* ══════════════ APPOINTMENTS TAB ══════════════ */}
+        {activeTab === 'appointments' && (
+          <div className="space-y-6">
+            {/* Enable toggle */}
+            <div className="bg-white rounded-2xl shadow p-5 flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-gray-800">Appointment Slots</p>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  {offersAppointments
+                    ? 'Enabled — users can book slots from your studio page'
+                    : 'Disabled — enable to offer bookable time slots'}
+                </p>
+              </div>
+              <div
+                onClick={async () => {
+                  const next = !offersAppointments;
+                  setOffersAppointments(next);
+                  await authFetch(`${api}/studios/${studioId}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ offers_appointments: next }),
+                  });
+                  flash(next ? 'Appointment slots enabled!' : 'Appointment slots disabled.');
+                }}
+                className={`w-12 h-7 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 ${offersAppointments ? 'bg-blue-600' : 'bg-gray-200'}`}
+              >
+                <div className={`w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ${offersAppointments ? 'translate-x-5' : 'translate-x-0'}`} />
+              </div>
+            </div>
+
+            {offersAppointments ? (
+              <AppointmentMatrix studioId={studioId} mode="manage" />
+            ) : (
+              <div className="bg-white rounded-2xl shadow px-6 py-12 text-center text-gray-400">
+                <p className="text-4xl mb-3">📆</p>
+                <p className="font-semibold text-gray-600">Enable appointment slots above to get started</p>
+                <p className="text-sm mt-1">You can set capacity, duration and credit cost per slot.</p>
+              </div>
+            )}
+          </div>
         )}
 
         {/* ══════════════ ANALYTICS TAB ══════════════ */}
