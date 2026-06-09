@@ -21,11 +21,19 @@ export default function GroupProfile() {
   const navigate = useNavigate();
   const [group, setGroup] = useState(null);
   const [members, setMembers] = useState([]);
+  const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState('success');
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [eventForm, setEventForm] = useState({ title: '', description: '', datetime: '', location: '' });
+
+  function nextHour() {
+    const d = new Date(); d.setHours(d.getHours() + 1, 0, 0, 0);
+    return d.toISOString().slice(0, 16);
+  }
 
   usePageTitle(group ? group.name : 'Group');
 
@@ -40,6 +48,10 @@ export default function GroupProfile() {
         if (d.error) { setLoading(false); return; }
         setGroup(d.group);
         setMembers(d.members || []);
+        fetch(`${api}/groups/${id}/events`)
+          .then(r => r.json())
+          .then(e => setEvents(e.events || []))
+          .catch(() => {});
         setEditForm({
           name: d.group.name,
           sport_type: d.group.sport_type || '',
@@ -80,6 +92,23 @@ export default function GroupProfile() {
       setMembers(prev => prev.filter(m => m.id !== userId));
       setGroup(g => ({ ...g, member_count: g.member_count - 1 }));
       flash('You left the group.');
+    } catch (e) { flash(e.message, 'error'); }
+  }
+
+  async function createEvent(e) {
+    e.preventDefault();
+    try {
+      const res = await authFetch(`${api}/groups/${id}/events`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...eventForm, datetime: new Date(eventForm.datetime).toISOString() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setEvents(prev => [...prev, { ...data.event, going_count: 0, maybe_count: 0 }].sort((a, b) => new Date(a.datetime) - new Date(b.datetime)));
+      setShowEventForm(false);
+      setEventForm({ title: '', description: '', datetime: '', location: '' });
+      flash('Event created! Members have been notified. 🎉');
     } catch (e) { flash(e.message, 'error'); }
   }
 
@@ -235,6 +264,83 @@ export default function GroupProfile() {
             </form>
           </div>
         )}
+
+        {/* Events */}
+        <div className="bg-white rounded-2xl shadow overflow-hidden mb-6">
+          <div className="px-6 py-4 border-b flex items-center justify-between">
+            <h2 className="font-bold text-gray-800">Events</h2>
+            {isAdmin && (
+              <button onClick={() => { setShowEventForm(o => !o); setEventForm(f => ({...f, datetime: nextHour()})); }}
+                className="text-sm text-blue-600 font-semibold hover:underline">
+                + New event
+              </button>
+            )}
+          </div>
+
+          {/* Create event form */}
+          {showEventForm && (
+            <div className="px-6 py-4 border-b bg-blue-50">
+              <form onSubmit={createEvent} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs font-medium text-gray-600">Event title *</span>
+                  <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                    placeholder="e.g. Sunday morning run" value={eventForm.title}
+                    onChange={e => setEventForm(f => ({...f, title: e.target.value}))} required />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-600">Date & Time *</span>
+                  <input type="datetime-local" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                    value={eventForm.datetime} onChange={e => setEventForm(f => ({...f, datetime: e.target.value}))} required />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-gray-600">Location</span>
+                  <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                    placeholder="e.g. Hayarkon Park" value={eventForm.location}
+                    onChange={e => setEventForm(f => ({...f, location: e.target.value}))} />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs font-medium text-gray-600">Description</span>
+                  <textarea rows={2} className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                    placeholder="Details, pace, what to bring..."
+                    value={eventForm.description} onChange={e => setEventForm(f => ({...f, description: e.target.value}))} />
+                </label>
+                <div className="md:col-span-2 flex gap-2">
+                  <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">Create</button>
+                  <button type="button" onClick={() => setShowEventForm(false)} className="text-gray-500 px-4 py-2 rounded-xl text-sm hover:bg-gray-100 transition">Cancel</button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {events.length === 0 ? (
+            <p className="px-6 py-8 text-sm text-gray-400">No events yet.{isAdmin ? ' Create the first one!' : ''}</p>
+          ) : (
+            <ul className="divide-y divide-gray-100">
+              {events.map(ev => {
+                const isPast = new Date(ev.datetime) < new Date();
+                return (
+                  <li key={ev.id}>
+                    <Link to={`/events/${ev.id}`} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                      <div>
+                        <p className={`font-semibold text-sm ${isPast ? 'text-gray-400' : 'text-gray-800'}`}>{ev.title}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          {new Date(ev.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          {' · '}{new Date(ev.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          {ev.location && ` · ${ev.location}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-gray-500 ml-4 shrink-0">
+                        <span>✅ {ev.going_count}</span>
+                        <span>🤔 {ev.maybe_count}</span>
+                        {isPast && <span className="bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full font-medium">Past</span>}
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
 
         {/* Members */}
         <div className="bg-white rounded-2xl shadow overflow-hidden">

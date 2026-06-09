@@ -18,6 +18,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import Pricing from './pages/Pricing';
 import Groups from './pages/Groups';
 import GroupProfile from './pages/GroupProfile';
+import EventDetail from './pages/EventDetail';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -43,6 +44,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/groups" element={<Groups />} />
         <Route path="/groups/:id" element={<GroupProfile />} />
+        <Route path="/events/:eventId" element={<EventDetail />} />
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />
