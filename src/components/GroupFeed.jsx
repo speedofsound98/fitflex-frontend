@@ -92,6 +92,8 @@ function CommentThread({ postId, isMember, currentUserId, isAdmin }) {
 export default function GroupFeed({ groupId, isMember, isAdmin }) {
   const [posts, setPosts] = useState([]);
   const [text, setText] = useState('');
+  const [broadcastText, setBroadcastText] = useState('');
+  const [showBroadcast, setShowBroadcast] = useState(false);
   const [openComments, setOpenComments] = useState({});
   const [msg, setMsg] = useState('');
 
@@ -102,6 +104,23 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
       .then(r => r.json())
       .then(d => setPosts(d.posts || []));
   }, [groupId]);
+
+  async function broadcast(e) {
+    e.preventDefault();
+    if (!broadcastText.trim()) return;
+    const res = await authFetch(`${api}/groups/${groupId}/broadcast`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: broadcastText.trim() }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setMsg(`📢 Broadcast sent to ${data.sent} member${data.sent !== 1 ? 's' : ''}!`);
+      setBroadcastText('');
+      setShowBroadcast(false);
+      setTimeout(() => setMsg(''), 4000);
+    }
+  }
 
   async function createPost(e) {
     e.preventDefault();
@@ -134,9 +153,32 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
   return (
     <div className="space-y-4">
       {/* Compose box */}
+      {/* Broadcast (admin only) */}
+      {isAdmin && (
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-semibold text-amber-800">📢 Broadcast to all members</p>
+            <button onClick={() => setShowBroadcast(o => !o)} className="text-xs text-amber-600 hover:underline">
+              {showBroadcast ? 'Cancel' : 'Compose'}
+            </button>
+          </div>
+          {showBroadcast && (
+            <form onSubmit={broadcast} className="flex flex-col gap-2">
+              <textarea rows={2} className="w-full border border-amber-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white resize-none"
+                placeholder="Send an announcement to everyone in this group…"
+                value={broadcastText} onChange={e => setBroadcastText(e.target.value)} />
+              <button type="submit" disabled={!broadcastText.trim()}
+                className="self-end bg-amber-500 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-amber-600 transition disabled:opacity-40">
+                Send to all
+              </button>
+            </form>
+          )}
+        </div>
+      )}
+
       {isMember && (
         <div className="bg-white rounded-2xl shadow p-4">
-          {msg && <p className="text-red-500 text-sm mb-2">{msg}</p>}
+          {msg && <p className={`text-sm mb-2 ${msg.startsWith('📢') ? 'text-green-600' : 'text-red-500'}`}>{msg}</p>}
           <form onSubmit={createPost} className="flex flex-col gap-3">
             <textarea
               rows={2}
