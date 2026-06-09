@@ -35,11 +35,17 @@ fitflex-frontend/
 │   │   ├── StudioDashboard.jsx    ← /studio — manage classes, analytics, messaging
 │   │   ├── StudioSettings.jsx     ← /studio/settings — profile, enquiries toggle, password
 │   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page + enquiry form
+│   │   ├── Groups.jsx             ← /groups — community groups list
+│   │   ├── GroupDetail.jsx        ← /groups/:id — group page with feed
+│   │   ├── EventDetail.jsx        ← /events/:eventId — single event page
+│   │   ├── Messages.jsx           ← /messages — DM inbox
 │   │   ├── ForgotPassword.jsx
 │   │   └── ResetPassword.jsx
 │   └── components/
 │       ├── NavBar.jsx             ← Header, notification bell, hamburger menu
-│       └── RoleRoute.jsx          ← Route guard by role
+│       ├── RoleRoute.jsx          ← Route guard by role
+│       ├── AppointmentMatrix.jsx  ← Weekly slot booking matrix
+│       └── GroupFeed.jsx          ← Group posts + comments feed
 ├── vercel.json                    ← SPA routing (all paths → index.html)
 ├── .env                           ← VITE_API_URL
 ├── vite.config.js
@@ -85,6 +91,10 @@ npm run dev
 | `/studios/:id` | Studio Profile | Public |
 | `/forgot` | Forgot Password | Public |
 | `/reset` | Reset Password | Public |
+| `/groups` | Community Groups | Auth |
+| `/groups/:id` | Group Detail + Feed | Auth |
+| `/events/:eventId` | Event Detail | Auth |
+| `/messages` | DM Inbox | Auth |
 | `/dashboard` | User Dashboard | Users only |
 | `/settings` | User Settings | Users only |
 | `/studio` | Studio Dashboard | Studios only |
@@ -118,6 +128,16 @@ npm run dev
 - Shows unread badge count
 - Click to open dropdown; clicking marks all as read
 - Notification types: `booking`, `cancellation`, `message`, `enquiry`
+
+---
+
+## Key Components
+
+### AppointmentMatrix
+Weekly slot booking matrix rendered on studio and dashboard pages. Displays available time slots in a grid by day-of-week and allows users to book directly from the matrix.
+
+### GroupFeed
+Posts and comments feed used on the `/groups/:id` page. Supports creating posts, replying with comments, and real-time-style updates.
 
 ---
 
