@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
+import GroupFeed from '../components/GroupFeed';
 
 const api = import.meta.env.VITE_API_URL;
 
@@ -68,6 +69,8 @@ export default function GroupProfile() {
   const myMembership = members.find(m => m.id === userId);
   const isMember = !!myMembership;
   const isAdmin = myMembership?.role === 'admin';
+  const [activeTab, setActiveTab] = useState('feed');
+  const tabClass = t => `px-4 py-2 text-sm font-semibold rounded-full transition ${activeTab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`;
 
   function flash(m, type = 'success') {
     setMsg(m); setMsgType(type);
@@ -265,7 +268,20 @@ export default function GroupProfile() {
           </div>
         )}
 
-        {/* Events */}
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 bg-white rounded-full shadow-sm p-1 w-fit">
+          <button className={tabClass('feed')} onClick={() => setActiveTab('feed')}>💬 Feed</button>
+          <button className={tabClass('events')} onClick={() => setActiveTab('events')}>📅 Events</button>
+          <button className={tabClass('members')} onClick={() => setActiveTab('members')}>👥 Members</button>
+        </div>
+
+        {/* Feed tab */}
+        {activeTab === 'feed' && (
+          <GroupFeed groupId={id} isMember={isMember} isAdmin={isAdmin} />
+        )}
+
+        {/* Events tab */}
+        {activeTab === 'events' && (
         <div className="bg-white rounded-2xl shadow overflow-hidden mb-6">
           <div className="px-6 py-4 border-b flex items-center justify-between">
             <h2 className="font-bold text-gray-800">Events</h2>
@@ -341,8 +357,10 @@ export default function GroupProfile() {
             </ul>
           )}
         </div>
+        )}
 
-        {/* Members */}
+        {/* Members tab */}
+        {activeTab === 'members' && (
         <div className="bg-white rounded-2xl shadow overflow-hidden">
           <div className="px-6 py-4 border-b flex items-center justify-between">
             <h2 className="font-bold text-gray-800">Members ({members.length})</h2>
@@ -363,6 +381,7 @@ export default function GroupProfile() {
             ))}
           </ul>
         </div>
+        )}
 
         <div className="mt-6">
           <Link to="/groups" className="text-sm text-blue-600 hover:underline">← Back to all groups</Link>
