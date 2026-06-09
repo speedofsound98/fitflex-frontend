@@ -16,6 +16,8 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import AdminDashboard from './pages/AdminDashboard';
 import Pricing from './pages/Pricing';
+import Groups from './pages/Groups';
+import GroupProfile from './pages/GroupProfile';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -39,6 +41,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
         {/* Public */}
         <Route path="/pricing" element={<Pricing />} />
+        <Route path="/groups" element={<Groups />} />
+        <Route path="/groups/:id" element={<GroupProfile />} />
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />

@@ -142,6 +142,7 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden sm:flex items-center gap-3">
           <Link to="/pricing" className="text-sm text-gray-600 hover:text-blue-600">Pricing</Link>
+          <Link to="/groups" className="text-sm text-gray-600 hover:text-blue-600">Communities</Link>
           {authed ? (
             <>
               <Link to={dashboardPath} className="text-sm text-gray-600 hover:text-blue-600">Dashboard</Link>
@@ -186,6 +187,7 @@ export default function Navbar() {
       {menuOpen && (
         <div className="sm:hidden border-t bg-white px-4 py-3 flex flex-col gap-3">
           <Link to="/pricing" onClick={closeMenu} className="text-sm text-gray-700 py-2 border-b">Pricing</Link>
+          <Link to="/groups" onClick={closeMenu} className="text-sm text-gray-700 py-2 border-b">Communities</Link>
           {authed ? (
             <>
               <p className="text-xs text-gray-400">Hi, {name}</p>
