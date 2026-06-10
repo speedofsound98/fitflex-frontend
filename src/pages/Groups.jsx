@@ -114,7 +114,10 @@ export default function Groups() {
       const res = await authFetch(`${api}/groups/${groupId}/join`, { method: 'POST' });
       if (!res.ok) { const d = await res.json(); throw new Error(d.error); }
       setGroups(prev => prev.map(g => g.id === groupId ? { ...g, member_count: g.member_count + 1 } : g));
-      setMyGroups(prev => [...prev, { ...groups.find(g => g.id === groupId), member_count: (groups.find(g => g.id === groupId)?.member_count || 0) + 1, role: 'member' }]);
+      setMyGroups(prev => {
+        const g = groups.find(g => g.id === groupId);
+        return [...prev, { ...(g || {}), id: groupId, name: groupName, role: 'member' }];
+      });
       setMsgType('success');
       setMsg(`Joined ${groupName}! 🎉`);
     } catch (e) { setMsgType('error'); setMsg(e.message); }
