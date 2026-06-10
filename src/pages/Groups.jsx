@@ -79,7 +79,8 @@ export default function Groups() {
     const uid = localStorage.getItem('userId');
     const role = localStorage.getItem('userRole');
     setUserId(uid);
-    setIsLoggedIn(!!uid && role === 'user');
+    // Show join/leave for any logged-in non-studio account
+    setIsLoggedIn(!!uid && role !== 'studio');
   }, []);
 
   useEffect(() => {
