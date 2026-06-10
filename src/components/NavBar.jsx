@@ -1,6 +1,7 @@
 // src/components/NavBar.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import authFetch from '../utils/authFetch';
 
 const api = import.meta.env.VITE_API_URL;
 
@@ -12,7 +13,7 @@ function NotificationBell({ role }) {
 
   async function fetchNotifications() {
     try {
-      const r = await fetch(`${api}/notifications`, { credentials: 'include' });
+      const r = await authFetch(`${api}/notifications`);
       if (!r.ok) return;
       const d = await r.json();
       setNotifications(d.notifications || []);
@@ -36,7 +37,7 @@ function NotificationBell({ role }) {
   }, []);
 
   async function markAllRead() {
-    await fetch(`${api}/notifications/read-all`, { method: 'PATCH', credentials: 'include' });
+    await authFetch(`${api}/notifications/read-all`, { method: 'PATCH' });
     setUnread(0);
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   }

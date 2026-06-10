@@ -72,20 +72,28 @@ export default function Groups() {
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState('success');
 
-  const userId = localStorage.getItem('userId');
-  const isLoggedIn = !!userId && localStorage.getItem('userRole') === 'user';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const uid = localStorage.getItem('userId');
+    const role = localStorage.getItem('userRole');
+    setUserId(uid);
+    setIsLoggedIn(!!uid && role === 'user');
+  }, []);
 
   useEffect(() => {
     fetch(`${api}/groups`)
       .then(r => r.json())
       .then(d => setGroups(d.groups || []));
-
-    if (isLoggedIn) {
-      authFetch(`${api}/users/${userId}/groups`)
-        .then(r => r.json())
-        .then(d => setMyGroups(d.groups || []));
-    }
   }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn || !userId) return;
+    authFetch(`${api}/users/${userId}/groups`)
+      .then(r => r.json())
+      .then(d => setMyGroups(d.groups || []));
+  }, [isLoggedIn, userId]);
 
   const myGroupIds = useMemo(() => new Set(myGroups.map(g => g.id)), [myGroups]);
 
