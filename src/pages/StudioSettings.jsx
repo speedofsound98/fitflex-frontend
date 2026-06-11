@@ -13,7 +13,7 @@ export default function StudioSettings() {
   const [studio, setStudio] = useState(null);
   const [profileForm, setProfileForm] = useState({
     about: '', phone: '', website: '', instagram: '', city: '', neighbourhood: '', accepts_enquiries: false,
-    opening_hour: 9, closing_hour: 18, tagline: '', cover_color: 'blue',
+    opening_hour: 9, closing_hour: 18, tagline: '', cover_color: 'blue', cover_photo: '',
   });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [activeTab, setActiveTab] = useState('profile');
@@ -43,6 +43,7 @@ export default function StudioSettings() {
             closing_hour: d.studio.closing_hour ?? 18,
             tagline: d.studio.tagline || '',
             cover_color: d.studio.cover_color || 'blue',
+            cover_photo: d.studio.cover_photo || '',
           });
         }
       })
@@ -194,6 +195,22 @@ export default function StudioSettings() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Cover photo */}
+              <div className="p-4 border border-gray-100 rounded-xl">
+                <p className="text-sm font-medium text-gray-800 mb-1">Cover Photo</p>
+                <p className="text-xs text-gray-400 mb-3">Paste a direct image URL — it will appear at the top of your public studio page</p>
+                <input type="url"
+                  className="border border-gray-200 p-2.5 rounded-xl text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  placeholder="https://example.com/your-studio-photo.jpg"
+                  value={profileForm.cover_photo}
+                  onChange={e => setProfileForm(f => ({...f, cover_photo: e.target.value}))} />
+                {profileForm.cover_photo && (
+                  <img src={profileForm.cover_photo} alt="Cover preview"
+                    className="mt-3 w-full h-36 object-cover rounded-xl border border-gray-100"
+                    onError={e => { e.target.style.display = 'none'; }} />
+                )}
               </div>
 
               {/* Business hours */}

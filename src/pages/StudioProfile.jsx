@@ -25,6 +25,13 @@ function sportIcon(type) {
   return SPORT_ICONS[(type||'').toLowerCase()] || SPORT_ICONS.default;
 }
 
+function formatHour(h) {
+  if (h === 0) return '12:00 AM';
+  if (h < 12) return `${h}:00 AM`;
+  if (h === 12) return '12:00 PM';
+  return `${h - 12}:00 PM`;
+}
+
 export default function StudioProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -38,7 +45,10 @@ export default function StudioProfile() {
   const [enquiryOpen, setEnquiryOpen] = useState(false);
   const [enquiryMsg, setEnquiryMsg] = useState('');
   const [enquiryStatus, setEnquiryStatus] = useState('');
+  const [guestNotice, setGuestNotice] = useState('');
+
   const userRole = localStorage.getItem('userRole');
+  const isLoggedIn = !!localStorage.getItem('userId');
 
   useEffect(() => {
     Promise.all([
@@ -79,6 +89,11 @@ export default function StudioProfile() {
     }
   }
 
+  function showGuestNotice(msg) {
+    setGuestNotice(msg);
+    setTimeout(() => setGuestNotice(''), 4000);
+  }
+
   if (notFound) return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
@@ -93,15 +108,30 @@ export default function StudioProfile() {
     .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 
   const gradient = COVER_GRADIENTS[studio.cover_color] || COVER_GRADIENTS.blue;
-  const isLoggedIn = !!localStorage.getItem('userId');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
 
+        {/* Guest notice toast */}
+        {guestNotice && (
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white text-sm font-medium px-5 py-3 rounded-2xl shadow-lg flex items-center gap-2 animate-fade-in">
+            🔒 {guestNotice}
+            <Link to="/login" className="underline text-blue-300 ml-1">Log in</Link>
+          </div>
+        )}
+
+        {/* Cover photo (if set) */}
+        {studio.cover_photo && (
+          <div className="rounded-3xl overflow-hidden mb-0 -mb-6 relative h-52 sm:h-64">
+            <img src={studio.cover_photo} alt={`${studio.name} cover`}
+              className="w-full h-full object-cover" />
+          </div>
+        )}
+
         {/* Studio header */}
-        <div className={`bg-gradient-to-br ${gradient} rounded-3xl p-8 text-white mb-8`}>
+        <div className={`bg-gradient-to-br ${gradient} rounded-3xl p-8 text-white mb-8 ${studio.cover_photo ? 'rounded-t-none pt-10' : ''}`}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -112,18 +142,10 @@ export default function StudioProfile() {
                 <p className="text-blue-100">📍 {[studio.neighbourhood, studio.city].filter(Boolean).join(', ')}</p>
               )}
             </div>
-            <div className="flex flex-col gap-1 text-sm text-blue-100">
-              {studio.phone && <span>📞 {studio.phone}</span>}
-              {studio.website && (
-                <a href={studio.website} target="_blank" rel="noreferrer" className="hover:text-white underline">🌐 Website</a>
-              )}
-              {studio.instagram && (
-                <a href={`https://instagram.com/${studio.instagram.replace('@','')}`} target="_blank" rel="noreferrer" className="hover:text-white underline">📸 {studio.instagram}</a>
-              )}
-            </div>
           </div>
           {studio.tagline && <p className="mt-2 text-white/90 font-medium italic">"{studio.tagline}"</p>}
           {studio.about && <p className="mt-3 text-white/80 max-w-xl text-sm">{studio.about}</p>}
+
           <div className="flex flex-wrap gap-2 mt-4">
             {!isLoggedIn && (
               <Link to="/login"
@@ -139,9 +161,17 @@ export default function StudioProfile() {
                 💬 Enquire for custom time
               </button>
             )}
-            {userRole && !(userRole === 'studio' && localStorage.getItem('userId') === id) && (
+            {isLoggedIn && !(userRole === 'studio' && localStorage.getItem('userId') === id) && (
               <button
                 onClick={() => navigate(`/messages?type=studio&id=${id}&name=${encodeURIComponent(studio.name)}`)}
+                className="inline-flex items-center gap-2 bg-white/20 text-white font-semibold px-5 py-2 rounded-full hover:bg-white/30 transition text-sm"
+              >
+                ✉️ Send message
+              </button>
+            )}
+            {!isLoggedIn && (
+              <button
+                onClick={() => showGuestNotice('You need to be logged in to send messages.')}
                 className="inline-flex items-center gap-2 bg-white/20 text-white font-semibold px-5 py-2 rounded-full hover:bg-white/30 transition text-sm"
               >
                 ✉️ Send message
@@ -187,19 +217,26 @@ export default function StudioProfile() {
               Reserve a private session slot directly with {studio.name}.
               {(studio.opening_hour != null && studio.closing_hour != null) && (
                 <span className="ml-2 text-gray-400">
-                  🕐 Business hours: {studio.opening_hour < 12 ? `${studio.opening_hour}:00 AM` : studio.opening_hour === 12 ? '12:00 PM' : `${studio.opening_hour - 12}:00 PM`}
-                  {' – '}
-                  {studio.closing_hour < 12 ? `${studio.closing_hour}:00 AM` : studio.closing_hour === 12 ? '12:00 PM' : `${studio.closing_hour - 12}:00 PM`}
+                  🕐 Business hours: {formatHour(studio.opening_hour)} – {formatHour(studio.closing_hour)}
                 </span>
               )}
             </p>
-            <AppointmentMatrix
-              studioId={id}
-              mode="view"
-              userId={localStorage.getItem('userRole') === 'user' ? localStorage.getItem('userId') : null}
-              openingHour={studio.opening_hour ?? 9}
-              closingHour={studio.closing_hour ?? 18}
-            />
+            {!isLoggedIn ? (
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 text-center">
+                <p className="text-blue-700 font-medium mb-3">🔒 Log in to view and book appointment slots</p>
+                <Link to="/login" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
+                  Log in
+                </Link>
+              </div>
+            ) : (
+              <AppointmentMatrix
+                studioId={id}
+                mode="view"
+                userId={userRole === 'user' ? localStorage.getItem('userId') : null}
+                openingHour={studio.opening_hour ?? 9}
+                closingHour={studio.closing_hour ?? 18}
+              />
+            )}
           </div>
         )}
 
@@ -226,13 +263,47 @@ export default function StudioProfile() {
                   {cls.sport_type && <p>🏷️ {cls.sport_type}</p>}
                   {cls.capacity && <p>👥 {cls.capacity} spots</p>}
                 </div>
-                <Link to={isLoggedIn ? "/dashboard" : "/login"} className="mt-auto w-full py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold text-center hover:bg-blue-700 transition">
-                  {isLoggedIn ? 'Book via Dashboard' : 'Log in to Book'}
-                </Link>
+                {isLoggedIn ? (
+                  <Link to="/dashboard" className="mt-auto w-full py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold text-center hover:bg-blue-700 transition">
+                    Book via Dashboard
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => showGuestNotice('You need to log in to book a class.')}
+                    className="mt-auto w-full py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold text-center hover:bg-blue-700 transition"
+                  >
+                    Book this class
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
+
+        {/* Contact info */}
+        {(studio.phone || studio.website || studio.instagram) && (
+          <div className="mt-10 bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-bold text-gray-800 mb-4">Contact & Links</h2>
+            <div className="flex flex-col gap-3 text-sm text-gray-600">
+              {studio.phone && (
+                <a href={`tel:${studio.phone}`} className="flex items-center gap-2 hover:text-blue-600 transition">
+                  📞 <span>{studio.phone}</span>
+                </a>
+              )}
+              {studio.website && (
+                <a href={studio.website} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-blue-600 transition underline">
+                  🌐 <span>{studio.website}</span>
+                </a>
+              )}
+              {studio.instagram && (
+                <a href={`https://instagram.com/${studio.instagram.replace('@','')}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-blue-600 transition underline">
+                  📸 <span>{studio.instagram}</span>
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
