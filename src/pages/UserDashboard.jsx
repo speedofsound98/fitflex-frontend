@@ -2,6 +2,7 @@ import authFetch from '../utils/authFetch';
 // src/pages/UserDashboard.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 
@@ -14,6 +15,28 @@ const SPORT_ICONS = {
 function sportIcon(type) {
   if (!type) return SPORT_ICONS.default;
   return SPORT_ICONS[type.toLowerCase()] || SPORT_ICONS.default;
+}
+
+function StudioCard({ studio }) {
+  return (
+    <Link to={`/studios/${studio.id}`}
+      className="bg-white rounded-2xl shadow hover:shadow-md transition p-5 flex flex-col gap-2">
+      <div className="flex items-start justify-between">
+        <div>
+          <h3 className="font-bold text-gray-800 text-lg">{studio.name}</h3>
+          {(studio.city || studio.neighbourhood) && (
+            <p className="text-sm text-gray-500">📍 {[studio.neighbourhood, studio.city].filter(Boolean).join(', ')}</p>
+          )}
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          {studio.verified && <span className="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-full">✅ Verified</span>}
+          {studio.offers_appointments && <span className="text-xs bg-green-50 text-green-700 font-semibold px-2 py-0.5 rounded-full">📆 Appointments</span>}
+        </div>
+      </div>
+      {studio.about && <p className="text-sm text-gray-500 line-clamp-2">{studio.about}</p>}
+      <span className="text-sm text-blue-600 font-medium mt-auto">View studio →</span>
+    </Link>
+  );
 }
 
 function ClassCard({ cls, onBook, bookedIds }) {
@@ -64,9 +87,11 @@ export default function UserDashboard() {
 
   usePageTitle('Dashboard');
   const [classes, setClasses] = useState([]);
+  const [studios, setStudios] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [search, setSearch] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
+  const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'studios'
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState('success');
 
@@ -80,6 +105,11 @@ export default function UserDashboard() {
       .then(d => setClasses(d.classes || []))
       .catch(() => {});
 
+    fetch(`${api}/studios`)
+      .then(r => r.json())
+      .then(d => setStudios(d.studios || []))
+      .catch(() => {});
+
     authFetch(`${api}/users/${userId}/bookings`, { })
       .then(r => r.json())
       .then(d => setBookings(d.bookings || []))
@@ -88,11 +118,15 @@ export default function UserDashboard() {
 
   const bookedIds = useMemo(() => new Set(bookings.map(b => b.class_id)), [bookings]);
 
-  // All unique locations for the filter dropdown
+  // All unique locations for the filter dropdown (classes + studio cities)
   const locations = useMemo(() => {
-    const locs = classes.map(c => c.studio_location).filter(Boolean);
+    const locs = [
+      ...classes.map(c => c.studio_location),
+      ...studios.map(s => s.city),
+      ...studios.map(s => s.neighbourhood),
+    ].filter(Boolean);
     return [...new Set(locs)].sort();
-  }, [classes]);
+  }, [classes, studios]);
 
   // Upcoming unbooked classes sorted by datetime
   const upcomingClasses = useMemo(() => {
@@ -106,7 +140,7 @@ export default function UserDashboard() {
     return upcomingClasses.filter(c => !bookedIds.has(c.id)).slice(0, 4);
   }, [upcomingClasses, bookedIds]);
 
-  // Search + filter results
+  // Search + filter results — classes
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return classes.filter(c => {
@@ -118,6 +152,22 @@ export default function UserDashboard() {
       return matchSearch && matchLocation;
     });
   }, [classes, search, locationFilter]);
+
+  // Search + filter results — studios
+  const filteredStudios = useMemo(() => {
+    const q = search.toLowerCase();
+    return studios.filter(s => {
+      const matchSearch = !q ||
+        s.name.toLowerCase().includes(q) ||
+        (s.about || '').toLowerCase().includes(q) ||
+        (s.city || '').toLowerCase().includes(q) ||
+        (s.neighbourhood || '').toLowerCase().includes(q);
+      const matchLocation = !locationFilter ||
+        s.city === locationFilter ||
+        s.neighbourhood === locationFilter;
+      return matchSearch && matchLocation;
+    });
+  }, [studios, search, locationFilter]);
 
   async function cancelBooking(bookingId) {
     if (!confirm('Cancel this booking? Your credits will be refunded.')) return;
@@ -179,6 +229,20 @@ export default function UserDashboard() {
           </div>
         )}
 
+        {/* Tab switcher */}
+        <div className="flex gap-2 mb-6 bg-white rounded-full shadow-sm p-1 w-fit">
+          <button
+            onClick={() => setActiveTab('classes')}
+            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${activeTab === 'classes' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+            🏋️ Classes
+          </button>
+          <button
+            onClick={() => setActiveTab('studios')}
+            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${activeTab === 'studios' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
+            🏢 Studios
+          </button>
+        </div>
+
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-10">
           <div className="relative flex-1">
@@ -202,45 +266,65 @@ export default function UserDashboard() {
           </select>
         </div>
 
-        {/* Search results */}
-        {showSearch && (
-          <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">
-              {filtered.length} result{filtered.length !== 1 ? 's' : ''}
-              {search && ` for "${search}"`}
-              {locationFilter && ` in ${locationFilter}`}
-            </h2>
-            {filtered.length === 0 ? (
-              <p className="text-gray-500">No classes match your search.</p>
+        {/* ── Classes tab ── */}
+        {activeTab === 'classes' && (
+          <>
+            {showSearch ? (
+              <section className="mb-12">
+                <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  {filtered.length} class{filtered.length !== 1 ? 'es' : ''}
+                  {search && ` for "${search}"`}
+                  {locationFilter && ` in ${locationFilter}`}
+                </h2>
+                {filtered.length === 0 ? (
+                  <p className="text-gray-500">No classes match your search.</p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {filtered.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
+                  </div>
+                )}
+              </section>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {filtered.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
-              </div>
+              <>
+                {recommended.length > 0 && (
+                  <section className="mb-12">
+                    <h2 className="text-xl font-bold text-gray-800 mb-1">Recommended for you</h2>
+                    <p className="text-sm text-gray-500 mb-4">Upcoming classes you haven't booked yet</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                      {recommended.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
+                    </div>
+                  </section>
+                )}
+                <section className="mb-12">
+                  <h2 className="text-xl font-bold text-gray-800 mb-1">All classes</h2>
+                  <p className="text-sm text-gray-500 mb-4">Everything available on the platform</p>
+                  {classes.length === 0 ? (
+                    <p className="text-gray-500">No classes available yet.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                      {classes.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
+                    </div>
+                  )}
+                </section>
+              </>
             )}
-          </section>
+          </>
         )}
 
-        {/* Recommended */}
-        {!showSearch && recommended.length > 0 && (
+        {/* ── Studios tab ── */}
+        {activeTab === 'studios' && (
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">Recommended for you</h2>
-            <p className="text-sm text-gray-500 mb-4">Upcoming classes you haven't booked yet</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-              {recommended.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
-            </div>
-          </section>
-        )}
-
-        {/* All classes */}
-        {!showSearch && (
-          <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">All classes</h2>
-            <p className="text-sm text-gray-500 mb-4">Everything available on the platform</p>
-            {classes.length === 0 ? (
-              <p className="text-gray-500">No classes available yet.</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-1">
+              {showSearch
+                ? `${filteredStudios.length} studio${filteredStudios.length !== 1 ? 's' : ''}${search ? ` for "${search}"` : ''}${locationFilter ? ` in ${locationFilter}` : ''}`
+                : 'All Studios'}
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">Browse studios — click to view classes and book appointments</p>
+            {filteredStudios.length === 0 ? (
+              <p className="text-gray-500">No studios match your search.</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                {classes.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredStudios.map(s => <StudioCard key={s.id} studio={s} />)}
               </div>
             )}
           </section>
