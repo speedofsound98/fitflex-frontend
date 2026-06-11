@@ -270,20 +270,34 @@ export default function UserDashboard() {
         {activeTab === 'classes' && (
           <>
             {showSearch ? (
-              <section className="mb-12">
-                <h2 className="text-xl font-bold text-gray-800 mb-4">
-                  {filtered.length} class{filtered.length !== 1 ? 'es' : ''}
-                  {search && ` for "${search}"`}
-                  {locationFilter && ` in ${locationFilter}`}
-                </h2>
-                {filtered.length === 0 ? (
-                  <p className="text-gray-500">No classes match your search.</p>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    {filtered.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
-                  </div>
+              <>
+                {filteredStudios.length > 0 && (
+                  <section className="mb-10">
+                    <h2 className="text-xl font-bold text-gray-800 mb-4">
+                      {filteredStudios.length} studio{filteredStudios.length !== 1 ? 's' : ''}
+                      {search && ` for "${search}"`}
+                      {locationFilter && ` in ${locationFilter}`}
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {filteredStudios.map(s => <StudioCard key={s.id} studio={s} />)}
+                    </div>
+                  </section>
                 )}
-              </section>
+                <section className="mb-12">
+                  <h2 className="text-xl font-bold text-gray-800 mb-4">
+                    {filtered.length} class{filtered.length !== 1 ? 'es' : ''}
+                    {search && ` for "${search}"`}
+                    {locationFilter && ` in ${locationFilter}`}
+                  </h2>
+                  {filtered.length === 0 ? (
+                    <p className="text-gray-500">No classes match your search.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                      {filtered.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
+                    </div>
+                  )}
+                </section>
+              </>
             ) : (
               <>
                 {recommended.length > 0 && (
