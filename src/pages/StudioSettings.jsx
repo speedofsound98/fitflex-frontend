@@ -7,6 +7,8 @@ import Navbar from '../components/NavBar';
 function CoverPhotoUpload({ studioId, api, current, onUploaded }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [preview, setPreview] = useState(current);
+  const inputRef = React.useRef();
 
   async function handleFile(e) {
     const file = e.target.files[0];
@@ -23,28 +25,40 @@ function CoverPhotoUpload({ studioId, api, current, onUploaded }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Upload failed');
+      setPreview(data.url);
       onUploaded(data.url);
     } catch (err) {
       setError(err.message);
     } finally {
       setUploading(false);
+      if (inputRef.current) inputRef.current.value = '';
     }
   }
 
   return (
     <div className="p-4 border border-gray-100 rounded-xl">
       <p className="text-sm font-medium text-gray-800 mb-1">Cover Photo</p>
-      <p className="text-xs text-gray-400 mb-3">Upload a photo — it will appear at the top of your public studio page (max 5 MB)</p>
-      {current && (
-        <img src={current} alt="Current cover"
+      <p className="text-xs text-gray-400 mb-3">Upload a photo — appears at the top of your public studio page (max 5 MB, JPG/PNG/WebP)</p>
+      {preview && (
+        <img src={preview} alt="Current cover"
           className="w-full h-36 object-cover rounded-xl border border-gray-100 mb-3"
           onError={e => { e.target.style.display = 'none'; }} />
       )}
-      <label className={`flex items-center gap-2 cursor-pointer w-fit px-4 py-2 rounded-xl border-2 border-dashed text-sm font-medium transition
-        ${uploading ? 'border-gray-200 text-gray-400 cursor-not-allowed' : 'border-blue-300 text-blue-600 hover:bg-blue-50'}`}>
-        {uploading ? '⏳ Uploading…' : '📷 Choose photo'}
-        <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={uploading} />
-      </label>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style={{ display: 'none' }}
+        onChange={handleFile}
+      />
+      <button
+        type="button"
+        disabled={uploading}
+        onClick={() => inputRef.current && inputRef.current.click()}
+        className="px-4 py-2 rounded-xl border-2 border-dashed border-blue-300 text-blue-600 text-sm font-medium hover:bg-blue-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {uploading ? '⏳ Uploading…' : preview ? '📷 Change photo' : '📷 Upload photo'}
+      </button>
       {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
     </div>
   );
