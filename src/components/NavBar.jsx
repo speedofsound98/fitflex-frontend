@@ -116,10 +116,8 @@ export default function Navbar() {
     setRole(userRole || '');
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await fetch(`${api}/logout`, { method: 'POST', credentials: 'include' });
-    } catch { /* ignore */ }
+  const handleLogout = () => {
+    // Clear client state immediately — don't wait for the server
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
@@ -128,6 +126,8 @@ export default function Navbar() {
     setRole('');
     setMenuOpen(false);
     navigate('/');
+    // Fire-and-forget to clear the httpOnly cookie on the server
+    fetch(`${api}/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
   };
 
   const dashboardPath = role === 'studio' ? '/studio' : '/dashboard';
