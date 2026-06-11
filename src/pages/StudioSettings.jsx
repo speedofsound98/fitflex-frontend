@@ -4,6 +4,52 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/NavBar';
 
+function CoverPhotoUpload({ studioId, api, current, onUploaded }) {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true); setError('');
+    const form = new FormData();
+    form.append('photo', file);
+    try {
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${api}/studios/${studioId}/cover-photo`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: form,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Upload failed');
+      onUploaded(data.url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="p-4 border border-gray-100 rounded-xl">
+      <p className="text-sm font-medium text-gray-800 mb-1">Cover Photo</p>
+      <p className="text-xs text-gray-400 mb-3">Upload a photo — it will appear at the top of your public studio page (max 5 MB)</p>
+      {current && (
+        <img src={current} alt="Current cover"
+          className="w-full h-36 object-cover rounded-xl border border-gray-100 mb-3"
+          onError={e => { e.target.style.display = 'none'; }} />
+      )}
+      <label className={`flex items-center gap-2 cursor-pointer w-fit px-4 py-2 rounded-xl border-2 border-dashed text-sm font-medium transition
+        ${uploading ? 'border-gray-200 text-gray-400 cursor-not-allowed' : 'border-blue-300 text-blue-600 hover:bg-blue-50'}`}>
+        {uploading ? '⏳ Uploading…' : '📷 Choose photo'}
+        <input type="file" accept="image/*" className="hidden" onChange={handleFile} disabled={uploading} />
+      </label>
+      {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+    </div>
+  );
+}
+
 export default function StudioSettings() {
   const navigate = useNavigate();
   const studioId = localStorage.getItem('userId');
@@ -198,20 +244,12 @@ export default function StudioSettings() {
               </div>
 
               {/* Cover photo */}
-              <div className="p-4 border border-gray-100 rounded-xl">
-                <p className="text-sm font-medium text-gray-800 mb-1">Cover Photo</p>
-                <p className="text-xs text-gray-400 mb-3">Paste a direct image URL — it will appear at the top of your public studio page</p>
-                <input type="url"
-                  className="border border-gray-200 p-2.5 rounded-xl text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  placeholder="https://example.com/your-studio-photo.jpg"
-                  value={profileForm.cover_photo}
-                  onChange={e => setProfileForm(f => ({...f, cover_photo: e.target.value}))} />
-                {profileForm.cover_photo && (
-                  <img src={profileForm.cover_photo} alt="Cover preview"
-                    className="mt-3 w-full h-36 object-cover rounded-xl border border-gray-100"
-                    onError={e => { e.target.style.display = 'none'; }} />
-                )}
-              </div>
+              <CoverPhotoUpload
+                studioId={studioId}
+                api={api}
+                current={profileForm.cover_photo}
+                onUploaded={url => setProfileForm(f => ({...f, cover_photo: url}))}
+              />
 
               {/* Business hours */}
               <div className="p-4 border border-gray-100 rounded-xl">
