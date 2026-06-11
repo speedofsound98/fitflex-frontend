@@ -127,14 +127,14 @@ npm run dev
 - Polls `GET /api/notifications` every 30 seconds when logged in
 - Shows unread badge count
 - Click to open dropdown; clicking marks all as read
-- Notification types: `booking`, `cancellation`, `message`, `enquiry`
+- Notification types: `booking`, `cancellation`, `message`, `enquiry`, `dm`, `follow`, `event`, `post`, `comment`, `broadcast`
 
 ---
 
 ## Key Components
 
 ### AppointmentMatrix
-Weekly slot booking matrix rendered on studio and dashboard pages. Displays available time slots in a grid by day-of-week and allows users to book directly from the matrix.
+Weekly slot booking matrix rendered on studio dashboard (manage mode) and studio profile (view mode). Always shows the studio's full business hours range. Props: `studioId`, `mode` (`manage`|`view`), `userId`, `openingHour` (default 9), `closingHour` (default 18). Studios set their hours in Studio Settings → Public Profile.
 
 ### GroupFeed
 Posts and comments feed used on the `/groups/:id` page. Supports creating posts, replying with comments, and real-time-style updates.
