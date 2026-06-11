@@ -163,11 +163,22 @@ export default function StudioProfile() {
         {studio.offers_appointments && (
           <div className="mb-10">
             <h2 className="text-xl font-bold text-gray-800 mb-1">Book an Appointment</h2>
-            <p className="text-sm text-gray-500 mb-4">Reserve a private session slot directly with {studio.name}.</p>
+            <p className="text-sm text-gray-500 mb-4">
+              Reserve a private session slot directly with {studio.name}.
+              {(studio.opening_hour != null && studio.closing_hour != null) && (
+                <span className="ml-2 text-gray-400">
+                  🕐 Business hours: {studio.opening_hour < 12 ? `${studio.opening_hour}:00 AM` : studio.opening_hour === 12 ? '12:00 PM' : `${studio.opening_hour - 12}:00 PM`}
+                  {' – '}
+                  {studio.closing_hour < 12 ? `${studio.closing_hour}:00 AM` : studio.closing_hour === 12 ? '12:00 PM' : `${studio.closing_hour - 12}:00 PM`}
+                </span>
+              )}
+            </p>
             <AppointmentMatrix
               studioId={id}
               mode="view"
               userId={localStorage.getItem('userRole') === 'user' ? localStorage.getItem('userId') : null}
+              openingHour={studio.opening_hour ?? 9}
+              closingHour={studio.closing_hour ?? 18}
             />
           </div>
         )}

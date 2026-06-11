@@ -30,19 +30,11 @@ function toISODate(date) {
   return date.toISOString().split('T')[0];
 }
 
-// Get all hours that have slots, plus surrounding context
-function getTimeRows(slots) {
-  if (!slots.length) {
-    // default 8am–6pm
-    return Array.from({ length: 11 }, (_, i) => i + 8);
-  }
-  const hours = slots.map(s => new Date(s.datetime).getHours());
-  const min = Math.max(0, Math.min(...hours) - 1);
-  const max = Math.min(23, Math.max(...hours) + 1);
-  return Array.from({ length: max - min + 1 }, (_, i) => i + min);
+function getTimeRows(openingHour, closingHour) {
+  return Array.from({ length: closingHour - openingHour }, (_, i) => i + openingHour);
 }
 
-export default function AppointmentMatrix({ studioId, mode = 'view', userId }) {
+export default function AppointmentMatrix({ studioId, mode = 'view', userId, openingHour = 9, closingHour = 18 }) {
   // mode: 'manage' (studio creates/deletes) or 'view' (user books)
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()));
   const [slots, setSlots] = useState([]);
@@ -82,7 +74,7 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId }) {
     slotMap[dayIdx][hour].push(s);
   });
 
-  const timeRows = getTimeRows(slots);
+  const timeRows = getTimeRows(openingHour, closingHour);
 
   async function createSlot(dayIdx, hour) {
     const day = addDays(weekStart, dayIdx);
@@ -252,9 +244,9 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId }) {
             ))}
           </tbody>
         </table>
-        {timeRows.length === 0 && (
-          <div className="px-6 py-10 text-center text-gray-400 text-sm">
-            {mode === 'manage' ? 'Click any cell to add a slot for that time.' : 'No appointment slots available this week.'}
+        {mode === 'manage' && slots.length === 0 && (
+          <div className="px-6 py-4 text-center text-gray-400 text-xs">
+            Click any cell to add a slot for that time.
           </div>
         )}
       </div>

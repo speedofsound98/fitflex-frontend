@@ -13,6 +13,7 @@ export default function StudioSettings() {
   const [studio, setStudio] = useState(null);
   const [profileForm, setProfileForm] = useState({
     about: '', phone: '', website: '', instagram: '', city: '', neighbourhood: '', accepts_enquiries: false,
+    opening_hour: 9, closing_hour: 18,
   });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [activeTab, setActiveTab] = useState('profile');
@@ -38,6 +39,8 @@ export default function StudioSettings() {
             city: d.studio.city || '',
             neighbourhood: d.studio.neighbourhood || '',
             accepts_enquiries: d.studio.accepts_enquiries || false,
+            opening_hour: d.studio.opening_hour ?? 9,
+            closing_hour: d.studio.closing_hour ?? 18,
           });
         }
       })
@@ -162,6 +165,35 @@ export default function StudioSettings() {
                     ${profileForm.accepts_enquiries ? 'translate-x-5' : 'translate-x-0'}`} />
                 </div>
               </label>
+
+              {/* Business hours */}
+              <div className="p-4 border border-gray-100 rounded-xl">
+                <p className="text-sm font-medium text-gray-800 mb-1">Business Hours</p>
+                <p className="text-xs text-gray-400 mb-3">Sets the time range shown on your appointment calendar</p>
+                <div className="flex items-center gap-3">
+                  <label className="flex flex-col gap-1 flex-1">
+                    <span className="text-xs text-gray-500">Opens at</span>
+                    <select className="border border-gray-200 rounded-xl p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      value={profileForm.opening_hour}
+                      onChange={e => setProfileForm(f => ({...f, opening_hour: Number(e.target.value)}))}>
+                      {Array.from({length: 24}, (_, i) => (
+                        <option key={i} value={i}>{i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <span className="text-gray-400 mt-4">–</span>
+                  <label className="flex flex-col gap-1 flex-1">
+                    <span className="text-xs text-gray-500">Closes at</span>
+                    <select className="border border-gray-200 rounded-xl p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+                      value={profileForm.closing_hour}
+                      onChange={e => setProfileForm(f => ({...f, closing_hour: Number(e.target.value)}))}>
+                      {Array.from({length: 24}, (_, i) => (
+                        <option key={i} value={i}>{i === 0 ? '12:00 AM' : i < 12 ? `${i}:00 AM` : i === 12 ? '12:00 PM' : `${i-12}:00 PM`}</option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+              </div>
 
               <button type="submit" className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">
                 Save Profile

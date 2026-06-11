@@ -46,6 +46,8 @@ export default function StudioDashboard() {
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'appointments' | 'analytics' | 'profile'
   const [offersAppointments, setOffersAppointments] = useState(false);
+  const [openingHour, setOpeningHour] = useState(9);
+  const [closingHour, setClosingHour] = useState(18);
   const [analytics, setAnalytics] = useState(null);
   usePageTitle('Studio Dashboard');
   const [messagingClassId, setMessagingClassId] = useState(null);
@@ -92,7 +94,11 @@ export default function StudioDashboard() {
         city: data.studio.city || '',
         neighbourhood: data.studio.neighbourhood || '',
       });
-      if (data.studio) setOffersAppointments(data.studio.offers_appointments || false);
+      if (data.studio) {
+        setOffersAppointments(data.studio.offers_appointments || false);
+        setOpeningHour(data.studio.opening_hour ?? 9);
+        setClosingHour(data.studio.closing_hour ?? 18);
+      }
     } catch (e) { /* profile might not exist yet */ }
   }, [api, studioId]);
 
@@ -422,7 +428,7 @@ export default function StudioDashboard() {
             </div>
 
             {offersAppointments ? (
-              <AppointmentMatrix studioId={studioId} mode="manage" />
+              <AppointmentMatrix studioId={studioId} mode="manage" openingHour={openingHour} closingHour={closingHour} />
             ) : (
               <div className="bg-white rounded-2xl shadow px-6 py-12 text-center text-gray-400">
                 <p className="text-4xl mb-3">📆</p>
