@@ -6,6 +6,16 @@ import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 import AppointmentMatrix from '../components/AppointmentMatrix';
 
+const COVER_GRADIENTS = {
+  blue:   'from-blue-600 to-blue-400',
+  purple: 'from-purple-600 to-purple-400',
+  green:  'from-green-600 to-green-400',
+  orange: 'from-orange-500 to-amber-400',
+  rose:   'from-rose-500 to-pink-400',
+  teal:   'from-teal-600 to-cyan-400',
+  slate:  'from-slate-700 to-slate-500',
+};
+
 const SPORT_ICONS = {
   yoga: '🧘', pilates: '🤸', hiit: '🔥', cycling: '🚴', boxing: '🥊',
   swimming: '🏊', crossfit: '💪', dance: '💃', 'martial arts': '🥋',
@@ -32,8 +42,8 @@ export default function StudioProfile() {
 
   useEffect(() => {
     Promise.all([
-      authFetch(`${api}/studios/${id}`).then(r => r.json()),
-      authFetch(`${api}/studios/${id}/classes`).then(r => r.json()),
+      fetch(`${api}/studios/${id}`).then(r => r.json()),
+      fetch(`${api}/studios/${id}/classes`).then(r => r.json()),
     ]).then(([studioData, classData]) => {
       if (studioData.error) { setNotFound(true); }
       else {
@@ -82,13 +92,16 @@ export default function StudioProfile() {
   const upcomingClasses = classes.filter(c => new Date(c.datetime) >= new Date())
     .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
 
+  const gradient = COVER_GRADIENTS[studio.cover_color] || COVER_GRADIENTS.blue;
+  const isLoggedIn = !!localStorage.getItem('userId');
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
 
         {/* Studio header */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-400 rounded-3xl p-8 text-white mb-8">
+        <div className={`bg-gradient-to-br ${gradient} rounded-3xl p-8 text-white mb-8`}>
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -109,8 +122,15 @@ export default function StudioProfile() {
               )}
             </div>
           </div>
-          {studio.about && <p className="mt-4 text-blue-50 max-w-xl">{studio.about}</p>}
+          {studio.tagline && <p className="mt-2 text-white/90 font-medium italic">"{studio.tagline}"</p>}
+          {studio.about && <p className="mt-3 text-white/80 max-w-xl text-sm">{studio.about}</p>}
           <div className="flex flex-wrap gap-2 mt-4">
+            {!isLoggedIn && (
+              <Link to="/login"
+                className="inline-flex items-center gap-2 bg-white text-blue-600 font-semibold px-5 py-2 rounded-full hover:bg-blue-50 transition text-sm">
+                🔑 Log in to book
+              </Link>
+            )}
             {studio.accepts_enquiries && userRole === 'user' && (
               <button
                 onClick={() => { setEnquiryOpen(o => !o); setEnquiryStatus(''); }}
@@ -206,8 +226,8 @@ export default function StudioProfile() {
                   {cls.sport_type && <p>🏷️ {cls.sport_type}</p>}
                   {cls.capacity && <p>👥 {cls.capacity} spots</p>}
                 </div>
-                <Link to="/dashboard" className="mt-auto w-full py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold text-center hover:bg-blue-700 transition">
-                  Book via Dashboard
+                <Link to={isLoggedIn ? "/dashboard" : "/login"} className="mt-auto w-full py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold text-center hover:bg-blue-700 transition">
+                  {isLoggedIn ? 'Book via Dashboard' : 'Log in to Book'}
                 </Link>
               </div>
             ))}

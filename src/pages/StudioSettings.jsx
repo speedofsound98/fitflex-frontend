@@ -13,7 +13,7 @@ export default function StudioSettings() {
   const [studio, setStudio] = useState(null);
   const [profileForm, setProfileForm] = useState({
     about: '', phone: '', website: '', instagram: '', city: '', neighbourhood: '', accepts_enquiries: false,
-    opening_hour: 9, closing_hour: 18,
+    opening_hour: 9, closing_hour: 18, tagline: '', cover_color: 'blue',
   });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
   const [activeTab, setActiveTab] = useState('profile');
@@ -41,6 +41,8 @@ export default function StudioSettings() {
             accepts_enquiries: d.studio.accepts_enquiries || false,
             opening_hour: d.studio.opening_hour ?? 9,
             closing_hour: d.studio.closing_hour ?? 18,
+            tagline: d.studio.tagline || '',
+            cover_color: d.studio.cover_color || 'blue',
           });
         }
       })
@@ -89,12 +91,23 @@ export default function StudioSettings() {
     `px-5 py-2.5 text-sm font-semibold rounded-full transition ${activeTab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`;
 
   const PROFILE_FIELDS = [
+    { key: 'tagline', label: 'Tagline', type: 'text', placeholder: 'e.g. "Where strength meets serenity"' },
     { key: 'about', label: 'About', type: 'textarea', placeholder: 'Tell people what makes your studio special...' },
     { key: 'city', label: 'City', type: 'text', placeholder: 'e.g. Tel Aviv' },
     { key: 'neighbourhood', label: 'Neighbourhood', type: 'text', placeholder: 'e.g. Florentin' },
     { key: 'phone', label: 'Phone', type: 'text', placeholder: '+1 234 567 8900' },
     { key: 'website', label: 'Website', type: 'text', placeholder: 'https://yourstudio.com' },
     { key: 'instagram', label: 'Instagram', type: 'text', placeholder: '@yourstudio' },
+  ];
+
+  const COVER_COLORS = [
+    { key: 'blue',   label: 'Ocean',   from: 'from-blue-600',   to: 'to-blue-400' },
+    { key: 'purple', label: 'Violet',  from: 'from-purple-600', to: 'to-purple-400' },
+    { key: 'green',  label: 'Forest',  from: 'from-green-600',  to: 'to-green-400' },
+    { key: 'orange', label: 'Ember',   from: 'from-orange-500', to: 'to-amber-400' },
+    { key: 'rose',   label: 'Rose',    from: 'from-rose-500',   to: 'to-pink-400' },
+    { key: 'teal',   label: 'Teal',    from: 'from-teal-600',   to: 'to-cyan-400' },
+    { key: 'slate',  label: 'Slate',   from: 'from-slate-700',  to: 'to-slate-500' },
   ];
 
   return (
@@ -165,6 +178,23 @@ export default function StudioSettings() {
                     ${profileForm.accepts_enquiries ? 'translate-x-5' : 'translate-x-0'}`} />
                 </div>
               </label>
+
+              {/* Page theme */}
+              <div className="p-4 border border-gray-100 rounded-xl">
+                <p className="text-sm font-medium text-gray-800 mb-1">Page Theme</p>
+                <p className="text-xs text-gray-400 mb-3">Colour of your public studio page header</p>
+                <div className="flex flex-wrap gap-2">
+                  {COVER_COLORS.map(c => (
+                    <button key={c.key} type="button"
+                      onClick={() => setProfileForm(f => ({...f, cover_color: c.key}))}
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition
+                        ${profileForm.cover_color === c.key ? 'border-gray-700' : 'border-transparent'}`}>
+                      <span className={`w-4 h-4 rounded-full bg-gradient-to-br ${c.from} ${c.to}`} />
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Business hours */}
               <div className="p-4 border border-gray-100 rounded-xl">
