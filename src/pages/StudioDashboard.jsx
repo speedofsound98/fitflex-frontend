@@ -52,6 +52,9 @@ export default function StudioDashboard() {
   usePageTitle('Studio Dashboard');
   const [messagingClassId, setMessagingClassId] = useState(null);
   const [messageText, setMessageText] = useState('');
+  const [rosterClassId, setRosterClassId] = useState(null);
+  const [roster, setRoster] = useState([]);
+  const [rosterLoading, setRosterLoading] = useState(false);
 
   // Guard: must be a studio with a valid numeric ID
   const studioIdNum = Number(studioId);
@@ -207,6 +210,18 @@ export default function StudioDashboard() {
       setMessageText('');
       flash(`Message sent to ${data.sent} booked user${data.sent !== 1 ? 's' : ''}! 📣`);
     } catch (e) { flash(e.message, 'error'); }
+  }
+
+  async function fetchRoster(classId) {
+    if (rosterClassId === classId) { setRosterClassId(null); return; }
+    setRosterClassId(classId);
+    setRosterLoading(true);
+    try {
+      const res = await authFetch(`${api}/classes/${classId}/attendees`);
+      const data = await res.json();
+      setRoster(data.attendees || []);
+    } catch { setRoster([]); }
+    finally { setRosterLoading(false); }
   }
 
   // ── Save profile ──
@@ -366,10 +381,36 @@ export default function StudioDashboard() {
                             </div>
                             <div className="flex gap-2 ml-4 shrink-0">
                               <button onClick={() => startEdit(cls)} className="text-blue-600 text-sm hover:underline">Edit</button>
+                              <button onClick={() => fetchRoster(cls.id)} className="text-green-600 text-sm hover:underline">
+                                {rosterClassId === cls.id ? 'Hide roster' : 'Roster'}
+                              </button>
                               <button onClick={() => { setMessagingClassId(cls.id); setMessageText(''); }} className="text-purple-600 text-sm hover:underline">Message</button>
                               <button onClick={() => deleteClass(cls.id)} className="text-red-500 text-sm hover:underline">Delete</button>
                             </div>
                           </div>
+                          {/* Roster panel */}
+                          {rosterClassId === cls.id && (
+                            <div className="mt-3 bg-green-50 border border-green-200 rounded-xl p-4">
+                              <p className="text-sm font-medium text-green-800 mb-3">
+                                👥 Attendees {!rosterLoading && `(${roster.length})`}
+                              </p>
+                              {rosterLoading ? (
+                                <p className="text-sm text-gray-400">Loading…</p>
+                              ) : roster.length === 0 ? (
+                                <p className="text-sm text-gray-500">No bookings yet.</p>
+                              ) : (
+                                <ul className="divide-y divide-green-100">
+                                  {roster.map(u => (
+                                    <li key={u.booking_id} className="py-2 flex items-center justify-between text-sm">
+                                      <span className="font-medium text-gray-800">{u.name}</span>
+                                      <span className="text-gray-400 text-xs">{u.email}{u.phone ? ` · ${u.phone}` : ''}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
+                            </div>
+                          )}
+
                           {/* Message panel */}
                           {messagingClassId === cls.id && (
                             <div className="mt-3 bg-purple-50 border border-purple-200 rounded-xl p-4">

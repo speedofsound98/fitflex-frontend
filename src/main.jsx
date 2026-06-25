@@ -20,6 +20,7 @@ import Groups from './pages/Groups';
 import GroupProfile from './pages/GroupProfile';
 import EventDetail from './pages/EventDetail';
 import Messages from './pages/Messages';
+import Studios from './pages/Studios';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -31,7 +32,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/reset" element={<ResetPassword />} />
 
-        {/* Public studio profile */}
+        {/* Public studio directory + profile */}
+        <Route path="/studios" element={<Studios />} />
         <Route path="/studios/:id" element={<StudioProfile />} />
 
         {/* Studio-only routes */}

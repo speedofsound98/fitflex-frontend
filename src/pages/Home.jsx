@@ -63,6 +63,12 @@ export default function Home() {
             >
               Go to Dashboard
             </Link>
+            <Link
+              to="/studios"
+              className="border border-white text-white font-semibold px-8 py-3 rounded-full hover:bg-blue-500 transition"
+            >
+              Browse Studios
+            </Link>
           </div>
         ) : (
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -73,10 +79,10 @@ export default function Home() {
               Get Started — It's Free
             </Link>
             <Link
-              to="/login"
+              to="/studios"
               className="border border-white text-white font-semibold px-8 py-3 rounded-full hover:bg-blue-500 transition"
             >
-              Log In
+              Browse Studios
             </Link>
           </div>
         )}
