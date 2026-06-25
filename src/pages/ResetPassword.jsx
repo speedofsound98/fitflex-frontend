@@ -19,7 +19,8 @@ e.preventDefault(); setError(''); setMessage('');
 if (password !== confirm) return setError('Passwords do not match');
 if (!isValidPassword(password)) return setError('Password must be 8+ chars with letters & numbers');
 try {
-const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
+const base = import.meta.env.VITE_API_URL.replace(/\/api$/, '');
+const res = await fetch(`${base}/auth/reset-password`, {
 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, newPassword: password })
 });
 const data = await res.json();

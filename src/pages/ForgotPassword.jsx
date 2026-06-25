@@ -11,7 +11,8 @@ const handleSubmit = async (e) => {
 e.preventDefault();
 setError(''); setMessage('');
 try {
-const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/request-password-reset`, {
+const base = import.meta.env.VITE_API_URL.replace(/\/api$/, '');
+const res = await fetch(`${base}/auth/request-password-reset`, {
 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email })
 });
 const data = await res.json();
