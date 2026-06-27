@@ -20,15 +20,27 @@ function cellText(cell) {
 }
 
 function isTrainingPlan(rows) {
-  const flat = rows.flatMap(r => r.map(c => c?.v || '')).join(' ').toLowerCase();
+  const flat = rows.flatMap(r => Array.from(r, c => c?.v || '')).join(' ').toLowerCase();
   return (flat.includes('week') || flat.includes('phase')) && flat.includes('run');
 }
 
+function dedupeMergedCells(rows) {
+  // If consecutive cells in a row all share the same value, blank the duplicates
+  return rows.map(row => {
+    const out = [...row];
+    for (let i = 1; i < out.length; i++) {
+      if (out[i]?.v && out[i].v === out[i - 1]?.v) out[i] = { ...out[i], v: '' };
+    }
+    return out;
+  });
+}
+
 function findHeaderRowIdx(rows) {
+  // Prefer the row with the most DISTINCT non-empty values
   let best = 0, bestCount = 0;
   rows.forEach((r, i) => {
-    const count = r.filter(c => c?.v?.trim()).length;
-    if (count > bestCount) { bestCount = count; best = i; }
+    const distinct = new Set(r.map(c => c?.v?.trim()).filter(Boolean)).size;
+    if (distinct > bestCount) { bestCount = distinct; best = i; }
   });
   return best;
 }
@@ -337,11 +349,12 @@ export default function WorkoutPlan() {
               )}
             </div>
 
-            {sheet && (
-              isTrainingPlan(sheet.rows)
-                ? <TrainingPlanView rows={sheet.rows} />
-                : <GenericTableView rows={sheet.rows} />
-            )}
+            {sheet && (() => {
+              const rows = dedupeMergedCells(sheet.rows);
+              return isTrainingPlan(rows)
+                ? <TrainingPlanView rows={rows} />
+                : <GenericTableView rows={rows} />;
+            })()}
           </>
         )}
       </div>
