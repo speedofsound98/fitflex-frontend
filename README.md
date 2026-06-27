@@ -26,17 +26,19 @@ fitflex-frontend/
 │   ├── utils/
 │   │   └── authFetch.js           ← fetch wrapper that adds Authorization header
 │   ├── pages/
-│   │   ├── Home.jsx               ← Landing page
+│   │   ├── Home.jsx               ← Landing page (Browse Studios button, hero CTAs)
 │   │   ├── Login.jsx              ← Login form
 │   │   ├── Signup.jsx             ← Signup (user / studio, supports ?role=studio)
 │   │   ├── Pricing.jsx            ← /pricing — credit packs + Stripe checkout
-│   │   ├── UserDashboard.jsx      ← /dashboard — browse + book classes
+│   │   ├── Studios.jsx            ← /studios — public studio directory with search + location filter
+│   │   ├── UserDashboard.jsx      ← /dashboard — browse + book classes + studio search
 │   │   ├── UserSettings.jsx       ← /settings — profile, credits, password
-│   │   ├── StudioDashboard.jsx    ← /studio — manage classes, analytics, messaging
-│   │   ├── StudioSettings.jsx     ← /studio/settings — profile, enquiries toggle, password
-│   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page + enquiry form
+│   │   ├── StudioDashboard.jsx    ← /studio — manage classes (with roster), analytics, appointments
+│   │   ├── StudioSettings.jsx     ← /studio/settings — profile, cover photo upload, theme, hours
+│   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page (no login required)
+│   │   ├── WorkoutPlan.jsx        ← /training-plan — upload + display Excel/CSV training plans
 │   │   ├── Groups.jsx             ← /groups — community groups list
-│   │   ├── GroupDetail.jsx        ← /groups/:id — group page with feed
+│   │   ├── GroupProfile.jsx       ← /groups/:id — group page with feed
 │   │   ├── EventDetail.jsx        ← /events/:eventId — single event page
 │   │   ├── Messages.jsx           ← /messages — DM inbox
 │   │   ├── ForgotPassword.jsx
@@ -88,6 +90,7 @@ npm run dev
 | `/login` | Login | Public |
 | `/signup` | Signup | Public |
 | `/pricing` | Credit Packs | Public |
+| `/studios` | Studio Directory | Public |
 | `/studios/:id` | Studio Profile | Public |
 | `/forgot` | Forgot Password | Public |
 | `/reset` | Reset Password | Public |
@@ -97,6 +100,7 @@ npm run dev
 | `/messages` | DM Inbox | Auth |
 | `/dashboard` | User Dashboard | Users only |
 | `/settings` | User Settings | Users only |
+| `/training-plan` | Training Plan Upload | Users only |
 | `/studio` | Studio Dashboard | Studios only |
 | `/studio/settings` | Studio Settings | Studios only |
 
@@ -138,6 +142,13 @@ Weekly slot booking matrix rendered on studio dashboard (manage mode) and studio
 
 ### GroupFeed
 Posts and comments feed used on the `/groups/:id` page. Supports creating posts, replying with comments, and real-time-style updates.
+
+### WorkoutPlan page
+Upload an Excel (.xlsx) or CSV file — the backend parses it with `exceljs` and returns every cell's value, background color, text color, and bold flag. The frontend detects whether the file looks like a training plan (contains "week", "phase", "run" keywords) and renders either:
+- **Rich card view** — phase filter buttons, per-week cards with run type chips using the Excel cell colors, summary stats bar
+- **Generic table view** — color-accurate table preserving all cell backgrounds
+
+Multi-sheet files get a tab switcher. Merged cells are deduplicated before rendering.
 
 ---
 
