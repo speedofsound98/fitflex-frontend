@@ -21,6 +21,7 @@ import GroupProfile from './pages/GroupProfile';
 import EventDetail from './pages/EventDetail';
 import Messages from './pages/Messages';
 import Studios from './pages/Studios';
+import WorkoutPlan from './pages/WorkoutPlan';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -52,6 +53,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />
+        <Route path="/training-plan" element={<RoleRoute allow={['user']}><WorkoutPlan /></RoleRoute>} />
         <Route path="/settings" element={<RoleRoute allow={['user']}><UserSettings /></RoleRoute>} />
       </Routes>
     </Router>
