@@ -145,8 +145,16 @@ Posts and comments feed used on the `/groups/:id` page. Supports creating posts,
 
 ### WorkoutPlan page
 Upload an Excel (.xlsx) or CSV file — the backend parses it with `exceljs` and returns every cell's value, background color, text color, and bold flag. The frontend detects whether the file looks like a training plan (contains "week", "phase", "run" keywords) and renders either:
-- **Rich card view** — phase filter buttons, per-week cards with run type chips using the Excel cell colors, summary stats bar
-- **Generic table view** — color-accurate table preserving all cell backgrounds
+- **Card view** — phase filter buttons, per-week cards with run type chips using the Excel cell colors, summary stats bar, and a collapsible Guide & Legend panel
+- **Table view** — editable spreadsheet preserving all cell colors; click any cell to edit inline
+
+**Sprint 14 features (all live):**
+- **Full-screen mode** — "⛶ Full screen" button opens a fixed overlay; ESC to exit
+- **Column resize** — drag the right edge of any column header to resize
+- **Row height** — Compact / Normal / Tall preset picker
+- **In-app editing** — click any cell in table view to edit; Enter/Tab commits, Escape cancels
+- **Export .xlsx** — sends current (possibly edited) data to `POST /api/workout-plan/export`; downloads file with colors and bold preserved
+- **Guide & Legend** — collapsible panel in card view showing phase color swatches + km totals, run type chips with descriptions for ~20 common abbreviations (Easy, Tempo, Long, MP, HMP, Intervals, Fartlek…), and a card-reading guide
 
 Multi-sheet files get a tab switcher. Merged cells are deduplicated before rendering.
 
