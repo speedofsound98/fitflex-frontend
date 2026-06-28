@@ -1,10 +1,19 @@
 // src/pages/WorkoutPlan.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
+const DEFAULT_COL_WIDTH = 130;
+const ROW_HEIGHTS = { compact: 28, normal: 36, tall: 52 };
+const PHASE_STYLE = {
+  Base:  { backgroundColor: '#d6e4f0', color: '#1a3a5c' },
+  Build: { backgroundColor: '#d9ead3', color: '#1a4a1a' },
+  Peak:  { backgroundColor: '#fce5cd', color: '#7f3000' },
+  Taper: { backgroundColor: '#e8d5f5', color: '#4a1a6a' },
+};
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function cellStyle(cell) {
   if (!cell) return {};
   const s = {};
@@ -14,10 +23,7 @@ function cellStyle(cell) {
   return s;
 }
 
-function cellText(cell) {
-  if (!cell) return '';
-  return cell.v ?? '';
-}
+function cellText(cell) { return cell?.v ?? ''; }
 
 function isTrainingPlan(rows) {
   const flat = rows.flatMap(r => Array.from(r, c => c?.v || '')).join(' ').toLowerCase();
@@ -25,7 +31,6 @@ function isTrainingPlan(rows) {
 }
 
 function dedupeMergedCells(rows) {
-  // If consecutive cells in a row all share the same value, blank the duplicates
   return rows.map(row => {
     const out = [...row];
     for (let i = 1; i < out.length; i++) {
@@ -36,7 +41,6 @@ function dedupeMergedCells(rows) {
 }
 
 function findHeaderRowIdx(rows) {
-  // Prefer the row with the most DISTINCT non-empty values
   let best = 0, bestCount = 0;
   rows.forEach((r, i) => {
     const distinct = new Set(r.map(c => c?.v?.trim()).filter(Boolean)).size;
@@ -51,15 +55,140 @@ function colIdx(headers, keywords) {
   );
 }
 
-// ── Phase badge colors (fallback if no Excel color) ─────────────────────────
-const PHASE_STYLE = {
-  Base:  { backgroundColor: '#d6e4f0', color: '#1a3a5c' },
-  Build: { backgroundColor: '#d9ead3', color: '#1a4a1a' },
-  Peak:  { backgroundColor: '#fce5cd', color: '#7f3000' },
-  Taper: { backgroundColor: '#e8d5f5', color: '#4a1a6a' },
-};
+// ── Spreadsheet View (editable, resizable) ────────────────────────────────────
+function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }) {
+  const [editingCell, setEditingCell] = useState(null); // {row, col}
+  const [editValue, setEditValue] = useState('');
+  const inputRef = useRef(null);
+  const dragging = useRef(null);
+  const colCount = Math.max(...rows.map(r => r.length), 1);
+  const rh = ROW_HEIGHTS[rowHeight] || ROW_HEIGHTS.normal;
+  const headerRowIdx = findHeaderRowIdx(rows);
 
-// ── Training Plan rich view ──────────────────────────────────────────────────
+  // ── Column resize ──
+  function startResize(e, ci) {
+    e.preventDefault();
+    dragging.current = { ci, startX: e.clientX, startW: colWidths[ci] || DEFAULT_COL_WIDTH };
+    function onMove(me) {
+      if (!dragging.current) return;
+      const newW = Math.max(60, dragging.current.startW + me.clientX - dragging.current.startX);
+      onColResize(dragging.current.ci, newW);
+    }
+    function onUp() {
+      dragging.current = null;
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    }
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  // ── Cell editing ──
+  function startEdit(ri, ci) {
+    setEditingCell({ row: ri, col: ci });
+    setEditValue(rows[ri]?.[ci]?.v ?? '');
+  }
+  function commitEdit() {
+    if (!editingCell) return;
+    onCellEdit(editingCell.row, editingCell.col, editValue);
+    setEditingCell(null);
+  }
+  function handleKeyDown(e) {
+    if (e.key === 'Enter') { e.preventDefault(); commitEdit(); }
+    if (e.key === 'Escape') setEditingCell(null);
+    if (e.key === 'Tab') { e.preventDefault(); commitEdit(); }
+  }
+  useEffect(() => {
+    if (editingCell && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [editingCell]);
+
+  return (
+    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm" style={{ userSelect: 'none' }}>
+      <table className="border-collapse text-sm" style={{ tableLayout: 'fixed', width: 'max-content' }}>
+        <colgroup>
+          {Array.from({ length: colCount }, (_, ci) => (
+            <col key={ci} style={{ width: colWidths[ci] || DEFAULT_COL_WIDTH }} />
+          ))}
+        </colgroup>
+        <thead>
+          <tr>
+            {Array.from({ length: colCount }, (_, ci) => {
+              const cell = rows[headerRowIdx]?.[ci];
+              return (
+                <th key={ci} style={{
+                  backgroundColor: cell?.bg || '#1e3a5f',
+                  color: cell?.fg || '#ffffff',
+                  fontWeight: 'bold',
+                  height: rh,
+                  position: 'relative',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  padding: '0 10px',
+                  textAlign: 'left',
+                  borderRight: '1px solid rgba(255,255,255,0.15)',
+                  boxSizing: 'border-box',
+                }}>
+                  {cellText(cell)}
+                  <div onMouseDown={e => startResize(e, ci)} style={{
+                    position: 'absolute', right: 0, top: 0, bottom: 0, width: 6,
+                    cursor: 'col-resize', zIndex: 1,
+                  }} title="Drag to resize" />
+                </th>
+              );
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row, ri) => {
+            if (ri === headerRowIdx) return null;
+            if (!row.some(c => c?.v?.trim())) return null;
+            return (
+              <tr key={ri} className="border-t border-gray-100">
+                {Array.from({ length: colCount }, (_, ci) => {
+                  const cell = row[ci];
+                  const isEditing = editingCell?.row === ri && editingCell?.col === ci;
+                  return (
+                    <td key={ci} style={{
+                      ...cellStyle(cell),
+                      height: rh,
+                      padding: '0 10px',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      borderRight: '1px solid #f0f0f0',
+                      cursor: 'text',
+                      position: 'relative',
+                      boxSizing: 'border-box',
+                    }} onClick={() => !isEditing && startEdit(ri, ci)}>
+                      {isEditing ? (
+                        <input ref={inputRef} value={editValue}
+                          onChange={e => setEditValue(e.target.value)}
+                          onBlur={commitEdit} onKeyDown={handleKeyDown}
+                          style={{
+                            position: 'absolute', inset: 0, width: '100%', height: '100%',
+                            padding: '0 10px', border: '2px solid #2563eb', outline: 'none',
+                            background: '#fff', color: '#1a1a1a', fontSize: 'inherit',
+                            fontFamily: 'inherit', boxSizing: 'border-box', zIndex: 2,
+                          }} />
+                      ) : (
+                        cellText(cell)
+                      )}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ── Card View ─────────────────────────────────────────────────────────────────
 function TrainingPlanView({ rows }) {
   const headerIdx = findHeaderRowIdx(rows);
   const headers = rows[headerIdx] || [];
@@ -80,20 +209,15 @@ function TrainingPlanView({ rows }) {
   };
 
   const hasRuns = C.r1km !== -1 || C.r2km !== -1;
-  if (!hasRuns) return <GenericTableView rows={rows} />;
+  if (!hasRuns) return null;
 
   const phases = [...new Set(dataRows.map(r => cellText(r[C.phase])).filter(Boolean))];
   const [activePhase, setActivePhase] = useState('');
-
-  const visible = activePhase
-    ? dataRows.filter(r => cellText(r[C.phase]) === activePhase)
-    : dataRows;
-
+  const visible = activePhase ? dataRows.filter(r => cellText(r[C.phase]) === activePhase) : dataRows;
   const totalKm = dataRows.reduce((s, r) => s + (parseFloat(cellText(r[C.total])) || 0), 0);
 
   return (
     <div>
-      {/* ── Summary bar ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
           <p className="text-3xl font-extrabold text-gray-900">{dataRows.length}</p>
@@ -116,7 +240,6 @@ function TrainingPlanView({ rows }) {
         })}
       </div>
 
-      {/* ── Phase filter ── */}
       {phases.length > 1 && (
         <div className="flex gap-2 mb-5 flex-wrap">
           <button onClick={() => setActivePhase('')}
@@ -124,84 +247,59 @@ function TrainingPlanView({ rows }) {
               ${!activePhase ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
             All weeks
           </button>
-          {phases.map(p => {
-            const style = activePhase === p
-              ? PHASE_STYLE[p] || { backgroundColor: '#e5e7eb', color: '#374151' }
-              : {};
-            return (
-              <button key={p} onClick={() => setActivePhase(activePhase === p ? '' : p)}
-                style={activePhase === p ? style : {}}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
-                  ${activePhase === p ? 'border-transparent' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                {p}
-              </button>
-            );
-          })}
+          {phases.map(p => (
+            <button key={p} onClick={() => setActivePhase(activePhase === p ? '' : p)}
+              style={activePhase === p ? (PHASE_STYLE[p] || {}) : {}}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
+                ${activePhase === p ? 'border-transparent' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+              {p}
+            </button>
+          ))}
         </div>
       )}
 
-      {/* ── Week cards ── */}
       <div className="space-y-2">
         {visible.map((row, i) => {
           const phase = cellText(row[C.phase]);
           const phaseStyle = (row[C.phase]?.bg
             ? { backgroundColor: row[C.phase].bg, color: row[C.phase].fg || '#1a3a5c' }
             : PHASE_STYLE[phase]) || {};
-
           const runs = [
             { km: row[C.r1km], type: row[C.r1type] },
             { km: row[C.r2km], type: row[C.r2type] },
             { km: row[C.r3km], type: row[C.r3type] },
-          ].filter(r => r.km || r.type).filter(r => cellText(r.km) || cellText(r.type));
-
+          ].filter(r => cellText(r.km) || cellText(r.type));
           const totalCell = row[C.total];
           const totalVal = cellText(totalCell);
 
           return (
             <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              {/* Card header */}
               <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-50">
-                {phase && (
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={phaseStyle}>
-                    {phase}
-                  </span>
-                )}
-                {C.wk !== -1 && cellText(row[C.wk]) && (
-                  <span className="font-bold text-gray-800 text-sm">
-                    Week {cellText(row[C.wk])}
-                  </span>
-                )}
-                {C.date !== -1 && cellText(row[C.date]) && (
-                  <span className="text-xs text-gray-400">{cellText(row[C.date])}</span>
-                )}
+                {phase && <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={phaseStyle}>{phase}</span>}
+                {C.wk !== -1 && cellText(row[C.wk]) && <span className="font-bold text-gray-800 text-sm">Week {cellText(row[C.wk])}</span>}
+                {C.date !== -1 && cellText(row[C.date]) && <span className="text-xs text-gray-400">{cellText(row[C.date])}</span>}
                 {totalVal && totalVal !== '0' && (
                   <span className="ml-auto text-sm font-bold" style={totalCell?.bg ? cellStyle(totalCell) : { color: '#2563eb' }}>
                     {parseFloat(totalVal) || totalVal} km
                   </span>
                 )}
               </div>
-
-              {/* Card body */}
               <div className="px-5 py-3 flex flex-col gap-2">
-                {C.focus !== -1 && cellText(row[C.focus]) && (
-                  <p className="text-sm text-gray-500 italic">{cellText(row[C.focus])}</p>
-                )}
+                {C.focus !== -1 && cellText(row[C.focus]) && <p className="text-sm text-gray-500 italic">{cellText(row[C.focus])}</p>}
                 {runs.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {runs.map((run, j) => {
                       const km = cellText(run.km);
                       const type = cellText(run.type);
-                      const hasKm = km && km !== '0';
-                      if (!hasKm && !type) return null;
+                      if (!km && !type) return null;
                       return (
-                        <div key={j}
-                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium border"
+                        <div key={j} className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium border"
                           style={{
                             backgroundColor: run.km?.bg || run.type?.bg || '#f9fafb',
                             color: run.km?.fg || run.type?.fg || '#374151',
                             borderColor: run.km?.bg || run.type?.bg || '#e5e7eb',
                           }}>
-                          {hasKm && <span className="font-bold">{km} km</span>}
+                          {km && km !== '0' && <span className="font-bold">{km} km</span>}
                           {type && <span className="opacity-80">{type}</span>}
                         </div>
                       );
@@ -217,63 +315,79 @@ function TrainingPlanView({ rows }) {
   );
 }
 
-// ── Generic table view ───────────────────────────────────────────────────────
-function GenericTableView({ rows }) {
-  if (!rows.length) return <p className="text-gray-400 text-sm">Empty sheet.</p>;
-  const headerIdx = findHeaderRowIdx(rows);
-  const headers = rows[headerIdx] || [];
-  const dataRows = rows.slice(headerIdx + 1).filter(r => r.some(c => c?.v?.trim()));
-  const colCount = Math.max(...rows.map(r => r.length));
-
+// ── Shared toolbar component ───────────────────────────────────────────────────
+function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onFullscreen, onExport, exporting, inFullscreen, onClose }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
-      <table className="w-full text-sm">
-        <thead>
-          <tr>
-            {Array.from({ length: colCount }, (_, i) => (
-              <th key={i}
-                className="text-left px-4 py-3 font-semibold whitespace-nowrap"
-                style={headers[i] ? { ...cellStyle(headers[i]), background: headers[i].bg || '#1a3a5c', color: headers[i].fg || '#ffffff' } : { background: '#1a3a5c', color: '#fff' }}>
-                {cellText(headers[i])}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {dataRows.map((row, ri) => (
-            <tr key={ri} className="border-t border-gray-50 hover:brightness-95 transition">
-              {Array.from({ length: colCount }, (_, ci) => {
-                const cell = row[ci];
-                return (
-                  <td key={ci} className="px-4 py-2.5" style={cellStyle(cell)}>
-                    {cellText(cell)}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="flex items-center gap-2 flex-wrap">
+      {isTP && (
+        <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+          <button onClick={() => setViewMode('table')}
+            className={`px-3 py-1.5 text-xs font-semibold transition ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+            Table
+          </button>
+          <button onClick={() => setViewMode('cards')}
+            className={`px-3 py-1.5 text-xs font-semibold border-l transition ${viewMode === 'cards' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+            Cards
+          </button>
+        </div>
+      )}
+      {viewMode === 'table' && (
+        <select value={rowHeight} onChange={e => setRowHeight(e.target.value)}
+          className="px-2 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-600 bg-white">
+          <option value="compact">Compact</option>
+          <option value="normal">Normal</option>
+          <option value="tall">Tall</option>
+        </select>
+      )}
+      {!inFullscreen && (
+        <button onClick={onFullscreen}
+          className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold bg-white text-gray-600 hover:bg-gray-50 transition"
+          title="Full screen (ESC to exit)">
+          ⛶ Full screen
+        </button>
+      )}
+      <button onClick={onExport} disabled={exporting}
+        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 text-white hover:bg-green-700 transition disabled:opacity-50">
+        {exporting ? 'Exporting…' : '⬇ Export .xlsx'}
+      </button>
+      {inFullscreen && (
+        <button onClick={onClose}
+          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-white hover:bg-gray-900 transition">
+          ✕ Close
+        </button>
+      )}
     </div>
   );
 }
 
-// ── Main page ────────────────────────────────────────────────────────────────
+// ── Main page ─────────────────────────────────────────────────────────────────
 export default function WorkoutPlan() {
   usePageTitle('My Training Plan');
   const api = import.meta.env.VITE_API_URL;
-  const inputRef = useRef();
+  const fileInputRef = useRef();
+
   const [uploading, setUploading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [error, setError] = useState('');
-  const [plan, setPlan] = useState(null);
   const [fileName, setFileName] = useState('');
   const [activeSheet, setActiveSheet] = useState(0);
+  const [editedSheets, setEditedSheets] = useState(null);
+  const [colWidths, setColWidths] = useState({});   // { [sheetIdx]: number[] }
+  const [rowHeight, setRowHeight] = useState('normal');
+  const [viewMode, setViewMode] = useState('table');
+  const [fullscreen, setFullscreen] = useState(false);
+
+  useEffect(() => {
+    function onKey(e) { if (e.key === 'Escape') setFullscreen(false); }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
 
   async function handleFile(e) {
     const file = e.target.files[0];
     if (!file) return;
-    setUploading(true); setError(''); setPlan(null);
-    setFileName(file.name);
+    setUploading(true); setError('');
+    setFileName(file.name.replace(/\.xlsx?$/i, ''));
     const form = new FormData();
     form.append('file', file);
     try {
@@ -285,79 +399,171 @@ export default function WorkoutPlan() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to parse file');
-      setPlan(data);
+      const processed = data.sheets.map(s => ({ ...s, rows: dedupeMergedCells(s.rows) }));
+      setEditedSheets(processed);
       setActiveSheet(0);
+      setColWidths({});
+      setViewMode('table');
     } catch (err) {
       setError(err.message);
     } finally {
       setUploading(false);
-      if (inputRef.current) inputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }
 
-  const sheet = plan?.sheets?.[activeSheet];
+  function handleCellEdit(sheetIdx, row, col, value) {
+    setEditedSheets(prev => prev.map((s, si) => si !== sheetIdx ? s : {
+      ...s,
+      rows: s.rows.map((r, ri) => ri !== row ? r : r.map((c, ci) => ci !== col ? c : { ...c, v: value })),
+    }));
+  }
+
+  function handleColResize(sheetIdx, ci, width) {
+    setColWidths(prev => {
+      const arr = [...(prev[sheetIdx] || [])];
+      arr[ci] = width;
+      return { ...prev, [sheetIdx]: arr };
+    });
+  }
+
+  async function handleExport() {
+    if (!editedSheets) return;
+    setExporting(true);
+    try {
+      const token = localStorage.getItem('authToken');
+      const res = await fetch(`${api}/workout-plan/export`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheets: editedSheets, fileName }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.error || 'Export failed');
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${fileName || 'training-plan'}.xlsx`;
+      a.click(); URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  const sheet = editedSheets?.[activeSheet];
+  const isTP = sheet ? isTrainingPlan(sheet.rows) : false;
+
+  function renderViewer() {
+    if (!sheet) return null;
+    if (viewMode === 'cards' && isTP) {
+      const cardResult = <TrainingPlanView rows={sheet.rows} />;
+      return cardResult || (
+        <SpreadsheetView rows={sheet.rows} colWidths={colWidths[activeSheet] || []}
+          rowHeight={rowHeight}
+          onCellEdit={(r, c, v) => handleCellEdit(activeSheet, r, c, v)}
+          onColResize={(ci, w) => handleColResize(activeSheet, ci, w)} />
+      );
+    }
+    return (
+      <SpreadsheetView rows={sheet.rows} colWidths={colWidths[activeSheet] || []}
+        rowHeight={rowHeight}
+        onCellEdit={(r, c, v) => handleCellEdit(activeSheet, r, c, v)}
+        onColResize={(ci, w) => handleColResize(activeSheet, ci, w)} />
+    );
+  }
+
+  const sheetTabs = editedSheets?.length > 1 ? (
+    <div className="flex gap-2 flex-wrap">
+      {editedSheets.map((s, i) => (
+        <button key={i} onClick={() => setActiveSheet(i)}
+          className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
+            ${activeSheet === i ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+          {s.name}
+        </button>
+      ))}
+    </div>
+  ) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
-
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">My Training Plan</h1>
-          <p className="text-gray-500 mt-1">Upload your workout or running plan — colors and formatting are preserved from your file.</p>
-        </div>
-
-        {/* Upload zone */}
-        <div
-          onClick={() => inputRef.current?.click()}
-          className={`bg-white rounded-2xl border-2 border-dashed p-8 text-center mb-8 cursor-pointer transition
-            ${uploading ? 'border-blue-300 bg-blue-50' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50/30'}`}
-        >
-          <div className="text-5xl mb-3">{uploading ? '⏳' : plan ? '📊' : '📂'}</div>
-          <p className="font-semibold text-gray-700 mb-1">
-            {uploading ? 'Parsing your plan…' : plan ? 'Upload a different file' : 'Upload your training plan'}
-          </p>
-          <p className="text-sm text-gray-400 mb-4">Excel (.xlsx) or CSV — max 10 MB · Colors preserved</p>
-          <button type="button" disabled={uploading}
-            className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50">
-            {uploading ? 'Loading…' : 'Choose file'}
-          </button>
-          <input ref={inputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleFile} />
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm mb-6">{error}</div>
-        )}
-
-        {plan && (
-          <>
-            {/* File name + sheet tabs */}
-            <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-              <p className="text-sm text-gray-400">📁 {fileName}</p>
-              {plan.sheets.length > 1 && (
-                <div className="flex gap-2 flex-wrap">
-                  {plan.sheets.map((s, i) => (
-                    <button key={i} onClick={() => setActiveSheet(i)}
-                      className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
-                        ${activeSheet === i
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                      {s.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+    <>
+      {/* ── Fullscreen overlay ── */}
+      {fullscreen && editedSheets && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#f9fafb', overflowY: 'auto' }}>
+          <div style={{ padding: '16px 20px' }}>
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
+              <span className="font-semibold text-gray-800 text-sm truncate max-w-xs">
+                {fileName}{editedSheets.length > 1 ? ` — ${sheet?.name}` : ''}
+              </span>
+              <div className="ml-auto">
+                <PlanToolbar isTP={isTP} viewMode={viewMode} setViewMode={setViewMode}
+                  rowHeight={rowHeight} setRowHeight={setRowHeight}
+                  onExport={handleExport} exporting={exporting}
+                  inFullscreen onClose={() => setFullscreen(false)} />
+              </div>
             </div>
+            {sheetTabs && <div className="mb-4">{sheetTabs}</div>}
+            {renderViewer()}
+          </div>
+        </div>
+      )}
 
-            {sheet && (() => {
-              const rows = dedupeMergedCells(sheet.rows);
-              return isTrainingPlan(rows)
-                ? <TrainingPlanView rows={rows} />
-                : <GenericTableView rows={rows} />;
-            })()}
-          </>
-        )}
+      {/* ── Normal page ── */}
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="pt-24 pb-16 px-4 max-w-5xl mx-auto">
+
+          <div className="mb-8">
+            <h1 className="text-3xl font-extrabold text-gray-900">My Training Plan</h1>
+            <p className="text-gray-500 mt-1">Upload your workout or running plan — colors and formatting are preserved.</p>
+          </div>
+
+          {/* Upload zone */}
+          <div onClick={() => fileInputRef.current?.click()}
+            className={`bg-white rounded-2xl border-2 border-dashed p-8 text-center mb-8 cursor-pointer transition
+              ${uploading ? 'border-blue-300 bg-blue-50' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50/30'}`}>
+            <div className="text-5xl mb-3">{uploading ? '⏳' : editedSheets ? '📊' : '📂'}</div>
+            <p className="font-semibold text-gray-700 mb-1">
+              {uploading ? 'Parsing your plan…' : editedSheets ? 'Upload a different file' : 'Upload your training plan'}
+            </p>
+            <p className="text-sm text-gray-400 mb-4">Excel (.xlsx) or CSV — max 10 MB · Colors preserved</p>
+            <button type="button" disabled={uploading}
+              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50">
+              {uploading ? 'Loading…' : 'Choose file'}
+            </button>
+            <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleFile} />
+          </div>
+
+          {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm mb-6">{error}</div>}
+
+          {editedSheets && (
+            <>
+              {/* Header: file name + sheet tabs + toolbar */}
+              <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
+                <div className="flex flex-col gap-2">
+                  <p className="text-sm text-gray-400">📁 {fileName}</p>
+                  {sheetTabs}
+                </div>
+                <PlanToolbar isTP={isTP} viewMode={viewMode} setViewMode={setViewMode}
+                  rowHeight={rowHeight} setRowHeight={setRowHeight}
+                  onFullscreen={() => setFullscreen(true)}
+                  onExport={handleExport} exporting={exporting}
+                  inFullscreen={false} />
+              </div>
+
+              {viewMode === 'table' && (
+                <p className="text-xs text-gray-400 mb-3">
+                  Click any cell to edit · Drag column header edges to resize
+                </p>
+              )}
+
+              {renderViewer()}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
