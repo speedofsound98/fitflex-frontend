@@ -188,6 +188,35 @@ function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }
   );
 }
 
+// ── Run type descriptions for the legend ─────────────────────────────────────
+const RUN_TYPE_GUIDE = {
+  easy:      'Conversational pace — aerobic base building',
+  e:         'Easy pace — aerobic base building',
+  long:      'Long slow distance — builds endurance',
+  l:         'Long run — builds endurance',
+  tempo:     'Comfortably hard — lactate threshold',
+  t:         'Tempo — lactate threshold effort',
+  intervals: 'Short hard repeats with recovery',
+  int:       'Interval repeats with recovery',
+  fartlek:   'Varied pace — unstructured speed play',
+  hills:     'Hill repeats — strength and form',
+  recovery:  'Very easy — active recovery',
+  rec:       'Recovery — very easy effort',
+  mp:        'Marathon pace effort',
+  hmp:       'Half marathon pace effort',
+  race:      'Race effort',
+  r:         'Race or race-pace effort',
+  strides:   'Short accelerations after an easy run',
+  cross:     'Cross-training — non-running cardio',
+  rest:      'Full rest day',
+};
+
+function getRunTypeGuide(label) {
+  if (!label) return null;
+  const key = label.toLowerCase().trim();
+  return RUN_TYPE_GUIDE[key] || null;
+}
+
 // ── Card View ─────────────────────────────────────────────────────────────────
 function TrainingPlanView({ rows }) {
   const headerIdx = findHeaderRowIdx(rows);
@@ -213,8 +242,23 @@ function TrainingPlanView({ rows }) {
 
   const phases = [...new Set(dataRows.map(r => cellText(r[C.phase])).filter(Boolean))];
   const [activePhase, setActivePhase] = useState('');
+  const [legendOpen, setLegendOpen] = useState(false);
   const visible = activePhase ? dataRows.filter(r => cellText(r[C.phase]) === activePhase) : dataRows;
   const totalKm = dataRows.reduce((s, r) => s + (parseFloat(cellText(r[C.total])) || 0), 0);
+
+  // Collect unique run types with their colors from actual data
+  const runTypeMap = new Map(); // label → {bg, fg}
+  dataRows.forEach(row => {
+    [[C.r1km, C.r1type], [C.r2km, C.r2type], [C.r3km, C.r3type]].forEach(([kmIdx, typeIdx]) => {
+      const type = cellText(row[typeIdx]);
+      if (type && !runTypeMap.has(type)) {
+        runTypeMap.set(type, {
+          bg: row[typeIdx]?.bg || row[kmIdx]?.bg || null,
+          fg: row[typeIdx]?.fg || row[kmIdx]?.fg || null,
+        });
+      }
+    });
+  });
 
   return (
     <div>
@@ -230,7 +274,11 @@ function TrainingPlanView({ rows }) {
         {phases.slice(0, 2).map(p => {
           const km = dataRows.filter(r => cellText(r[C.phase]) === p)
             .reduce((s, r) => s + (parseFloat(cellText(r[C.total])) || 0), 0);
-          const style = PHASE_STYLE[p] || { backgroundColor: '#f3f4f6', color: '#374151' };
+          // Use first row's actual cell color for this phase if available
+          const firstRow = dataRows.find(r => cellText(r[C.phase]) === p);
+          const style = firstRow?.[C.phase]?.bg
+            ? { backgroundColor: firstRow[C.phase].bg, color: firstRow[C.phase].fg || '#1a3a5c' }
+            : PHASE_STYLE[p] || { backgroundColor: '#f3f4f6', color: '#374151' };
           return (
             <div key={p} className="rounded-2xl shadow-sm border border-gray-100 p-4 text-center" style={style}>
               <p className="text-3xl font-extrabold">{Math.round(km)}</p>
@@ -238,6 +286,114 @@ function TrainingPlanView({ rows }) {
             </div>
           );
         })}
+      </div>
+
+      {/* ── Guide & Legend toggle ── */}
+      <div className="mb-5">
+        <button
+          onClick={() => setLegendOpen(o => !o)}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
+        >
+          <span>{legendOpen ? '▾' : '▸'}</span>
+          Guide &amp; Legend
+        </button>
+
+        {legendOpen && (
+          <div className="mt-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 grid sm:grid-cols-2 gap-6">
+
+            {/* Phases */}
+            {phases.length > 0 && (
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Training Phases</p>
+                <div className="flex flex-col gap-2">
+                  {phases.map(p => {
+                    const firstRow = dataRows.find(r => cellText(r[C.phase]) === p);
+                    const style = firstRow?.[C.phase]?.bg
+                      ? { backgroundColor: firstRow[C.phase].bg, color: firstRow[C.phase].fg || '#1a3a5c' }
+                      : PHASE_STYLE[p] || { backgroundColor: '#f3f4f6', color: '#374151' };
+                    const km = dataRows.filter(r => cellText(r[C.phase]) === p)
+                      .reduce((s, r) => s + (parseFloat(cellText(r[C.total])) || 0), 0);
+                    const phaseDescriptions = {
+                      Base: 'Build aerobic foundation at easy effort',
+                      Build: 'Increase volume and introduce quality workouts',
+                      Peak: 'Highest training load before taper',
+                      Taper: 'Reduce volume, maintain sharpness for race day',
+                    };
+                    return (
+                      <div key={p} className="flex items-center gap-3">
+                        <span className="text-xs font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 min-w-[64px] text-center" style={style}>{p}</span>
+                        <span className="text-sm text-gray-500 flex-1">{phaseDescriptions[p] || `${Math.round(km)} km total`}</span>
+                        <span className="text-xs text-gray-400 font-medium">{Math.round(km)} km</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Run types */}
+            {runTypeMap.size > 0 && (
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Run Types</p>
+                <div className="flex flex-col gap-2">
+                  {[...runTypeMap.entries()].map(([type, colors]) => {
+                    const desc = getRunTypeGuide(type);
+                    return (
+                      <div key={type} className="flex items-start gap-3">
+                        <span
+                          className="text-xs font-bold px-2.5 py-0.5 rounded-xl flex-shrink-0 border"
+                          style={{
+                            backgroundColor: colors.bg || '#f3f4f6',
+                            color: colors.fg || '#374151',
+                            borderColor: colors.bg || '#e5e7eb',
+                          }}
+                        >
+                          {type}
+                        </span>
+                        {desc
+                          ? <span className="text-sm text-gray-500">{desc}</span>
+                          : <span className="text-sm text-gray-400 italic">No description available</span>
+                        }
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Reading the cards guide */}
+            <div className="sm:col-span-2 pt-4 border-t border-gray-100">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Reading the Cards</p>
+              <div className="grid sm:grid-cols-3 gap-3 text-sm text-gray-500">
+                <div className="flex gap-2 items-start">
+                  <span className="text-base">🏷️</span>
+                  <span><strong className="text-gray-700">Phase badge</strong> — training block color coded from your file</span>
+                </div>
+                <div className="flex gap-2 items-start">
+                  <span className="text-base">📅</span>
+                  <span><strong className="text-gray-700">Week / date</strong> — week number and start date</span>
+                </div>
+                <div className="flex gap-2 items-start">
+                  <span className="text-base">🏃</span>
+                  <span><strong className="text-gray-700">Run chips</strong> — each chip shows distance + type for that session</span>
+                </div>
+                <div className="flex gap-2 items-start">
+                  <span className="text-base">📊</span>
+                  <span><strong className="text-gray-700">Total km</strong> — weekly volume shown top-right of each card</span>
+                </div>
+                <div className="flex gap-2 items-start">
+                  <span className="text-base">🎨</span>
+                  <span><strong className="text-gray-700">Colors</strong> — preserved from your Excel file for at-a-glance intensity</span>
+                </div>
+                <div className="flex gap-2 items-start">
+                  <span className="text-base">✏️</span>
+                  <span><strong className="text-gray-700">Editing</strong> — switch to Table view to edit cells, then export back to .xlsx</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        )}
       </div>
 
       {phases.length > 1 && (
