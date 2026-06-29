@@ -143,6 +143,8 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <Link to="/blog" className="text-sm text-blue-600 hover:underline">Blog</Link>
+          <Link to="/admin/blog" className="text-sm text-blue-600 hover:underline">Manage Blog</Link>
           <Link to="/" className="text-sm text-blue-600 hover:underline">← Back to site</Link>
           <button
             onClick={() => {
