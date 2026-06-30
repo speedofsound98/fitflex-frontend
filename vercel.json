@@ -1,11 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/sitemap.xml",
-      "destination": "https://fitflex-backend-jdd2.onrender.com/sitemap.xml",
-      "permanent": false
-    }
-  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
