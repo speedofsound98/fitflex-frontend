@@ -1,6 +1,7 @@
 // src/pages/Blog.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 
@@ -51,6 +52,13 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>Blog — FitFlex</title>
+        <meta name="description" content="Training tips, running routes, and fitness inspiration from the FitFlex community." />
+        <meta property="og:title" content="FitFlex Blog" />
+        <meta property="og:description" content="Training tips, running routes, and fitness inspiration from the FitFlex community." />
+        <meta property="og:type" content="website" />
+      </Helmet>
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-5xl mx-auto">
 

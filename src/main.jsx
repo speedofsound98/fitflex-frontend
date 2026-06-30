@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import './index.css';
 
 import Home from './pages/Home';
@@ -28,6 +29,7 @@ import AdminBlog from './pages/AdminBlog';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <HelmetProvider>
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -65,5 +67,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/settings" element={<RoleRoute allow={['user']}><UserSettings /></RoleRoute>} />
       </Routes>
     </Router>
+    </HelmetProvider>
   </React.StrictMode>
 );

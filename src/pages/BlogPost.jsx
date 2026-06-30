@@ -1,6 +1,7 @@
 // src/pages/BlogPost.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 
@@ -65,8 +66,32 @@ export default function BlogPost() {
     ? new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
 
+  const siteUrl = 'https://your-portfolio-g56q.vercel.app';
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>{post.title} — FitFlex Blog</title>
+        <meta name="description" content={post.excerpt || post.title} />
+        <link rel="canonical" href={`${siteUrl}/blog/${post.slug}`} />
+
+        {/* Open Graph (Facebook, WhatsApp, LinkedIn) */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt || post.title} />
+        <meta property="og:url" content={`${siteUrl}/blog/${post.slug}`} />
+        {post.cover_image && <meta property="og:image" content={post.cover_image} />}
+        <meta property="article:published_time" content={post.published_at} />
+        <meta property="article:author" content={post.author_name} />
+        {(post.tags || []).map(t => <meta key={t} property="article:tag" content={t} />)}
+
+        {/* Twitter card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt || post.title} />
+        {post.cover_image && <meta name="twitter:image" content={post.cover_image} />}
+      </Helmet>
+
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-3xl mx-auto">
 
