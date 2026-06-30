@@ -1,5 +1,11 @@
 {
+  "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [{ "key": "Content-Type", "value": "application/xml; charset=utf-8" }]
+    }
+  ],
   "rewrites": [
-    { "source": "/((?!sitemap.xml|googlefc9079792cd11400.html).*)", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
