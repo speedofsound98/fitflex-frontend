@@ -8,8 +8,11 @@ React + Vite + Tailwind CSS frontend for the FitFlex fitness marketplace.
 
 - React 19
 - Vite 7 + @tailwindcss/vite
-- Tailwind CSS
+- Tailwind CSS (+ `@tailwindcss/typography` for blog article rendering)
 - React Router 7
+- TipTap — rich text WYSIWYG editor for the blog admin
+- react-helmet-async — per-page SEO meta tags
+- exceljs (backend) + client-side parsing for training plans
 - JWT auth via `Authorization: Bearer` header (token stored in localStorage)
 
 ---
@@ -37,6 +40,9 @@ fitflex-frontend/
 │   │   ├── StudioSettings.jsx     ← /studio/settings — profile, cover photo upload, theme, hours
 │   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page (no login required)
 │   │   ├── WorkoutPlan.jsx        ← /training-plan — upload + display Excel/CSV training plans
+│   │   ├── Blog.jsx               ← /blog — public blog listing (featured post, tag filter)
+│   │   ├── BlogPost.jsx           ← /blog/:slug — single article (SEO meta tags, prose styling)
+│   │   ├── AdminBlog.jsx          ← /admin/blog — TipTap editor + post management (admin secret)
 │   │   ├── Groups.jsx             ← /groups — community groups list
 │   │   ├── GroupProfile.jsx       ← /groups/:id — group page with feed
 │   │   ├── EventDetail.jsx        ← /events/:eventId — single event page
@@ -92,6 +98,9 @@ npm run dev
 | `/pricing` | Credit Packs | Public |
 | `/studios` | Studio Directory | Public |
 | `/studios/:id` | Studio Profile | Public |
+| `/blog` | Blog Listing | Public |
+| `/blog/:slug` | Blog Article | Public |
+| `/admin/blog` | Blog Management | Admin secret |
 | `/forgot` | Forgot Password | Public |
 | `/reset` | Reset Password | Public |
 | `/groups` | Community Groups | Auth |
@@ -157,6 +166,26 @@ Upload an Excel (.xlsx) or CSV file — the backend parses it with `exceljs` and
 - **Guide & Legend** — collapsible panel in card view showing phase color swatches + km totals, run type chips with descriptions for ~20 common abbreviations (Easy, Tempo, Long, MP, HMP, Intervals, Fartlek…), and a card-reading guide
 
 Multi-sheet files get a tab switcher. Merged cells are deduplicated before rendering.
+
+### Blog
+
+- **`/blog`** — public listing: featured post hero, tag filter bar, card grid (cover image, excerpt, author, date)
+- **`/blog/:slug`** — full article rendered with `@tailwindcss/typography` (`prose`) classes; cover image, tags, author/date
+- **`/admin/blog`** — admin-only (gated by admin secret stored in `localStorage`). Uses **TipTap** WYSIWYG editor (bold, italic, headings, lists, blockquote, links, inline images). Slug auto-generates from title; draft/publish toggle; cover image URL; comma-separated tags; excerpt. Lists all posts with status badges + view/publish/edit/delete actions.
+
+Content is stored as HTML and rendered with `dangerouslySetInnerHTML` inside the `prose` container. The backend `blog_posts.status` field (draft/pending/published/rejected) is wired for future studio/user submissions with admin moderation.
+
+---
+
+## SEO
+
+- **Meta tags** via `react-helmet-async` (provider wraps the app in `main.jsx`). Blog post pages set `<title>`, description, canonical URL, Open Graph tags (og:title/description/image/url), Twitter card, and article:tag per post.
+- **`public/sitemap.xml`** — static file served directly by Vercel (instant, no backend dependency). Lists static pages + every published blog post. **Add a `<url>` entry whenever a new post is published**, then commit + push.
+- **`public/robots.txt`** — allows all crawlers, points to the sitemap.
+- **`public/googlefc9079792cd11400.html`** — Google Search Console verification file (do not delete — removing it un-verifies the property).
+- **`vercel.json`** uses `rewrites` + `headers` (never legacy `routes`, which breaks asset loading). The `headers` block pins `application/xml` for sitemap.xml and `text/plain` for robots.txt. Real files (assets, sitemap, robots, verification) are served before the SPA catch-all.
+
+> ⚠️ The sitemap must stay a **static file** — do not switch to a backend-generated one. Render's free tier sleeps and times out Google's crawler ("Couldn't fetch").
 
 ---
 
