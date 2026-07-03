@@ -22,6 +22,8 @@ export default function UserSettings() {
   const [user, setUser] = useState(null);
   const [form, setForm] = useState({ name: '', bio: '', public_fields: 'name', phone: '' });
   const [pwForm, setPwForm] = useState({ currentPassword: '', newPassword: '', confirm: '' });
+  const [notifPrefs, setNotifPrefs] = useState({ bookings: true, reminders: true, messages: true });
+  const [savingNotif, setSavingNotif] = useState(false);
   const [purchases, setPurchases] = useState([]);
   const [activeTab, setActiveTab] = useState('profile');
   const [success, setSuccess] = useState('');
@@ -43,6 +45,12 @@ export default function UserSettings() {
             bio: d.user.bio || '',
             public_fields: d.user.public_fields || 'name',
             phone: d.user.phone || '',
+          });
+          const p = d.user.email_prefs || {};
+          setNotifPrefs({
+            bookings: p.bookings !== false,
+            reminders: p.reminders !== false,
+            messages: p.messages !== false,
           });
         }
       })
@@ -102,6 +110,32 @@ export default function UserSettings() {
     } catch (e) { flash(e.message, 'error'); }
   }
 
+  async function saveNotifications(next) {
+    // Optimistic update; revert on failure
+    const prev = notifPrefs;
+    setNotifPrefs(next);
+    setSavingNotif(true);
+    try {
+      const res = await authFetch(`${api}/users/${userId}/settings`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_prefs: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save');
+      flash('Notification settings saved!');
+    } catch (e) {
+      setNotifPrefs(prev);
+      flash(e.message, 'error');
+    } finally {
+      setSavingNotif(false);
+    }
+  }
+
+  function toggleNotif(key) {
+    saveNotifications({ ...notifPrefs, [key]: !notifPrefs[key] });
+  }
+
   const tabClass = (t) =>
     `px-5 py-2.5 text-sm font-semibold rounded-full transition ${activeTab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`;
 
@@ -124,6 +158,7 @@ export default function UserSettings() {
         <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit">
           <button className={tabClass('profile')} onClick={() => setActiveTab('profile')}>👤 Profile</button>
           <button className={tabClass('credits')} onClick={() => setActiveTab('credits')}>🎟️ Credits</button>
+          <button className={tabClass('notifications')} onClick={() => setActiveTab('notifications')}>🔔 Notifications</button>
           <button className={tabClass('password')} onClick={() => setActiveTab('password')}>🔒 Password</button>
         </div>
 
@@ -238,6 +273,42 @@ export default function UserSettings() {
                   ))}
                 </ul>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Notifications tab ── */}
+        {activeTab === 'notifications' && (
+          <div className="bg-white rounded-2xl shadow p-6">
+            <h2 className="text-lg font-bold text-gray-800 mb-1">Email Notifications</h2>
+            <p className="text-sm text-gray-400 mb-6">
+              Choose which emails you'd like to receive. Password reset and security emails are always sent.
+            </p>
+            <div className="divide-y divide-gray-100">
+              {[
+                { key: 'bookings', label: 'Booking confirmations', desc: 'When you book or cancel a class' },
+                { key: 'reminders', label: 'Class & event reminders', desc: '24 hours before a class or group event' },
+                { key: 'messages', label: 'Studio messages', desc: 'When a studio sends a message about your class' },
+              ].map(item => (
+                <div key={item.key} className="flex items-center justify-between py-4">
+                  <div className="pr-4">
+                    <p className="font-semibold text-gray-800">{item.label}</p>
+                    <p className="text-sm text-gray-400">{item.desc}</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={notifPrefs[item.key]}
+                    disabled={savingNotif}
+                    onClick={() => toggleNotif(item.key)}
+                    className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition disabled:opacity-50
+                      ${notifPrefs[item.key] ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  >
+                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition
+                      ${notifPrefs[item.key] ? 'translate-x-6' : 'translate-x-1'}`} />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         )}
