@@ -51,6 +51,18 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Kill the ugly mobile tap-highlight flash on links/buttons */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep keyboard accessibility: visible ring only for keyboard focus */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-brand-400);
+  outline-offset: 2px;
 }
 
 body {
