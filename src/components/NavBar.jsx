@@ -100,19 +100,13 @@ function NotificationBell({ role }) {
 }
 
 export default function Navbar() {
-  const [authed, setAuthed] = useState(false);
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('');
+  // Read auth state synchronously so the navbar doesn't flash the
+  // logged-out state (orange Get Started) on every route change/remount.
+  const [authed, setAuthed] = useState(() => !!localStorage.getItem('userName'));
+  const [name, setName] = useState(() => localStorage.getItem('userName') || '');
+  const [role, setRole] = useState(() => localStorage.getItem('userRole') || '');
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const userName = localStorage.getItem('userName');
-    const userRole = localStorage.getItem('userRole');
-    setAuthed(!!userName);
-    setName(userName || '');
-    setRole(userRole || '');
-  }, []);
 
   const handleLogout = () => {
     // Clear client state immediately — don't wait for the server
