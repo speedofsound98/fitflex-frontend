@@ -1,8 +1,50 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* ─────────────────────────────────────────────
+   FitFlex design tokens
+   Brand: warm orange on ink & cream (editorial)
+   ───────────────────────────────────────────── */
+@theme {
+  /* Typography */
+  --font-sans: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-display: "Archivo", "Inter", system-ui, sans-serif;
+
+  /* Brand orange ramp */
+  --color-brand-50: #fdf3ec;
+  --color-brand-100: #fbe4d3;
+  --color-brand-200: #f6c9a7;
+  --color-brand-300: #f1a878;
+  --color-brand-400: #ed8a4b;
+  --color-brand-500: #e8702a;
+  --color-brand-600: #d55f1f;
+  --color-brand-700: #b24c17;
+  --color-brand-800: #8e3c13;
+  --color-brand-900: #6f2f10;
+
+  /* Ink (deep blue-charcoal) ramp for text & dark surfaces */
+  --color-ink-50: #f4f6f8;
+  --color-ink-100: #e6eaee;
+  --color-ink-200: #ccd4dc;
+  --color-ink-300: #a5b2c0;
+  --color-ink-400: #8494a4;
+  --color-ink-500: #5b6b7b;
+  --color-ink-600: #40505f;
+  --color-ink-700: #2c3e50;
+  --color-ink-800: #1e2c3a;
+  --color-ink-900: #15202b;
+
+  /* Page surfaces */
+  --color-cream: #f7f4ee;
+  --color-paper: #f3f3f5;
+
+  /* Elevation */
+  --shadow-card: 0 20px 45px -24px rgb(21 32 43 / 0.16);
+  --shadow-card-lg: 0 30px 60px -28px rgb(21 32 43 / 0.28);
+  --shadow-pill: 0 12px 30px -12px rgb(21 32 43 / 0.25);
+}
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -15,4 +57,12 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  font-family: var(--font-sans);
+  color: var(--color-ink-800);
+  background: var(--color-cream);
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-ink-900);
 }

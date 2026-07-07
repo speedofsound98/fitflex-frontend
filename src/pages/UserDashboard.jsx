@@ -2,6 +2,10 @@ import authFetch from '../utils/authFetch';
 // src/pages/UserDashboard.jsx
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import {
+  Search, MapPin, CalendarDays, Clock, Users, Tag, Building2,
+  Dumbbell, CheckCircle2, Sparkles, ArrowRight,
+} from 'lucide-react';
 
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
@@ -12,29 +16,63 @@ const SPORT_ICONS = {
   shiatsu: '🙌', default: '🏃',
 };
 
+// Soft chip backgrounds cycled per sport for variety (reference-style icon chips)
+const CHIP_STYLES = [
+  'bg-brand-100 text-brand-700',
+  'bg-ink-100 text-ink-700',
+  'bg-amber-100 text-amber-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-sky-100 text-sky-700',
+];
+
 function sportIcon(type) {
   if (!type) return SPORT_ICONS.default;
   return SPORT_ICONS[type.toLowerCase()] || SPORT_ICONS.default;
 }
 
+function chipStyle(type) {
+  const key = (type || 'default').toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) | 0;
+  return CHIP_STYLES[Math.abs(hash) % CHIP_STYLES.length];
+}
+
 function StudioCard({ studio }) {
   return (
     <Link to={`/studios/${studio.id}`}
-      className="bg-white rounded-2xl shadow hover:shadow-md transition p-5 flex flex-col gap-2">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="font-bold text-gray-800 text-lg">{studio.name}</h3>
-          {(studio.city || studio.neighbourhood) && (
-            <p className="text-sm text-gray-500">📍 {[studio.neighbourhood, studio.city].filter(Boolean).join(', ')}</p>
-          )}
+      className="bg-white rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-2.5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <span className="w-11 h-11 rounded-2xl bg-ink-100 text-ink-700 grid place-items-center shrink-0">
+            <Building2 className="w-5 h-5" strokeWidth={1.9} />
+          </span>
+          <div>
+            <h3 className="font-display font-bold text-ink-900 text-lg leading-tight">{studio.name}</h3>
+            {(studio.city || studio.neighbourhood) && (
+              <p className="text-sm text-ink-400 flex items-center gap-1 mt-0.5">
+                <MapPin className="w-3.5 h-3.5" />
+                {[studio.neighbourhood, studio.city].filter(Boolean).join(', ')}
+              </p>
+            )}
+          </div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          {studio.verified && <span className="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-full">✅ Verified</span>}
-          {studio.offers_appointments && <span className="text-xs bg-green-50 text-green-700 font-semibold px-2 py-0.5 rounded-full">📆 Appointments</span>}
+          {studio.verified && (
+            <span className="inline-flex items-center gap-1 text-xs bg-brand-50 text-brand-600 font-semibold px-2.5 py-1 rounded-full">
+              <CheckCircle2 className="w-3 h-3" /> Verified
+            </span>
+          )}
+          {studio.offers_appointments && (
+            <span className="inline-flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-1 rounded-full">
+              <CalendarDays className="w-3 h-3" /> Appointments
+            </span>
+          )}
         </div>
       </div>
-      {studio.about && <p className="text-sm text-gray-500 line-clamp-2">{studio.about}</p>}
-      <span className="text-sm text-blue-600 font-medium mt-auto">View studio →</span>
+      {studio.about && <p className="text-sm text-ink-500 line-clamp-2">{studio.about}</p>}
+      <span className="inline-flex items-center gap-1.5 text-sm text-brand-600 font-semibold mt-auto">
+        View studio <ArrowRight className="w-3.5 h-3.5" />
+      </span>
     </Link>
   );
 }
@@ -44,33 +82,49 @@ function ClassCard({ cls, onBook, bookedIds }) {
   const isPast = new Date(cls.datetime) < new Date();
 
   return (
-    <div className="bg-white rounded-2xl shadow hover:shadow-md transition p-5 flex flex-col gap-3">
-      <div className="flex items-start justify-between">
+    <div className="bg-white rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-4">
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <span className="text-2xl">{sportIcon(cls.sport_type)}</span>
-          <h3 className="font-bold text-gray-800 text-lg mt-1">{cls.name}</h3>
-          <Link to={`/studios/${cls.studio_id}`} className="text-sm text-blue-600 font-medium hover:underline">{cls.studio_name}</Link>
+          <span className={`inline-grid place-items-center w-11 h-11 rounded-2xl text-xl ${chipStyle(cls.sport_type)}`}>
+            {sportIcon(cls.sport_type)}
+          </span>
+          <h3 className="font-display font-bold text-ink-900 text-lg mt-3 leading-tight">{cls.name}</h3>
+          <Link to={`/studios/${cls.studio_id}`} className="text-sm text-brand-600 font-medium hover:underline">
+            {cls.studio_name}
+          </Link>
         </div>
-        <span className="bg-blue-50 text-blue-700 text-xs font-semibold px-2 py-1 rounded-full">
-          {cls.credit_cost} credit{cls.credit_cost !== 1 ? 's' : ''}
+        <span className="bg-brand-50 text-brand-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
+          {cls.credit_cost} cr
         </span>
       </div>
 
-      <div className="text-sm text-gray-500 space-y-1">
-        <p>📅 {new Date(cls.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</p>
-        <p>🕐 {new Date(cls.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</p>
-        {cls.studio_location && <p>📍 {cls.studio_location}</p>}
-        {cls.sport_type && <p>🏷️ {cls.sport_type}</p>}
-        {cls.capacity && <p>👥 {cls.capacity} spots</p>}
+      <div className="text-sm text-ink-500 space-y-1.5">
+        <p className="flex items-center gap-2">
+          <CalendarDays className="w-4 h-4 text-ink-300" />
+          {new Date(cls.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+        </p>
+        <p className="flex items-center gap-2">
+          <Clock className="w-4 h-4 text-ink-300" />
+          {new Date(cls.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+        </p>
+        {cls.studio_location && (
+          <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-ink-300" />{cls.studio_location}</p>
+        )}
+        {cls.sport_type && (
+          <p className="flex items-center gap-2"><Tag className="w-4 h-4 text-ink-300" />{cls.sport_type}</p>
+        )}
+        {cls.capacity && (
+          <p className="flex items-center gap-2"><Users className="w-4 h-4 text-ink-300" />{cls.capacity} spots</p>
+        )}
       </div>
 
       <button
         onClick={() => onBook(cls.id)}
         disabled={alreadyBooked || isPast}
-        className={`mt-auto w-full py-2 rounded-xl text-sm font-semibold transition
-          ${alreadyBooked ? 'bg-green-100 text-green-700 cursor-default'
-          : isPast ? 'bg-gray-100 text-gray-400 cursor-default'
-          : 'bg-blue-600 text-white hover:bg-blue-700'}`}
+        className={`mt-auto w-full py-2.5 rounded-full text-sm font-semibold transition
+          ${alreadyBooked ? 'bg-emerald-100 text-emerald-700 cursor-default'
+          : isPast ? 'bg-ink-50 text-ink-300 cursor-default'
+          : 'bg-brand-500 text-white hover:bg-brand-600 shadow-pill'}`}
       >
         {alreadyBooked ? '✓ Booked' : isPast ? 'Past' : 'Book Class'}
       </button>
@@ -139,6 +193,12 @@ export default function UserDashboard() {
   const recommended = useMemo(() => {
     return upcomingClasses.filter(c => !bookedIds.has(c.id)).slice(0, 4);
   }, [upcomingClasses, bookedIds]);
+
+  // Upcoming bookings count for the stat row
+  const upcomingBookings = useMemo(
+    () => bookings.filter(b => new Date(b.datetime) >= new Date()).length,
+    [bookings]
+  );
 
   // Search + filter results — classes
   const filtered = useMemo(() => {
@@ -212,54 +272,88 @@ export default function UserDashboard() {
   const showSearch = search || locationFilter;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <Navbar />
 
-      <div className="pt-24 pb-16 px-4 max-w-6xl mx-auto">
+      <div className="pt-28 pb-16 px-4 max-w-6xl mx-auto">
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {userName} 👋</h1>
-          <p className="text-gray-500 mt-1">Find and book your next fitness class.</p>
+          <h1 className="font-display font-black text-3xl sm:text-4xl text-ink-900 tracking-tight">
+            Welcome back, {userName} 👋
+          </h1>
+          <p className="text-ink-500 mt-1.5">Find and book your next fitness class.</p>
+        </div>
+
+        {/* Stat row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          <div className="rounded-3xl p-5 text-white shadow-card flex items-center gap-4"
+            style={{ background: 'linear-gradient(135deg,#e8702a,#f1a878)' }}>
+            <span className="w-12 h-12 rounded-2xl bg-white/20 grid place-items-center shrink-0">
+              <CalendarDays className="w-6 h-6" strokeWidth={1.9} />
+            </span>
+            <div>
+              <p className="text-sm/tight opacity-90">Upcoming bookings</p>
+              <p className="font-display font-black text-2xl">{upcomingBookings}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-3xl p-5 shadow-card flex items-center gap-4">
+            <span className="w-12 h-12 rounded-2xl bg-brand-100 text-brand-600 grid place-items-center shrink-0">
+              <Dumbbell className="w-6 h-6" strokeWidth={1.9} />
+            </span>
+            <div>
+              <p className="text-sm/tight text-ink-400">Classes available</p>
+              <p className="font-display font-black text-2xl text-ink-900">{classes.length}</p>
+            </div>
+          </div>
+          <div className="bg-white rounded-3xl p-5 shadow-card flex items-center gap-4">
+            <span className="w-12 h-12 rounded-2xl bg-ink-100 text-ink-700 grid place-items-center shrink-0">
+              <Building2 className="w-6 h-6" strokeWidth={1.9} />
+            </span>
+            <div>
+              <p className="text-sm/tight text-ink-400">Studios on FitFlex</p>
+              <p className="font-display font-black text-2xl text-ink-900">{studios.length}</p>
+            </div>
+          </div>
         </div>
 
         {msg && (
-          <div className={`mb-6 p-3 rounded-xl text-sm font-medium ${msgType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div className={`mb-6 p-3.5 rounded-2xl text-sm font-medium ${msgType === 'success' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
             {msg}
           </div>
         )}
 
         {/* Tab switcher */}
-        <div className="flex gap-2 mb-6 bg-white rounded-full shadow-sm p-1 w-fit">
+        <div className="flex gap-1 mb-6 bg-white rounded-full shadow-card p-1.5 w-fit">
           <button
             onClick={() => setActiveTab('classes')}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${activeTab === 'classes' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-            🏋️ Classes
+            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${activeTab === 'classes' ? 'bg-brand-500 text-white shadow-pill' : 'text-ink-500 hover:bg-ink-50'}`}>
+            Classes
           </button>
           <button
             onClick={() => setActiveTab('studios')}
-            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${activeTab === 'studios' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}>
-            🏢 Studios
+            className={`px-5 py-2 text-sm font-semibold rounded-full transition ${activeTab === 'studios' ? 'bg-brand-500 text-white shadow-pill' : 'text-ink-500 hover:bg-ink-50'}`}>
+            Studios
           </button>
         </div>
 
         {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-10">
           <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-ink-300" strokeWidth={2} />
             <input
-              className="w-full border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+              className="w-full bg-white rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
               placeholder="Search classes, studios or sport types..."
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
           </div>
           <select
-            className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300 text-gray-600"
+            className="bg-white rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
             value={locationFilter}
             onChange={e => setLocationFilter(e.target.value)}
           >
-            <option value="">📍 All locations</option>
+            <option value="">All locations</option>
             {locations.map(loc => (
               <option key={loc} value={loc}>{loc}</option>
             ))}
@@ -273,7 +367,7 @@ export default function UserDashboard() {
               <>
                 {filteredStudios.length > 0 && (
                   <section className="mb-10">
-                    <h2 className="text-xl font-bold text-gray-800 mb-4">
+                    <h2 className="font-display font-bold text-xl text-ink-900 mb-4">
                       {filteredStudios.length} studio{filteredStudios.length !== 1 ? 's' : ''}
                       {search && ` for "${search}"`}
                       {locationFilter && ` in ${locationFilter}`}
@@ -284,13 +378,13 @@ export default function UserDashboard() {
                   </section>
                 )}
                 <section className="mb-12">
-                  <h2 className="text-xl font-bold text-gray-800 mb-4">
+                  <h2 className="font-display font-bold text-xl text-ink-900 mb-4">
                     {filtered.length} class{filtered.length !== 1 ? 'es' : ''}
                     {search && ` for "${search}"`}
                     {locationFilter && ` in ${locationFilter}`}
                   </h2>
                   {filtered.length === 0 ? (
-                    <p className="text-gray-500">No classes match your search.</p>
+                    <p className="text-ink-500">No classes match your search.</p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                       {filtered.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
@@ -302,18 +396,20 @@ export default function UserDashboard() {
               <>
                 {recommended.length > 0 && (
                   <section className="mb-12">
-                    <h2 className="text-xl font-bold text-gray-800 mb-1">Recommended for you</h2>
-                    <p className="text-sm text-gray-500 mb-4">Upcoming classes you haven't booked yet</p>
+                    <h2 className="font-display font-bold text-xl text-ink-900 mb-1 flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-brand-500" /> Recommended for you
+                    </h2>
+                    <p className="text-sm text-ink-400 mb-4">Upcoming classes you haven't booked yet</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                       {recommended.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
                     </div>
                   </section>
                 )}
                 <section className="mb-12">
-                  <h2 className="text-xl font-bold text-gray-800 mb-1">All classes</h2>
-                  <p className="text-sm text-gray-500 mb-4">Everything available on the platform</p>
+                  <h2 className="font-display font-bold text-xl text-ink-900 mb-1">All classes</h2>
+                  <p className="text-sm text-ink-400 mb-4">Everything available on the platform</p>
                   {classes.length === 0 ? (
-                    <p className="text-gray-500">No classes available yet.</p>
+                    <p className="text-ink-500">No classes available yet.</p>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                       {classes.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}
@@ -328,14 +424,14 @@ export default function UserDashboard() {
         {/* ── Studios tab ── */}
         {activeTab === 'studios' && (
           <section className="mb-12">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">
+            <h2 className="font-display font-bold text-xl text-ink-900 mb-1">
               {showSearch
                 ? `${filteredStudios.length} studio${filteredStudios.length !== 1 ? 's' : ''}${search ? ` for "${search}"` : ''}${locationFilter ? ` in ${locationFilter}` : ''}`
                 : 'All Studios'}
             </h2>
-            <p className="text-sm text-gray-500 mb-4">Browse studios — click to view classes and book appointments</p>
+            <p className="text-sm text-ink-400 mb-4">Browse studios — click to view classes and book appointments</p>
             {filteredStudios.length === 0 ? (
-              <p className="text-gray-500">No studios match your search.</p>
+              <p className="text-ink-500">No studios match your search.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filteredStudios.map(s => <StudioCard key={s.id} studio={s} />)}
@@ -346,28 +442,33 @@ export default function UserDashboard() {
 
         {/* Booking history */}
         <section>
-          <h2 className="text-xl font-bold text-gray-800 mb-1">My bookings</h2>
-          <p className="text-sm text-gray-500 mb-4">Classes you've reserved</p>
+          <h2 className="font-display font-bold text-xl text-ink-900 mb-1">My bookings</h2>
+          <p className="text-sm text-ink-400 mb-4">Classes you've reserved</p>
           {bookings.length === 0 ? (
-            <p className="text-gray-500">You haven't booked any classes yet.</p>
+            <p className="text-ink-500">You haven't booked any classes yet.</p>
           ) : (
-            <div className="bg-white rounded-2xl shadow overflow-hidden">
-              <ul className="divide-y divide-gray-100">
+            <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+              <ul className="divide-y divide-ink-50">
                 {bookings.map(b => {
                   const isPast = new Date(b.datetime) < new Date();
                   return (
-                    <li key={b.id} className="flex items-center justify-between px-5 py-4">
-                      <div>
-                        <p className="font-semibold text-gray-800">{b.class_name}</p>
-                        <p className="text-sm text-gray-500">
-                          {b.studio_name}
-                          {b.studio_location ? ` · ${b.studio_location}` : ''}
-                          {' · '}{new Date(b.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                          {' '}{new Date(b.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                        </p>
+                    <li key={b.id} className="flex items-center justify-between px-6 py-4 hover:bg-paper/60 transition">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <span className={`hidden sm:grid place-items-center w-10 h-10 rounded-2xl shrink-0 ${isPast ? 'bg-ink-50 text-ink-300' : 'bg-brand-100 text-brand-600'}`}>
+                          <CalendarDays className="w-5 h-5" strokeWidth={1.9} />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-ink-800 truncate">{b.class_name}</p>
+                          <p className="text-sm text-ink-400 truncate">
+                            {b.studio_name}
+                            {b.studio_location ? ` · ${b.studio_location}` : ''}
+                            {' · '}{new Date(b.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            {' '}{new Date(b.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${isPast ? 'bg-gray-100 text-gray-500' : 'bg-green-100 text-green-700'}`}>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${isPast ? 'bg-ink-50 text-ink-400' : 'bg-emerald-100 text-emerald-700'}`}>
                           {isPast ? 'Completed' : 'Upcoming'}
                         </span>
                         {!isPast && (
