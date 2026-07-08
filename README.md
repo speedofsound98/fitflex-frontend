@@ -8,12 +8,28 @@ React + Vite + Tailwind CSS frontend for the FitFlex fitness marketplace.
 
 - React 19
 - Vite 7 + @tailwindcss/vite
-- Tailwind CSS (+ `@tailwindcss/typography` for blog article rendering)
-- React Router 7
+- Tailwind CSS v4 (+ `@tailwindcss/typography` for blog article rendering)
+- React Router 7 (nested routes + `useOutletContext` for the dashboard)
+- lucide-react — icon set (replaces emoji in the redesigned UI)
 - TipTap — rich text WYSIWYG editor for the blog admin
 - react-helmet-async — per-page SEO meta tags
 - exceljs (backend) + client-side parsing for training plans
 - JWT auth via `Authorization: Bearer` header (token stored in localStorage)
+
+---
+
+## Design System
+
+The UI was redesigned around an editorial, light-first look (warm orange on ink & cream). Tokens live in `src/index.css` under Tailwind v4's `@theme` block — use these instead of ad-hoc Tailwind colors so the app stays cohesive. See **REDESIGN.md** for the full plan, reference inspiration, and remaining work.
+
+- **Fonts** — `Archivo` (display / headings, via `font-display`) + `Inter` (body, default). Loaded from Google Fonts in `index.html`.
+- **Brand ramp** — `brand-50 … brand-900` (orange, primary `brand-500` `#e8702a`). Used for CTAs, active states, accents.
+- **Ink ramp** — `ink-50 … ink-900` (blue-charcoal) for text + dark surfaces. Body text is `ink-800`; muted labels `ink-400`.
+- **Surfaces** — `cream` (`#f7f4ee`, landing) and `paper` (`#f3f3f5`, app pages) page backgrounds; cards are white.
+- **Elevation** — `shadow-card`, `shadow-card-lg`, `shadow-pill`.
+- **Shape** — cards use `rounded-3xl`; pills/buttons `rounded-full`; icon chips `rounded-2xl`.
+- **Motion** — cards lift on hover (`hover:-translate-y-1`), pill CTAs, tab transitions.
+- Global `-webkit-tap-highlight-color: transparent` (kills the mobile tap flash) with a `:focus-visible` ring for keyboard users.
 
 ---
 
@@ -23,20 +39,26 @@ React + Vite + Tailwind CSS frontend for the FitFlex fitness marketplace.
 fitflex-frontend/
 ├── src/
 │   ├── main.jsx                   ← Router + all routes registered here
-│   ├── index.css                  ← Tailwind import
+│   ├── index.css                  ← Tailwind import + @theme design tokens (see Design System)
 │   ├── hooks/
 │   │   └── usePageTitle.js        ← Sets document.title per page
 │   ├── utils/
-│   │   └── authFetch.js           ← fetch wrapper that adds Authorization header
+│   │   ├── authFetch.js           ← fetch wrapper that adds Authorization header
+│   │   └── sport.js               ← sportIcon() + chipStyle() helpers (shared by cards)
 │   ├── pages/
-│   │   ├── Home.jsx               ← Landing page (Browse Studios button, hero CTAs)
+│   │   ├── Home.jsx               ← Landing page (editorial hero, features, how-it-works, CTA)
 │   │   ├── Login.jsx              ← Login form
 │   │   ├── Signup.jsx             ← Signup (user / studio, supports ?role=studio)
 │   │   ├── Pricing.jsx            ← /pricing — credit packs + Stripe checkout
 │   │   ├── Studios.jsx            ← /studios — public studio directory with search + location filter
-│   │   ├── UserDashboard.jsx      ← /dashboard — browse + book classes + studio search
+│   │   ├── dashboard/             ← /dashboard — user dashboard (Overview hub + sub-pages)
+│   │   │   ├── UserDashboardLayout.jsx ← fetches shared data, sub-nav tabs, <Outlet context>
+│   │   │   ├── Overview.jsx       ← /dashboard — stats, next class, derived booking chart, recommended
+│   │   │   ├── BrowseClasses.jsx  ← /dashboard/classes — search + book classes
+│   │   │   ├── BrowseStudios.jsx  ← /dashboard/studios — studio directory
+│   │   │   └── Bookings.jsx       ← /dashboard/bookings — booking history + cancel
 │   │   ├── UserSettings.jsx       ← /settings — profile, credits, password
-│   │   ├── StudioDashboard.jsx    ← /studio — manage classes (with roster), analytics, appointments
+│   │   ├── StudioDashboard.jsx    ← /studio — Overview hub + classes (roster), appointments, analytics, profile
 │   │   ├── StudioSettings.jsx     ← /studio/settings — profile, cover photo upload, theme, hours
 │   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page (no login required)
 │   │   ├── WorkoutPlan.jsx        ← /training-plan — upload + display Excel/CSV training plans
@@ -50,7 +72,9 @@ fitflex-frontend/
 │   │   ├── ForgotPassword.jsx
 │   │   └── ResetPassword.jsx
 │   └── components/
-│       ├── NavBar.jsx             ← Header, notification bell, hamburger menu
+│       ├── NavBar.jsx             ← Minimal top bar + slide-out side drawer, notification bell
+│       ├── ClassCard.jsx          ← Reusable class card (used across dashboard pages)
+│       ├── StudioCard.jsx         ← Reusable studio card
 │       ├── RoleRoute.jsx          ← Route guard by role
 │       ├── AppointmentMatrix.jsx  ← Weekly slot booking matrix
 │       └── GroupFeed.jsx          ← Group posts + comments feed
@@ -107,7 +131,10 @@ npm run dev
 | `/groups/:id` | Group Detail + Feed | Auth |
 | `/events/:eventId` | Event Detail | Auth |
 | `/messages` | DM Inbox | Auth |
-| `/dashboard` | User Dashboard | Users only |
+| `/dashboard` | User Dashboard — Overview hub | Users only |
+| `/dashboard/classes` | Browse + book classes | Users only |
+| `/dashboard/studios` | Studio directory | Users only |
+| `/dashboard/bookings` | Booking history | Users only |
 | `/settings` | User Settings | Users only |
 | `/training-plan` | Training Plan Upload | Users only |
 | `/studio` | Studio Dashboard | Studios only |
@@ -134,6 +161,13 @@ npm run dev
 | `authToken` | JWT (7-day expiry) |
 
 ---
+
+## NavBar & Side Drawer
+
+- **Minimal top bar** (floating pill): logo, a `Dashboard` quick link, notification bell, and an avatar/menu button.
+- **Side drawer** — the menu button opens a slide-in right drawer holding the full nav (Dashboard, Training Plan, Messages, Communities, Pricing, Blog, Settings) with Log out pinned at the bottom. Backdrop click / Esc closes it; body scroll locks while open.
+- Auth state initializes **synchronously** from `localStorage` (`useState(() => …)`), so the navbar never flashes the logged-out state on route changes/remounts.
+- Every page renders its own `<Navbar />` (there is no shared app shell), which is why the synchronous init matters.
 
 ## Notification Bell
 
