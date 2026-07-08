@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   CalendarDays, CalendarCheck, BarChart3, Building2, Users, Megaphone,
   CheckCircle2, Plus, MapPin, Phone, Globe, AtSign, TrendingUp, Ticket,
+  LayoutDashboard, ArrowRight,
 } from 'lucide-react';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
@@ -52,7 +53,7 @@ export default function StudioDashboard() {
   // ── Feedback ──
   const [err, setErr] = useState('');
   const [success, setSuccess] = useState('');
-  const [activeTab, setActiveTab] = useState('classes'); // 'classes' | 'appointments' | 'analytics' | 'profile'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'classes' | 'appointments' | 'analytics' | 'profile'
   const [offersAppointments, setOffersAppointments] = useState(false);
   const [openingHour, setOpeningHour] = useState(9);
   const [closingHour, setClosingHour] = useState(18);
@@ -276,6 +277,9 @@ export default function StudioDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-1 mb-8 bg-white rounded-full shadow-card p-1.5 w-fit flex-wrap">
+          <button className={tabClass('overview')} onClick={() => { setActiveTab('overview'); fetchAnalytics(); }}>
+            <LayoutDashboard className="w-4 h-4" /> Overview
+          </button>
           <button className={tabClass('classes')} onClick={() => setActiveTab('classes')}>
             <CalendarDays className="w-4 h-4" /> Classes
           </button>
@@ -289,6 +293,92 @@ export default function StudioDashboard() {
             <Building2 className="w-4 h-4" /> Studio Profile
           </button>
         </div>
+
+        {/* ══════════════ OVERVIEW TAB ══════════════ */}
+        {activeTab === 'overview' && (() => {
+          const perClass = (analytics?.classes || [])
+            .slice()
+            .sort((a, b) => (b.booking_count || 0) - (a.booking_count || 0))
+            .slice(0, 6);
+          const maxCount = Math.max(1, ...perClass.map(c => c.booking_count || 0));
+          const upcomingCount = classes.filter(c => new Date(c.datetime) >= new Date()).length;
+          const OV_STATS = [
+            { label: 'Total bookings', value: analytics?.totalBookings ?? '—', Icon: TrendingUp, gradient: true },
+            { label: 'Credits earned', value: analytics?.totalRevenue ?? '—', Icon: Ticket, chip: 'bg-brand-100 text-brand-600' },
+            { label: 'Classes created', value: analytics?.classes?.length ?? classes.length, Icon: CalendarDays, chip: 'bg-ink-100 text-ink-700' },
+            { label: 'Upcoming classes', value: upcomingCount, Icon: CalendarCheck, chip: 'bg-emerald-100 text-emerald-700' },
+          ];
+          const QUICK = [
+            { label: 'Create a class', desc: 'Add a new session', Icon: Plus, go: 'classes' },
+            { label: 'Appointments', desc: 'Manage bookable slots', Icon: CalendarCheck, go: 'appointments' },
+            { label: 'View analytics', desc: 'Bookings & revenue', Icon: BarChart3, go: 'analytics' },
+            { label: 'Edit profile', desc: 'Your public page', Icon: Building2, go: 'profile' },
+          ];
+          return (
+            <div className="flex flex-col gap-6">
+              {/* Stats */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {OV_STATS.map(({ label, value, Icon, gradient, chip }) => (
+                  <div key={label}
+                    className={`rounded-3xl p-5 flex items-center gap-4 shadow-card ${gradient ? 'text-white' : 'bg-white'}`}
+                    style={gradient ? { background: 'linear-gradient(135deg,#e8702a,#f1a878)' } : undefined}>
+                    <span className={`w-12 h-12 rounded-2xl grid place-items-center shrink-0 ${gradient ? 'bg-white/20' : chip}`}>
+                      <Icon className="w-6 h-6" strokeWidth={1.9} />
+                    </span>
+                    <div>
+                      <p className={`text-sm/tight ${gradient ? 'opacity-90' : 'text-ink-400'}`}>{label}</p>
+                      <p className={`font-display font-black text-2xl ${gradient ? '' : 'text-ink-900'}`}>{value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6">
+                {/* Bookings per class (derived) */}
+                <section>
+                  <h2 className="font-display font-bold text-xl text-ink-900 mb-4">Top classes by bookings</h2>
+                  <div className="rounded-3xl bg-white shadow-card p-6">
+                    {perClass.length === 0 ? (
+                      <div className="h-[180px] grid place-items-center text-center text-ink-400 text-sm">
+                        Create classes and take bookings to see your top performers here.
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        {perClass.map(c => (
+                          <div key={c.id} className="flex items-center gap-3">
+                            <span className="w-28 sm:w-40 text-sm text-ink-700 truncate shrink-0">{c.name}</span>
+                            <div className="flex-1 bg-ink-50 rounded-full h-2.5 overflow-hidden">
+                              <div className="h-2.5 rounded-full bg-brand-500 transition-all duration-500"
+                                style={{ width: `${Math.max(Math.round((c.booking_count / maxCount) * 100), 4)}%` }} />
+                            </div>
+                            <span className="text-sm font-bold text-ink-800 w-6 text-right shrink-0">{c.booking_count}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </section>
+
+                {/* Quick actions */}
+                <section>
+                  <h2 className="font-display font-bold text-xl text-ink-900 mb-4">Quick actions</h2>
+                  <div className="grid grid-cols-2 gap-4">
+                    {QUICK.map(({ label, desc, Icon, go }) => (
+                      <button key={go} onClick={() => { setActiveTab(go); if (go === 'analytics') fetchAnalytics(); }}
+                        className="text-left bg-white rounded-3xl shadow-card p-5 hover:-translate-y-1 hover:shadow-card-lg transition duration-300 group">
+                        <span className="inline-grid place-items-center w-11 h-11 rounded-2xl bg-brand-100 text-brand-600 mb-3 group-hover:bg-brand-500 group-hover:text-white transition">
+                          <Icon className="w-5 h-5" strokeWidth={1.9} />
+                        </span>
+                        <p className="font-semibold text-ink-900 text-sm flex items-center gap-1">{label} <ArrowRight className="w-3.5 h-3.5 text-ink-300 group-hover:text-brand-500 transition" /></p>
+                        <p className="text-xs text-ink-400 mt-0.5">{desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ══════════════ CLASSES TAB ══════════════ */}
         {activeTab === 'classes' && (

@@ -1,7 +1,10 @@
 // src/components/NavBar.jsx
 import React, { useEffect, useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Menu, X, Dumbbell } from 'lucide-react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import {
+  Bell, Menu, X, Dumbbell, LayoutDashboard, CreditCard, Newspaper,
+  Users, MessageSquare, Settings, ClipboardList, LogOut, ChevronRight,
+} from 'lucide-react';
 import authFetch from '../utils/authFetch';
 
 const api = import.meta.env.VITE_API_URL;
@@ -69,7 +72,7 @@ function NotificationBell({ role }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-card-lg border border-ink-100 z-30 overflow-hidden">
+        <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-card-lg border border-ink-100 z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-ink-100">
             <span className="font-semibold text-ink-800 text-sm">Notifications</span>
             {notifications.some(n => !n.read) && (
@@ -105,7 +108,7 @@ export default function Navbar() {
   const [authed, setAuthed] = useState(() => !!localStorage.getItem('userName'));
   const [name, setName] = useState(() => localStorage.getItem('userName') || '');
   const [role, setRole] = useState(() => localStorage.getItem('userRole') || '');
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -116,7 +119,7 @@ export default function Navbar() {
     localStorage.removeItem('authToken');
     setAuthed(false);
     setRole('');
-    setMenuOpen(false);
+    setDrawerOpen(false);
     navigate('/');
     // Fire-and-forget to clear the httpOnly cookie on the server
     fetch(`${api}/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
@@ -124,94 +127,165 @@ export default function Navbar() {
 
   const dashboardPath = role === 'studio' ? '/studio' : '/dashboard';
   const settingsPath = role === 'studio' ? '/studio/settings' : '/settings';
-  const closeMenu = () => setMenuOpen(false);
+  const closeDrawer = () => setDrawerOpen(false);
 
-  const navLink = 'text-sm font-medium text-ink-500 hover:text-ink-900 transition';
+  // Lock body scroll + close on Esc while the drawer is open
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e) => { if (e.key === 'Escape') setDrawerOpen(false); };
+    document.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = ''; };
+  }, [drawerOpen]);
+
+  // Full menu shown inside the side drawer
+  const drawerLinks = authed
+    ? [
+        { to: dashboardPath, label: 'Dashboard', Icon: LayoutDashboard },
+        ...(role === 'user' ? [{ to: '/training-plan', label: 'Training Plan', Icon: ClipboardList }] : []),
+        { to: '/messages', label: 'Messages', Icon: MessageSquare },
+        { to: '/groups', label: 'Communities', Icon: Users },
+        { to: '/pricing', label: 'Pricing', Icon: CreditCard },
+        { to: '/blog', label: 'Blog', Icon: Newspaper },
+        { to: settingsPath, label: 'Settings', Icon: Settings },
+      ]
+    : [
+        { to: '/pricing', label: 'Pricing', Icon: CreditCard },
+        { to: '/blog', label: 'Blog', Icon: Newspaper },
+        { to: '/groups', label: 'Communities', Icon: Users },
+        { to: '/studios', label: 'Browse Studios', Icon: Dumbbell },
+      ];
+
+  const drawerItem = ({ isActive }) =>
+    `flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium transition ${
+      isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-ink-50'
+    }`;
 
   return (
-    <div className="fixed top-3 sm:top-4 inset-x-3 sm:inset-x-6 z-20">
-      <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md rounded-full shadow-pill border border-ink-100/60">
-        {/* Main bar */}
-        <div className="flex justify-between items-center pl-5 pr-3 sm:pl-6 sm:pr-3 py-2.5">
-          <Link to="/" className="flex items-center gap-2 group" onClick={closeMenu}>
-            <span className="w-8 h-8 rounded-full bg-brand-500 text-white grid place-items-center group-hover:bg-brand-600 transition">
-              <Dumbbell className="w-4 h-4" strokeWidth={2.2} />
-            </span>
-            <span className="text-lg font-display font-bold tracking-tight text-ink-900">FitFlex</span>
-          </Link>
+    <>
+      <div className="fixed top-3 sm:top-4 inset-x-3 sm:inset-x-6 z-30">
+        <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md rounded-full shadow-pill border border-ink-100/60">
+          <div className="flex justify-between items-center pl-5 pr-3 sm:pl-6 sm:pr-3 py-2.5">
+            {/* Logo */}
+            <Link to="/" className="flex items-center gap-2 group" onClick={closeDrawer}>
+              <span className="w-8 h-8 rounded-full bg-brand-500 text-white grid place-items-center group-hover:bg-brand-600 transition">
+                <Dumbbell className="w-4 h-4" strokeWidth={2.2} />
+              </span>
+              <span className="text-lg font-display font-bold tracking-tight text-ink-900">FitFlex</span>
+            </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden sm:flex items-center gap-5">
-            <Link to="/pricing" className={navLink}>Pricing</Link>
-            <Link to="/blog" className={navLink}>Blog</Link>
-            <Link to="/groups" className={navLink}>Communities</Link>
-            {authed ? (
-              <>
-                <Link to={dashboardPath} className={navLink}>Dashboard</Link>
-                <Link to={settingsPath} className={navLink}>Settings</Link>
-                <Link to="/messages" className={navLink}>Messages</Link>
-                {role === 'user' && <Link to="/training-plan" className={navLink}>Training Plan</Link>}
-                <NotificationBell role={role} />
-                <span className="hidden lg:inline text-sm text-ink-400">Hi, {name}</span>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm font-semibold text-ink-600 border border-ink-200 rounded-full hover:border-ink-400 hover:text-ink-900 transition"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className={navLink}>Log in</Link>
-                <Link
-                  to="/signup"
-                  className="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-full hover:bg-brand-600 shadow-pill transition"
-                >
-                  Get Started
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile: bell + hamburger */}
-          <div className="flex items-center gap-1 sm:hidden">
-            {authed && <NotificationBell role={role} />}
-            <button
-              className="p-2 rounded-full text-ink-600 hover:bg-ink-50 transition"
-              onClick={() => setMenuOpen(o => !o)}
-              aria-label="Menu"
-            >
-              {menuOpen ? <X className="w-6 h-6" strokeWidth={2} /> : <Menu className="w-6 h-6" strokeWidth={2} />}
-            </button>
+            {/* Right cluster — minimal */}
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              {authed ? (
+                <>
+                  <Link
+                    to={dashboardPath}
+                    className="hidden sm:inline-flex text-sm font-medium text-ink-600 hover:text-ink-900 px-3 py-2 transition"
+                  >
+                    Dashboard
+                  </Link>
+                  <NotificationBell role={role} />
+                  <button
+                    onClick={() => setDrawerOpen(true)}
+                    className="flex items-center gap-2 pl-1 pr-1 sm:pr-2 py-1 rounded-full hover:bg-ink-50 transition"
+                    aria-label="Open menu"
+                  >
+                    <span
+                      className="w-8 h-8 rounded-full grid place-items-center text-white text-sm font-semibold shrink-0"
+                      style={{ background: 'linear-gradient(135deg,#e8702a,#1e2c3a)' }}
+                    >
+                      {(name || 'U').charAt(0).toUpperCase()}
+                    </span>
+                    <Menu className="hidden sm:block w-4 h-4 text-ink-500" strokeWidth={2} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="hidden sm:inline-flex text-sm font-medium text-ink-600 hover:text-ink-900 px-3 py-2 transition">Log in</Link>
+                  <Link
+                    to="/signup"
+                    className="hidden sm:inline-flex px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-full hover:bg-brand-600 shadow-pill transition"
+                  >
+                    Get Started
+                  </Link>
+                  <button
+                    onClick={() => setDrawerOpen(true)}
+                    className="p-2 rounded-full text-ink-600 hover:bg-ink-50 transition"
+                    aria-label="Open menu"
+                  >
+                    <Menu className="w-6 h-6" strokeWidth={2} />
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile dropdown */}
-      {menuOpen && (
-        <div className="sm:hidden mt-2 max-w-6xl mx-auto bg-white rounded-3xl shadow-card-lg border border-ink-100/60 px-5 py-4 flex flex-col gap-3">
-          <Link to="/pricing" onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Pricing</Link>
-          <Link to="/blog" onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Blog</Link>
-          <Link to="/groups" onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Communities</Link>
+      {/* ── Side drawer ── */}
+      {/* Backdrop */}
+      <div
+        onClick={closeDrawer}
+        className={`fixed inset-0 z-40 bg-ink-900/40 backdrop-blur-sm transition-opacity duration-300 ${
+          drawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        }`}
+        aria-hidden={!drawerOpen}
+      />
+      {/* Panel */}
+      <aside
+        className={`fixed top-0 right-0 z-50 h-full w-[300px] max-w-[85vw] bg-white shadow-card-lg flex flex-col transition-transform duration-300 ease-out ${
+          drawerOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
+      >
+        <div className="flex items-center justify-between px-5 py-4 border-b border-ink-50">
+          <span className="flex items-center gap-2 font-display font-bold text-ink-900">
+            <span className="w-8 h-8 rounded-full bg-brand-500 text-white grid place-items-center">
+              <Dumbbell className="w-4 h-4" strokeWidth={2.2} />
+            </span>
+            FitFlex
+          </span>
+          <button onClick={closeDrawer} className="p-2 rounded-full text-ink-500 hover:bg-ink-50 transition" aria-label="Close menu">
+            <X className="w-5 h-5" strokeWidth={2} />
+          </button>
+        </div>
+
+        {authed && (
+          <div className="px-5 py-4 border-b border-ink-50">
+            <p className="text-xs text-ink-400">Signed in as</p>
+            <p className="font-semibold text-ink-900">{name}</p>
+            <span className="inline-block mt-1 text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full capitalize">{role}</span>
+          </div>
+        )}
+
+        <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
+          {drawerLinks.map(({ to, label, Icon }) => (
+            <NavLink key={to} to={to} end onClick={closeDrawer} className={drawerItem}>
+              <Icon className="w-5 h-5" strokeWidth={1.9} />
+              <span className="flex-1">{label}</span>
+              <ChevronRight className="w-4 h-4 text-ink-300" />
+            </NavLink>
+          ))}
+        </nav>
+
+        <div className="px-3 py-4 border-t border-ink-50">
           {authed ? (
-            <>
-              <p className="text-xs text-ink-400">Hi, {name}</p>
-              <Link to={dashboardPath} onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Dashboard</Link>
-              <Link to={settingsPath} onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Settings</Link>
-              <Link to="/messages" onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Messages</Link>
-              {role === 'user' && <Link to="/training-plan" onClick={closeMenu} className="text-sm font-medium text-ink-700 py-2 border-b border-ink-50">Training Plan</Link>}
-              <button onClick={handleLogout} className="w-full py-2.5 border border-ink-200 text-ink-700 text-sm font-semibold rounded-full hover:border-ink-400 transition">
-                Logout
-              </button>
-            </>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-red-600 hover:bg-red-50 transition"
+            >
+              <LogOut className="w-5 h-5" strokeWidth={1.9} /> Log out
+            </button>
           ) : (
-            <>
-              <Link to="/signup" onClick={closeMenu} className="w-full py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-full text-center">Get Started</Link>
-              <Link to="/login" onClick={closeMenu} className="w-full py-2.5 bg-ink-50 text-ink-800 text-sm font-semibold rounded-full text-center">Log in</Link>
-            </>
+            <div className="flex flex-col gap-2">
+              <Link to="/signup" onClick={closeDrawer} className="w-full py-3 bg-brand-500 text-white text-sm font-semibold rounded-full text-center hover:bg-brand-600 transition">Get Started</Link>
+              <Link to="/login" onClick={closeDrawer} className="w-full py-3 bg-ink-50 text-ink-800 text-sm font-semibold rounded-full text-center hover:bg-ink-100 transition">Log in</Link>
+            </div>
           )}
         </div>
-      )}
-    </div>
+      </aside>
+    </>
   );
 }

@@ -10,7 +10,11 @@ import Login from './pages/Login';
 import StudioDashboard from './pages/StudioDashboard';
 import StudioSettings from './pages/StudioSettings';
 import StudioProfile from './pages/StudioProfile';
-import UserDashboard from './pages/UserDashboard';
+import UserDashboardLayout from './pages/dashboard/UserDashboardLayout';
+import Overview from './pages/dashboard/Overview';
+import BrowseClasses from './pages/dashboard/BrowseClasses';
+import BrowseStudios from './pages/dashboard/BrowseStudios';
+import Bookings from './pages/dashboard/Bookings';
 import UserSettings from './pages/UserSettings';
 import RoleRoute from './components/RoleRoute';
 import ForgotPassword from './pages/ForgotPassword';
@@ -62,7 +66,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/messages" element={<Messages />} />
 
         {/* User-only routes */}
-        <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboard /></RoleRoute>} />
+        <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboardLayout /></RoleRoute>}>
+          <Route index element={<Overview />} />
+          <Route path="classes" element={<BrowseClasses />} />
+          <Route path="studios" element={<BrowseStudios />} />
+          <Route path="bookings" element={<Bookings />} />
+        </Route>
         <Route path="/training-plan" element={<RoleRoute allow={['user']}><WorkoutPlan /></RoleRoute>} />
         <Route path="/settings" element={<RoleRoute allow={['user']}><UserSettings /></RoleRoute>} />
       </Routes>
