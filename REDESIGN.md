@@ -63,10 +63,10 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 - [x] User dashboard — split into Overview hub + `/classes` `/studios` `/bookings`
 - [x] Studio dashboard — Overview hub tab + restyled classes/appointments/analytics/profile
 - [x] Mobile tap-highlight flash fixed; navbar auth-flash fixed
+- [x] **Studios** (`/studios`) + **StudioProfile** (`/studios/:id`) — public-facing pair (now uses shared `StudioCard`; editorial header, gradient hero mapped to ink/brand tokens, lucide icons, shared sport chip helpers)
 
 ### Remaining (old blue/default style)
-- [ ] **Studios** (`/studios`) + **StudioProfile** (`/studios/:id`) — public-facing pair (recommended next)
-- [ ] **Auth pages** — Login, Signup, ForgotPassword, ResetPassword (quick wins)
+- [ ] **Auth pages** — Login, Signup, ForgotPassword, ResetPassword (recommended next / quick wins)
 - [ ] **UserSettings** + **StudioSettings**
 - [ ] **Blog**, **BlogPost**, **AdminBlog**
 - [ ] **Groups**, **GroupProfile**, **EventDetail**, **Messages**

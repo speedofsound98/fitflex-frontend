@@ -91,6 +91,7 @@ function CommentThread({ postId, isMember, currentUserId, isAdmin }) {
 
 export default function GroupFeed({ groupId, isMember, isAdmin }) {
   const [posts, setPosts] = useState([]);
+  const [feedLocked, setFeedLocked] = useState(false);
   const [text, setText] = useState('');
   const [broadcastText, setBroadcastText] = useState('');
   const [showBroadcast, setShowBroadcast] = useState(false);
@@ -100,9 +101,14 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
   const currentUserId = Number(localStorage.getItem('userId'));
 
   useEffect(() => {
-    fetch(`${api}/groups/${groupId}/posts`)
+    const token = localStorage.getItem('authToken');
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    fetch(`${api}/groups/${groupId}/posts`, { headers, credentials: 'include' })
       .then(r => r.json())
-      .then(d => setPosts(d.posts || []));
+      .then(d => {
+        if (d.feedPrivate) { setFeedLocked(true); return; }
+        setPosts(d.posts || []);
+      });
   }, [groupId]);
 
   async function broadcast(e) {
@@ -150,9 +156,18 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
     setOpenComments(prev => ({ ...prev, [postId]: !prev[postId] }));
   }
 
+  if (feedLocked) {
+    return (
+      <div className="bg-white rounded-2xl shadow px-6 py-12 text-center text-gray-400">
+        <p className="text-4xl mb-3">🔒</p>
+        <p className="font-semibold text-gray-700">This feed is members only</p>
+        <p className="text-sm mt-1">Join the group to see and post in the feed.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      {/* Compose box */}
       {/* Broadcast (admin only) */}
       {isAdmin && (
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">

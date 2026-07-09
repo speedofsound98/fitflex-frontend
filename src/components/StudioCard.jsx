@@ -35,6 +35,7 @@ export default function StudioCard({ studio }) {
           )}
         </div>
       </div>
+      {studio.tagline && <p className="text-sm text-brand-600 font-medium italic line-clamp-1">“{studio.tagline}”</p>}
       {studio.about && <p className="text-sm text-ink-500 line-clamp-2">{studio.about}</p>}
       <span className="inline-flex items-center gap-1.5 text-sm text-brand-600 font-semibold mt-auto">
         View studio <ArrowRight className="w-3.5 h-3.5" />

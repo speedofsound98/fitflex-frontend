@@ -28,6 +28,7 @@ export default function GroupProfile() {
   const [msgType, setMsgType] = useState('success');
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
+  const [feedPrivate, setFeedPrivate] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventForm, setEventForm] = useState({ title: '', description: '', datetime: '', location: '' });
 
@@ -60,6 +61,7 @@ export default function GroupProfile() {
           description: d.group.description || '',
           cover_emoji: d.group.cover_emoji || '🏃',
           is_private: d.group.is_private || false,
+          is_feed_public: d.group.is_feed_public || false,
         });
       })
       .catch(() => {})
@@ -251,13 +253,23 @@ export default function GroupProfile() {
                 </div>
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Visibility</span>
+                <span className="text-sm font-medium text-gray-700">Group visibility</span>
                 <label className="flex items-center gap-3 cursor-pointer mt-1">
                   <div onClick={() => setEditForm(f => ({...f, is_private: !f.is_private}))}
                     className={`w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 ${editForm.is_private ? 'bg-blue-600' : 'bg-gray-200'}`}>
                     <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${editForm.is_private ? 'translate-x-5' : 'translate-x-0'}`} />
                   </div>
-                  <span className="text-sm text-gray-600">{editForm.is_private ? '🔒 Private' : '🌐 Public'}</span>
+                  <span className="text-sm text-gray-600">{editForm.is_private ? '🔒 Private group' : '🌐 Public group'}</span>
+                </label>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-medium text-gray-700">Feed visibility</span>
+                <label className="flex items-center gap-3 cursor-pointer mt-1">
+                  <div onClick={() => setEditForm(f => ({...f, is_feed_public: !f.is_feed_public}))}
+                    className={`w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 ${editForm.is_feed_public ? 'bg-blue-600' : 'bg-gray-200'}`}>
+                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${editForm.is_feed_public ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </div>
+                  <span className="text-sm text-gray-600">{editForm.is_feed_public ? '🌐 Public feed' : '🔒 Members only feed'}</span>
                 </label>
               </div>
               <div className="md:col-span-2 flex gap-3">

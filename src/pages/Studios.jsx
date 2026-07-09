@@ -1,36 +1,9 @@
 // src/pages/Studios.jsx — public studio directory
 import React, { useEffect, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import Navbar from '../components/NavBar';
+import StudioCard from '../components/StudioCard';
 import usePageTitle from '../hooks/usePageTitle';
-
-function StudioCard({ studio }) {
-  return (
-    <Link to={`/studios/${studio.id}`}
-      className="bg-white rounded-2xl shadow hover:shadow-md transition p-5 flex flex-col gap-2">
-      {studio.cover_photo && (
-        <img src={studio.cover_photo} alt={studio.name}
-          className="w-full h-32 object-cover rounded-xl mb-1"
-          onError={e => { e.target.style.display = 'none'; }} />
-      )}
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="font-bold text-gray-800 text-lg">{studio.name}</h3>
-          {(studio.city || studio.neighbourhood) && (
-            <p className="text-sm text-gray-500">📍 {[studio.neighbourhood, studio.city].filter(Boolean).join(', ')}</p>
-          )}
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          {studio.verified && <span className="text-xs bg-blue-50 text-blue-600 font-semibold px-2 py-0.5 rounded-full">✅ Verified</span>}
-          {studio.offers_appointments && <span className="text-xs bg-green-50 text-green-700 font-semibold px-2 py-0.5 rounded-full">📆 Appointments</span>}
-        </div>
-      </div>
-      {studio.tagline && <p className="text-sm text-blue-600 italic">"{studio.tagline}"</p>}
-      {studio.about && <p className="text-sm text-gray-500 line-clamp-2">{studio.about}</p>}
-      <span className="text-sm text-blue-600 font-medium mt-auto">View studio →</span>
-    </Link>
-  );
-}
 
 export default function Studios() {
   usePageTitle('Browse Studios');
@@ -73,29 +46,37 @@ export default function Studios() {
   }, [studios, search, locationFilter]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-5xl mx-auto">
 
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900">Browse Studios</h1>
-          <p className="text-gray-500 mt-1">Discover fitness studios near you — no account needed.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-2">Directory</p>
+          <h1 className="font-display font-bold text-4xl sm:text-5xl text-ink-900 leading-[1.05]">
+            Find your studio.
+          </h1>
+          <p className="text-ink-500 mt-3 text-lg max-w-xl">
+            Discover fitness studios near you — browse classes, hours, and appointments. No account needed.
+          </p>
         </div>
 
         {/* Search + filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
-          <input
-            type="text"
-            placeholder="Search by name, type, location…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="flex-1 border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-          />
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-ink-300" strokeWidth={2} />
+            <input
+              type="text"
+              placeholder="Search by name, type, location…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-white rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+            />
+          </div>
           {locations.length > 0 && (
             <select
               value={locationFilter}
               onChange={e => setLocationFilter(e.target.value)}
-              className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="bg-white rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
             >
               <option value="">All locations</option>
               {locations.map(l => <option key={l} value={l}>{l}</option>)}
@@ -104,12 +85,16 @@ export default function Studios() {
         </div>
 
         {loading ? (
-          <p className="text-gray-400 text-center pt-12">Loading…</p>
+          <p className="text-ink-400 text-center pt-12">Loading…</p>
         ) : filtered.length === 0 ? (
-          <p className="text-gray-500 text-center pt-12">No studios found{search ? ` for "${search}"` : ''}.</p>
+          <p className="text-ink-500 text-center pt-12">No studios found{search ? ` for "${search}"` : ''}.</p>
         ) : (
           <>
-            <p className="text-sm text-gray-400 mb-4">{filtered.length} studio{filtered.length !== 1 ? 's' : ''}</p>
+            <h2 className="font-display font-bold text-xl text-ink-900 mb-4">
+              {filtered.length} studio{filtered.length !== 1 ? 's' : ''}
+              {search && ` for "${search}"`}
+              {locationFilter && ` in ${locationFilter}`}
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filtered.map(s => <StudioCard key={s.id} studio={s} />)}
             </div>
