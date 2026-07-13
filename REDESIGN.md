@@ -65,9 +65,10 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 - [x] Mobile tap-highlight flash fixed; navbar auth-flash fixed
 - [x] **Studios** (`/studios`) + **StudioProfile** (`/studios/:id`) — public-facing pair (now uses shared `StudioCard`; editorial header, gradient hero mapped to ink/brand tokens, lucide icons, shared sport chip helpers)
 
+- [x] **Auth pages** — Login, Signup, ForgotPassword, ResetPassword (shared `AuthShell` + `inputClass`; editorial centered card, role toggle on signup, inline alert/success banners, loading states)
+
 ### Remaining (old blue/default style)
-- [ ] **Auth pages** — Login, Signup, ForgotPassword, ResetPassword (recommended next / quick wins)
-- [ ] **UserSettings** + **StudioSettings**
+- [ ] **UserSettings** + **StudioSettings** (recommended next)
 - [ ] **Blog**, **BlogPost**, **AdminBlog**
 - [ ] **Groups**, **GroupProfile**, **EventDetail**, **Messages**
 - [ ] **WorkoutPlan** (`/training-plan`)
