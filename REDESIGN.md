@@ -67,9 +67,11 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 
 - [x] **Auth pages** — Login, Signup, ForgotPassword, ResetPassword (shared `AuthShell` + `inputClass`; editorial centered card, role toggle on signup, inline alert/success banners, loading states)
 
+- [x] **Blog** + **BlogPost** — editorial restyle (cream bg, ink/brand tokens, shared `chipStyle` for tags, lucide icons, prose mapped to display headings + brand links). *AdminBlog still pending.*
+
 ### Remaining (old blue/default style)
 - [ ] **UserSettings** + **StudioSettings** (recommended next)
-- [ ] **Blog**, **BlogPost**, **AdminBlog**
+- [ ] **AdminBlog**
 - [ ] **Groups**, **GroupProfile**, **EventDetail**, **Messages**
 - [ ] **WorkoutPlan** (`/training-plan`)
 - [ ] **AppointmentMatrix** component (used in studio dashboard + studio profile)
