@@ -72,7 +72,8 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 ### Remaining (old blue/default style)
 - [ ] **UserSettings** + **StudioSettings** (recommended next)
 - [ ] **AdminBlog**
-- [ ] **Groups**, **GroupProfile**, **EventDetail**, **Messages**
+- [ ] **Groups**, **GroupProfile**, **EventDetail**
+- [x] **Messages** — editorial restyle (paper bg, rounded-3xl cards, brand message bubbles, lucide `MessageCircle`/`Send`, brand avatars)
 - [ ] **WorkoutPlan** (`/training-plan`)
 - [ ] **AppointmentMatrix** component (used in studio dashboard + studio profile)
 
