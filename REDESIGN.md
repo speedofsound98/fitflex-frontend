@@ -69,9 +69,10 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 
 - [x] **Blog** + **BlogPost** — editorial restyle (cream bg, ink/brand tokens, shared `chipStyle` for tags, lucide icons, prose mapped to display headings + brand links). *AdminBlog still pending.*
 
+- [x] **UserSettings** + **StudioSettings** — editorial restyle (paper bg, brand pill tabs w/ lucide icons, rounded-3xl cards, shared `Toggle` + `inputClass`, icon flash banners; cover-theme swatches now mirror StudioProfile gradients)
+
 ### Remaining (old blue/default style)
-- [ ] **UserSettings** + **StudioSettings** (recommended next)
-- [ ] **AdminBlog**
+- [ ] **AdminBlog** (recommended next)
 - [ ] **Groups**, **GroupProfile**, **EventDetail**
 - [x] **Messages** — editorial restyle (paper bg, rounded-3xl cards, brand message bubbles, lucide `MessageCircle`/`Send`, brand avatars)
 - [ ] **WorkoutPlan** (`/training-plan`)

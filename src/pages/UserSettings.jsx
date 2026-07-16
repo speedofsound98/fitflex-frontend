@@ -2,7 +2,10 @@ import authFetch from '../utils/authFetch';
 // src/pages/UserSettings.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { User, Ticket, Bell, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Navbar from '../components/NavBar';
+import Toggle from '../components/Toggle';
+import { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 const ALL_FIELDS = [
@@ -10,6 +13,13 @@ const ALL_FIELDS = [
   { key: 'bio', label: 'Bio' },
   { key: 'credits', label: 'Credit balance' },
   { key: 'bookings', label: 'Booked classes' },
+];
+
+const TABS = [
+  { key: 'profile', label: 'Profile', icon: User },
+  { key: 'credits', label: 'Credits', icon: Ticket },
+  { key: 'notifications', label: 'Notifications', icon: Bell },
+  { key: 'password', label: 'Password', icon: Lock },
 ];
 
 export default function UserSettings() {
@@ -136,100 +146,104 @@ export default function UserSettings() {
     saveNotifications({ ...notifPrefs, [key]: !notifPrefs[key] });
   }
 
-  const tabClass = (t) =>
-    `px-5 py-2.5 text-sm font-semibold rounded-full transition ${activeTab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`;
-
   const publicFields = form.public_fields.split(',').filter(Boolean);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-2xl mx-auto">
 
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-          <p className="text-gray-500 mt-1">Manage your profile and account preferences.</p>
+          <h1 className="font-display font-bold text-3xl text-ink-900">Account Settings</h1>
+          <p className="text-ink-500 mt-1">Manage your profile and account preferences.</p>
         </div>
 
-        {err && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-xl text-sm">{err}</div>}
-        {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-xl text-sm">{success}</div>}
+        {err && (
+          <div className="mb-4 flex items-center gap-2 p-3 bg-rose-50 text-rose-700 rounded-2xl text-sm">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {err}
+          </div>
+        )}
+        {success && (
+          <div className="mb-4 flex items-center gap-2 p-3 bg-emerald-50 text-emerald-700 rounded-2xl text-sm">
+            <CheckCircle2 className="w-4 h-4 shrink-0" /> {success}
+          </div>
+        )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 bg-white rounded-full shadow-sm p-1 w-fit">
-          <button className={tabClass('profile')} onClick={() => setActiveTab('profile')}>👤 Profile</button>
-          <button className={tabClass('credits')} onClick={() => setActiveTab('credits')}>🎟️ Credits</button>
-          <button className={tabClass('notifications')} onClick={() => setActiveTab('notifications')}>🔔 Notifications</button>
-          <button className={tabClass('password')} onClick={() => setActiveTab('password')}>🔒 Password</button>
+        <div className="flex gap-1 mb-8 bg-white rounded-full shadow-card p-1 w-fit">
+          {TABS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold rounded-full transition
+                ${activeTab === key ? 'bg-brand-500 text-white shadow-pill' : 'text-ink-500 hover:text-ink-800'}`}
+            >
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
         </div>
 
         {/* ── Profile tab ── */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-2xl shadow p-6 space-y-6">
+          <div className="bg-white rounded-3xl shadow-card p-6 space-y-6">
             <form onSubmit={saveProfile} className="space-y-5">
 
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Account info</p>
+                <p className="text-xs font-semibold text-ink-400 uppercase tracking-[0.15em] mb-3">Account info</p>
                 <div className="space-y-1 mb-4">
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="text-sm font-medium text-gray-800">{user?.email}</p>
-                  <p className="text-xs text-gray-400">Email cannot be changed.</p>
+                  <p className="text-sm text-ink-500">Email</p>
+                  <p className="text-sm font-medium text-ink-800">{user?.email}</p>
+                  <p className="text-xs text-ink-400">Email cannot be changed.</p>
                 </div>
-                <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">Display name</span>
-                  <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                    value={form.name} onChange={e => setForm(f => ({...f, name: e.target.value}))} />
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-sm font-medium text-ink-700">Display name</span>
+                  <input className={inputClass}
+                    value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
                 </label>
               </div>
 
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Bio <span className="text-gray-400 text-xs">(optional)</span></span>
-                <textarea rows={3} className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Bio <span className="text-ink-400 text-xs">(optional)</span></span>
+                <textarea rows={3} className={inputClass}
                   placeholder="Tell others a little about yourself..."
-                  value={form.bio} onChange={e => setForm(f => ({...f, bio: e.target.value}))} />
+                  value={form.bio} onChange={e => setForm(f => ({ ...f, bio: e.target.value }))} />
               </label>
 
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Phone number <span className="text-gray-400 text-xs">(optional — for WhatsApp class messages)</span></span>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Phone number <span className="text-ink-400 text-xs">(optional — for WhatsApp class messages)</span></span>
                 <input
                   type="tel"
-                  className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  className={inputClass}
                   placeholder="+1 234 567 8900"
                   value={form.phone}
-                  onChange={e => setForm(f => ({...f, phone: e.target.value}))}
+                  onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
                 />
               </label>
 
               {/* Credit balance (read only) */}
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">Credit balance</p>
-                <p className="text-2xl font-bold text-blue-600">{user?.credits ?? '—'} <span className="text-sm font-normal text-gray-500">credits</span></p>
+                <p className="text-sm font-medium text-ink-700 mb-1">Credit balance</p>
+                <p className="text-2xl font-display font-bold text-brand-600">{user?.credits ?? '—'} <span className="text-sm font-normal text-ink-500">credits</span></p>
               </div>
 
               {/* Visibility toggles */}
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Profile visibility</p>
-                <p className="text-sm text-gray-500 mb-3">Choose what others can see on your public profile.</p>
+                <p className="text-xs font-semibold text-ink-400 uppercase tracking-[0.15em] mb-3">Profile visibility</p>
+                <p className="text-sm text-ink-500 mb-3">Choose what others can see on your public profile.</p>
                 <div className="space-y-2">
                   {ALL_FIELDS.map(f => (
-                    <label key={f.key} className="flex items-center justify-between p-3 border border-gray-100 rounded-xl cursor-pointer hover:bg-gray-50">
+                    <div key={f.key} className="flex items-center justify-between p-3 bg-paper rounded-2xl">
                       <div>
-                        <p className="text-sm font-medium text-gray-800">{f.label}</p>
-                        <p className="text-xs text-gray-400">{publicFields.includes(f.key) ? '🌐 Public' : '🔒 Private'}</p>
+                        <p className="text-sm font-medium text-ink-800">{f.label}</p>
+                        <p className="text-xs text-ink-400">{publicFields.includes(f.key) ? 'Public' : 'Private'}</p>
                       </div>
-                      <div
-                        onClick={() => togglePublic(f.key)}
-                        className={`w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5
-                          ${publicFields.includes(f.key) ? 'bg-blue-600' : 'bg-gray-200'}`}
-                      >
-                        <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200
-                          ${publicFields.includes(f.key) ? 'translate-x-5' : 'translate-x-0'}`} />
-                      </div>
-                    </label>
+                      <Toggle checked={publicFields.includes(f.key)} onChange={() => togglePublic(f.key)} />
+                    </div>
                   ))}
                 </div>
               </div>
 
-              <button type="submit" className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">
+              <button type="submit" className="w-full bg-brand-500 text-white py-3 rounded-full font-semibold hover:bg-brand-600 transition shadow-pill">
                 Save Profile
               </button>
             </form>
@@ -240,35 +254,35 @@ export default function UserSettings() {
         {activeTab === 'credits' && (
           <div className="space-y-6">
             {/* Balance + buy link */}
-            <div className="bg-white rounded-2xl shadow p-6 flex items-center justify-between">
+            <div className="bg-white rounded-3xl shadow-card p-6 flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Current balance</p>
-                <p className="text-4xl font-bold text-blue-600">{user?.credits ?? '—'} <span className="text-lg font-normal text-gray-500">credits</span></p>
+                <p className="text-sm text-ink-500 mb-1">Current balance</p>
+                <p className="text-4xl font-display font-bold text-brand-600">{user?.credits ?? '—'} <span className="text-lg font-normal text-ink-500">credits</span></p>
               </div>
-              <a href="/pricing" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition text-sm">
-                Buy Credits →
+              <a href="/pricing" className="bg-brand-500 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-brand-600 transition text-sm shadow-pill">
+                Buy Credits
               </a>
             </div>
 
             {/* Purchase history */}
-            <div className="bg-white rounded-2xl shadow overflow-hidden">
-              <div className="px-6 py-4 border-b">
-                <h2 className="font-bold text-gray-800">Purchase history</h2>
+            <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+              <div className="px-6 py-4 border-b border-ink-100">
+                <h2 className="font-display font-bold text-ink-900">Purchase history</h2>
               </div>
               {purchases.length === 0 ? (
-                <p className="px-6 py-8 text-gray-400 text-sm">No purchases yet.</p>
+                <p className="px-6 py-8 text-ink-400 text-sm">No purchases yet.</p>
               ) : (
-                <ul className="divide-y divide-gray-100">
+                <ul className="divide-y divide-ink-50">
                   {purchases.map(p => (
                     <li key={p.id} className="flex items-center justify-between px-6 py-4">
                       <div>
-                        <p className="font-semibold text-gray-800">{p.credits} credits</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="font-semibold text-ink-800">{p.credits} credits</p>
+                        <p className="text-sm text-ink-400">
                           Purchased {new Date(p.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           {' · '}Expires {new Date(p.expires_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                       </div>
-                      <span className="text-sm font-medium text-gray-700">${(p.amount_cents / 100).toFixed(2)}</span>
+                      <span className="text-sm font-medium text-ink-700">${(p.amount_cents / 100).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
@@ -279,12 +293,12 @@ export default function UserSettings() {
 
         {/* ── Notifications tab ── */}
         {activeTab === 'notifications' && (
-          <div className="bg-white rounded-2xl shadow p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-1">Email Notifications</h2>
-            <p className="text-sm text-gray-400 mb-6">
+          <div className="bg-white rounded-3xl shadow-card p-6">
+            <h2 className="font-display font-bold text-lg text-ink-900 mb-1">Email Notifications</h2>
+            <p className="text-sm text-ink-400 mb-6">
               Choose which emails you'd like to receive. Password reset and security emails are always sent.
             </p>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-ink-50">
               {[
                 { key: 'bookings', label: 'Booking confirmations', desc: 'When you book or cancel a class' },
                 { key: 'reminders', label: 'Class & event reminders', desc: '24 hours before a class or group event' },
@@ -292,21 +306,10 @@ export default function UserSettings() {
               ].map(item => (
                 <div key={item.key} className="flex items-center justify-between py-4">
                   <div className="pr-4">
-                    <p className="font-semibold text-gray-800">{item.label}</p>
-                    <p className="text-sm text-gray-400">{item.desc}</p>
+                    <p className="font-semibold text-ink-800">{item.label}</p>
+                    <p className="text-sm text-ink-400">{item.desc}</p>
                   </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={notifPrefs[item.key]}
-                    disabled={savingNotif}
-                    onClick={() => toggleNotif(item.key)}
-                    className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition disabled:opacity-50
-                      ${notifPrefs[item.key] ? 'bg-blue-600' : 'bg-gray-300'}`}
-                  >
-                    <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition
-                      ${notifPrefs[item.key] ? 'translate-x-6' : 'translate-x-1'}`} />
-                  </button>
+                  <Toggle checked={notifPrefs[item.key]} onChange={() => toggleNotif(item.key)} disabled={savingNotif} />
                 </div>
               ))}
             </div>
@@ -315,25 +318,25 @@ export default function UserSettings() {
 
         {/* ── Password tab ── */}
         {activeTab === 'password' && (
-          <div className="bg-white rounded-2xl shadow p-6">
-            <h2 className="text-lg font-bold text-gray-800 mb-5">Change Password</h2>
+          <div className="bg-white rounded-3xl shadow-card p-6">
+            <h2 className="font-display font-bold text-lg text-ink-900 mb-5">Change Password</h2>
             <form onSubmit={changePassword} className="space-y-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Current password</span>
-                <input type="password" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={pwForm.currentPassword} onChange={e => setPwForm(f => ({...f, currentPassword: e.target.value}))} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Current password</span>
+                <input type="password" className={inputClass}
+                  value={pwForm.currentPassword} onChange={e => setPwForm(f => ({ ...f, currentPassword: e.target.value }))} />
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">New password</span>
-                <input type="password" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={pwForm.newPassword} onChange={e => setPwForm(f => ({...f, newPassword: e.target.value}))} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">New password</span>
+                <input type="password" className={inputClass}
+                  value={pwForm.newPassword} onChange={e => setPwForm(f => ({ ...f, newPassword: e.target.value }))} />
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Confirm new password</span>
-                <input type="password" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={pwForm.confirm} onChange={e => setPwForm(f => ({...f, confirm: e.target.value}))} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Confirm new password</span>
+                <input type="password" className={inputClass}
+                  value={pwForm.confirm} onChange={e => setPwForm(f => ({ ...f, confirm: e.target.value }))} />
               </label>
-              <button type="submit" className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">
+              <button type="submit" className="w-full bg-brand-500 text-white py-3 rounded-full font-semibold hover:bg-brand-600 transition shadow-pill">
                 Update Password
               </button>
             </form>
