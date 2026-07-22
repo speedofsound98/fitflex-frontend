@@ -1,15 +1,20 @@
 // src/pages/AdminBlog.jsx
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link2 from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
+import {
+  Bold, Italic, Strikethrough, Heading2, Heading3, List, ListOrdered, Quote,
+  Link as LinkIcon, Image as ImageIcon, Undo2, Redo2, Plus, ArrowLeft,
+  ExternalLink, Pencil, Trash2, FileText, AlertCircle,
+} from 'lucide-react';
+import { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 const api = import.meta.env.VITE_API_URL;
-const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET;
 
 function slugify(str) {
   return str.toLowerCase().trim()
@@ -23,7 +28,7 @@ function ToolBtn({ onClick, active, title, children }) {
   return (
     <button type="button" onMouseDown={e => { e.preventDefault(); onClick(); }}
       title={title}
-      className={`px-2 py-1 rounded text-sm font-mono transition ${active ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+      className={`inline-grid place-items-center w-8 h-8 rounded-lg transition ${active ? 'bg-brand-500 text-white' : 'text-ink-600 hover:bg-white'}`}>
       {children}
     </button>
   );
@@ -42,24 +47,26 @@ function EditorToolbar({ editor }) {
     if (url) editor.chain().focus().setLink({ href: url, target: '_blank' }).run();
   }
 
+  const Divider = () => <div className="w-px bg-ink-200 mx-1 self-stretch my-1" />;
+
   return (
-    <div className="flex flex-wrap gap-1 p-2 border-b border-gray-200 bg-gray-50 rounded-t-xl">
-      <ToolBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold">B</ToolBtn>
-      <ToolBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Italic"><em>I</em></ToolBtn>
-      <ToolBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Strikethrough"><s>S</s></ToolBtn>
-      <div className="w-px bg-gray-300 mx-1" />
-      <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Heading 2">H2</ToolBtn>
-      <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Heading 3">H3</ToolBtn>
-      <div className="w-px bg-gray-300 mx-1" />
-      <ToolBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list">• List</ToolBtn>
-      <ToolBtn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Numbered list">1. List</ToolBtn>
-      <ToolBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote">"</ToolBtn>
-      <div className="w-px bg-gray-300 mx-1" />
-      <ToolBtn onClick={addLink} active={editor.isActive('link')} title="Add link">🔗</ToolBtn>
-      <ToolBtn onClick={addImage} title="Add image">🖼</ToolBtn>
-      <div className="w-px bg-gray-300 mx-1" />
-      <ToolBtn onClick={() => editor.chain().focus().undo().run()} title="Undo">↩</ToolBtn>
-      <ToolBtn onClick={() => editor.chain().focus().redo().run()} title="Redo">↪</ToolBtn>
+    <div className="flex flex-wrap items-center gap-1 p-2 border-b border-ink-100 bg-paper rounded-t-2xl">
+      <ToolBtn onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive('bold')} title="Bold"><Bold className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive('italic')} title="Italic"><Italic className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive('strike')} title="Strikethrough"><Strikethrough className="w-4 h-4" /></ToolBtn>
+      <Divider />
+      <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive('heading', { level: 2 })} title="Heading 2"><Heading2 className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive('heading', { level: 3 })} title="Heading 3"><Heading3 className="w-4 h-4" /></ToolBtn>
+      <Divider />
+      <ToolBtn onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive('bulletList')} title="Bullet list"><List className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive('orderedList')} title="Numbered list"><ListOrdered className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive('blockquote')} title="Blockquote"><Quote className="w-4 h-4" /></ToolBtn>
+      <Divider />
+      <ToolBtn onClick={addLink} active={editor.isActive('link')} title="Add link"><LinkIcon className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={addImage} title="Add image"><ImageIcon className="w-4 h-4" /></ToolBtn>
+      <Divider />
+      <ToolBtn onClick={() => editor.chain().focus().undo().run()} title="Undo"><Undo2 className="w-4 h-4" /></ToolBtn>
+      <ToolBtn onClick={() => editor.chain().focus().redo().run()} title="Redo"><Redo2 className="w-4 h-4" /></ToolBtn>
     </div>
   );
 }
@@ -115,53 +122,54 @@ function PostForm({ initial, onSave, onCancel }) {
     }
   }
 
+  const label = 'block text-xs font-semibold text-ink-500 uppercase tracking-[0.1em] mb-1.5';
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm">{error}</div>}
+      {error && (
+        <div className="flex items-center gap-2 bg-rose-50 text-rose-700 rounded-2xl p-3 text-sm">
+          <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+        </div>
+      )}
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Title *</label>
-          <input value={form.title} onChange={e => setField('title', e.target.value)} required
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label className={label}>Title *</label>
+          <input value={form.title} onChange={e => setField('title', e.target.value)} required className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Slug *</label>
+          <label className={label}>Slug *</label>
           <input value={form.slug} onChange={e => { setSlugEdited(true); setField('slug', e.target.value); }} required
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            className={`${inputClass} font-mono`} />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1">Excerpt (shown in listing)</label>
-        <textarea value={form.excerpt} onChange={e => setField('excerpt', e.target.value)} rows={2}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        <label className={label}>Excerpt (shown in listing)</label>
+        <textarea value={form.excerpt} onChange={e => setField('excerpt', e.target.value)} rows={2} className={`${inputClass} resize-none`} />
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Cover Image URL</label>
+          <label className={label}>Cover Image URL</label>
           <input value={form.cover_image} onChange={e => setField('cover_image', e.target.value)} type="url"
-            placeholder="https://..." className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            placeholder="https://..." className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Tags (comma separated)</label>
+          <label className={label}>Tags (comma separated)</label>
           <input value={form.tags} onChange={e => setField('tags', e.target.value)}
-            placeholder="Running, Jerusalem, Routes"
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            placeholder="Running, Jerusalem, Routes" className={inputClass} />
         </div>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Author Name</label>
-          <input value={form.author_name} onChange={e => setField('author_name', e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          <label className={label}>Author Name</label>
+          <input value={form.author_name} onChange={e => setField('author_name', e.target.value)} className={inputClass} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-gray-500 mb-1">Status</label>
-          <select value={form.status} onChange={e => setField('status', e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <label className={label}>Status</label>
+          <select value={form.status} onChange={e => setField('status', e.target.value)} className={`${inputClass} !bg-white`}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>
           </select>
@@ -170,21 +178,21 @@ function PostForm({ initial, onSave, onCancel }) {
 
       {/* Rich text editor */}
       <div>
-        <label className="block text-xs font-semibold text-gray-500 mb-1">Content</label>
-        <div className="border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500">
+        <label className={label}>Content</label>
+        <div className="border border-ink-100 rounded-2xl overflow-hidden focus-within:border-brand-300 focus-within:ring-2 focus-within:ring-brand-200 transition">
           <EditorToolbar editor={editor} />
           <EditorContent editor={editor}
-            className="min-h-[320px] p-4 text-sm text-gray-800 focus:outline-none prose prose-sm max-w-none" />
+            className="min-h-[320px] p-4 text-sm text-ink-800 focus:outline-none prose prose-sm max-w-none prose-headings:font-display prose-headings:text-ink-900 prose-a:text-brand-600" />
         </div>
       </div>
 
       <div className="flex gap-3 pt-2">
         <button type="submit" disabled={saving}
-          className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50">
+          className="px-6 py-2.5 bg-brand-500 text-white rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill disabled:opacity-50">
           {saving ? 'Saving…' : initial ? 'Update post' : 'Create post'}
         </button>
         <button type="button" onClick={onCancel}
-          className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-200 transition">
+          className="px-5 py-2.5 bg-ink-50 text-ink-600 rounded-full text-sm font-semibold hover:bg-ink-100 transition">
           Cancel
         </button>
       </div>
@@ -259,20 +267,19 @@ export default function AdminBlog() {
   }
 
   const statusBadge = s => ({
-    published: 'bg-green-100 text-green-700',
-    draft: 'bg-gray-100 text-gray-600',
-    pending: 'bg-yellow-100 text-yellow-700',
-    rejected: 'bg-red-100 text-red-700',
-  }[s] || 'bg-gray-100 text-gray-600');
+    published: 'bg-emerald-100 text-emerald-700',
+    draft: 'bg-ink-100 text-ink-600',
+    pending: 'bg-amber-100 text-amber-700',
+    rejected: 'bg-rose-100 text-rose-700',
+  }[s] || 'bg-ink-100 text-ink-600');
 
   if (!authed) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-      <form onSubmit={handleLogin} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 w-full max-w-sm">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">Blog Admin</h2>
-        <label className="block text-xs font-semibold text-gray-500 mb-1">Admin secret</label>
-        <input type="password" value={secret} onChange={e => setSecret(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-        <button className="w-full py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
+    <div className="min-h-screen bg-paper flex items-center justify-center px-4">
+      <form onSubmit={handleLogin} className="bg-white rounded-3xl shadow-card p-8 w-full max-w-sm">
+        <h2 className="font-display font-bold text-xl text-ink-900 mb-6">Blog Admin</h2>
+        <label className="block text-xs font-semibold text-ink-500 uppercase tracking-[0.1em] mb-1.5">Admin secret</label>
+        <input type="password" value={secret} onChange={e => setSecret(e.target.value)} className={`${inputClass} mb-4`} />
+        <button className="w-full py-3 bg-brand-500 text-white rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill">
           Enter
         </button>
       </form>
@@ -280,33 +287,39 @@ export default function AdminBlog() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <div className="max-w-4xl mx-auto px-4 py-10">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <Link to="/admin" className="text-sm text-gray-400 hover:text-blue-600 transition">← Admin</Link>
-            <h1 className="text-2xl font-extrabold text-gray-900 mt-1">Blog Management</h1>
+            <Link to="/admin" className="inline-flex items-center gap-1.5 text-sm text-ink-400 hover:text-brand-600 transition">
+              <ArrowLeft className="w-4 h-4" /> Admin
+            </Link>
+            <h1 className="font-display font-bold text-3xl text-ink-900 mt-1">Blog Management</h1>
           </div>
           {view === 'list' && (
             <button onClick={() => setView('create')}
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition">
-              + New post
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-brand-500 text-white rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill">
+              <Plus className="w-4 h-4" /> New post
             </button>
           )}
         </div>
 
-        {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm mb-6">{error}</div>}
+        {error && (
+          <div className="flex items-center gap-2 bg-rose-50 text-rose-700 rounded-2xl p-3 text-sm mb-6">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          </div>
+        )}
 
         {view === 'create' && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">New Post</h2>
+          <div className="bg-white rounded-3xl shadow-card p-7">
+            <h2 className="font-display font-bold text-lg text-ink-900 mb-6">New Post</h2>
             <PostForm onSave={handleCreate} onCancel={() => setView('list')} />
           </div>
         )}
 
         {view === 'edit' && editing && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-7">
-            <h2 className="text-lg font-bold text-gray-900 mb-6">Edit Post</h2>
+          <div className="bg-white rounded-3xl shadow-card p-7">
+            <h2 className="font-display font-bold text-lg text-ink-900 mb-6">Edit Post</h2>
             <PostForm initial={editing} onSave={handleUpdate} onCancel={() => { setView('list'); setEditing(null); }} />
           </div>
         )}
@@ -314,52 +327,54 @@ export default function AdminBlog() {
         {view === 'list' && (
           loading ? (
             <div className="space-y-3">
-              {[1,2,3].map(i => <div key={i} className="h-20 bg-white rounded-2xl animate-pulse border border-gray-100" />)}
+              {[1, 2, 3].map(i => <div key={i} className="h-20 bg-white rounded-3xl animate-pulse shadow-card" />)}
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-20 text-gray-400">
-              <p className="text-4xl mb-3">📝</p>
-              <p className="font-semibold text-gray-600">No posts yet</p>
-              <p className="text-sm mt-1">Click "+ New post" to get started.</p>
+            <div className="text-center py-20">
+              <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-4">
+                <FileText className="w-6 h-6" />
+              </span>
+              <p className="font-display font-bold text-ink-800">No posts yet</p>
+              <p className="text-sm text-ink-400 mt-1">Click "New post" to get started.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {posts.map(post => (
-                <div key={post.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-start gap-4">
+                <div key={post.id} className="bg-white rounded-3xl shadow-card p-5 flex items-start gap-4">
                   {post.cover_image && (
-                    <img src={post.cover_image} alt="" className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
+                    <img src={post.cover_image} alt="" className="w-16 h-16 rounded-2xl object-cover flex-shrink-0" />
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusBadge(post.status)}`}>
+                      <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusBadge(post.status)}`}>
                         {post.status}
                       </span>
                       {(post.tags || []).map(t => (
-                        <span key={t} className="text-xs text-gray-400 px-1.5 py-0.5 rounded-full bg-gray-50 border">{t}</span>
+                        <span key={t} className="text-xs text-ink-500 px-2 py-0.5 rounded-full bg-paper">{t}</span>
                       ))}
                     </div>
-                    <p className="font-bold text-gray-900 truncate">{post.title}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="font-display font-bold text-ink-900 truncate">{post.title}</p>
+                    <p className="text-xs text-ink-400 mt-0.5">
                       /blog/{post.slug} · {post.author_name}
                       {post.published_at && ` · ${new Date(post.published_at).toLocaleDateString()}`}
                     </p>
                   </div>
                   <div className="flex gap-2 flex-shrink-0">
                     <Link to={`/blog/${post.slug}`} target="_blank"
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
-                      View
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-ink-50 text-ink-600 hover:bg-ink-100 transition">
+                      <ExternalLink className="w-3.5 h-3.5" /> View
                     </Link>
                     <button onClick={() => togglePublish(post)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${post.status === 'published' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}>
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${post.status === 'published' ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'}`}>
                       {post.status === 'published' ? 'Unpublish' : 'Publish'}
                     </button>
                     <button onClick={() => { setEditing(post); setView('edit'); }}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-100 text-blue-700 hover:bg-blue-200 transition">
-                      Edit
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-100 text-brand-700 hover:bg-brand-200 transition">
+                      <Pencil className="w-3.5 h-3.5" /> Edit
                     </button>
                     <button onClick={() => handleDelete(post.id)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-100 text-red-700 hover:bg-red-200 transition">
-                      Delete
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-100 text-rose-700 hover:bg-rose-200 transition">
+                      <Trash2 className="w-3.5 h-3.5" /> Delete
                     </button>
                   </div>
                 </div>
