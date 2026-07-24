@@ -73,10 +73,12 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 
 - [x] **AdminBlog** — editorial restyle (paper bg, rounded-3xl cards, brand pill buttons/toolbar w/ lucide icons replacing mono letters + emoji, token status badges, shared `inputClass`, TipTap content styled with display headings)
 
-### Remaining (old blue/default style)
-- [ ] **Groups**, **GroupProfile**, **EventDetail** (recommended next)
 - [x] **Messages** — editorial restyle (paper bg, rounded-3xl cards, brand message bubbles, lucide `MessageCircle`/`Send`, brand avatars)
-- [ ] **WorkoutPlan** (`/training-plan`)
+
+- [x] **Groups** + **GroupProfile** + **EventDetail** + **GroupFeed** — editorial restyle (paper bg, rounded-3xl cards, ink gradient group header, brand pill tabs/CTAs w/ lucide icons, brand avatars, shared `Toggle` + `inputClass`, RSVP/status pills via lucide Check/HelpCircle/X, token flash banners)
+
+### Remaining (old blue/default style)
+- [ ] **WorkoutPlan** (`/training-plan`) — recommended next (big; 725 lines)
 - [ ] **AppointmentMatrix** component (used in studio dashboard + studio profile)
 
 ### Nice-to-have / follow-ups

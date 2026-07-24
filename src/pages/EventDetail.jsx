@@ -2,17 +2,32 @@
 import authFetch from '../utils/authFetch';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import {
+  Check, HelpCircle, X, CalendarDays, Clock, MapPin, ArrowLeft,
+  AlertCircle, CheckCircle2,
+} from 'lucide-react';
 import Navbar from '../components/NavBar';
+import { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 const api = import.meta.env.VITE_API_URL;
 
-const STATUS_LABELS = { going: '✅ Going', maybe: '🤔 Maybe', not_going: '❌ Not going' };
-const STATUS_STYLES = {
-  going: 'bg-green-600 text-white',
-  maybe: 'bg-yellow-500 text-white',
-  not_going: 'bg-gray-300 text-gray-700',
+const STATUS = {
+  going:     { label: 'Going',     Icon: Check,      solid: 'bg-emerald-600 text-white', soft: 'bg-emerald-100 text-emerald-700' },
+  maybe:     { label: 'Maybe',     Icon: HelpCircle, solid: 'bg-amber-500 text-white',   soft: 'bg-amber-100 text-amber-700' },
+  not_going: { label: 'Not going', Icon: X,          solid: 'bg-ink-300 text-ink-800',   soft: 'bg-ink-100 text-ink-500' },
 };
+
+function StatusPill({ status, solid = false }) {
+  const s = STATUS[status];
+  if (!s) return null;
+  const { Icon, label } = s;
+  return (
+    <span className={`inline-flex items-center gap-1 ${solid ? s.solid : s.soft} text-xs font-semibold px-2.5 py-1 rounded-full`}>
+      <Icon className="w-3.5 h-3.5" /> {label}
+    </span>
+  );
+}
 
 export default function EventDetail() {
   const { eventId } = useParams();
@@ -71,7 +86,7 @@ export default function EventDetail() {
         const filtered = prev.filter(r => r.user_id !== userId);
         return [...filtered, { user_id: userId, name: userName, status }];
       });
-      flash(STATUS_LABELS[status]);
+      flash(`You're marked as "${STATUS[status].label}"`);
     } catch (e) { flash(e.message, 'error'); }
   }
 
@@ -101,16 +116,18 @@ export default function EventDetail() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
-      <div className="pt-32 text-center text-gray-400">Loading…</div>
+    <div className="min-h-screen bg-paper"><Navbar />
+      <div className="pt-32 text-center text-ink-400">Loading…</div>
     </div>
   );
 
   if (!event) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
+    <div className="min-h-screen bg-paper"><Navbar />
       <div className="pt-32 text-center">
-        <p className="text-xl font-semibold text-gray-700">Event not found.</p>
-        <Link to="/groups" className="text-blue-600 hover:underline mt-2 block">← Back to groups</Link>
+        <p className="text-xl font-display font-bold text-ink-800">Event not found.</p>
+        <Link to="/groups" className="inline-flex items-center gap-1.5 text-brand-600 font-semibold hover:underline mt-2">
+          <ArrowLeft className="w-4 h-4" /> Back to groups
+        </Link>
       </div>
     </div>
   );
@@ -122,44 +139,45 @@ export default function EventDetail() {
   const maybeCount = rsvps.filter(r => r.status === 'maybe').length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-3xl mx-auto">
 
         {msg && (
-          <div className={`mb-6 p-3 rounded-xl text-sm font-medium ${msgType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div className={`mb-6 flex items-center gap-2 p-3 rounded-2xl text-sm font-medium ${msgType === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+            {msgType === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
             {msg}
           </div>
         )}
 
         {/* Breadcrumb */}
-        <Link to={`/groups/${event.group_id}`} className="text-sm text-blue-600 hover:underline mb-6 block">
-          ← {event.cover_emoji} {event.group_name}
+        <Link to={`/groups/${event.group_id}`} className="inline-flex items-center gap-1.5 text-sm text-brand-600 font-semibold hover:underline mb-6">
+          <ArrowLeft className="w-4 h-4" /> {event.cover_emoji} {event.group_name}
         </Link>
 
         {/* Event header */}
-        <div className="bg-white rounded-2xl shadow p-6 mb-6">
+        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                {isPast && <span className="text-xs bg-gray-100 text-gray-500 font-semibold px-2 py-0.5 rounded-full">Past</span>}
-                <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                {isPast && <span className="text-xs bg-ink-100 text-ink-500 font-semibold px-2.5 py-0.5 rounded-full">Past</span>}
+                <h1 className="font-display font-bold text-2xl text-ink-900">{event.title}</h1>
               </div>
-              <p className="text-sm text-gray-500 mt-1">Created by {event.creator_name}</p>
+              <p className="text-sm text-ink-500 mt-1">Created by {event.creator_name}</p>
             </div>
           </div>
 
-          <div className="mt-4 space-y-2 text-sm text-gray-700">
-            <p>📅 {friendlyDate}</p>
-            <p>🕐 {friendlyTime}</p>
-            {event.location && <p>📍 {event.location}</p>}
-            {event.description && <p className="mt-3 text-gray-600 whitespace-pre-wrap">{event.description}</p>}
+          <div className="mt-4 space-y-2 text-sm text-ink-700">
+            <p className="flex items-center gap-2"><CalendarDays className="w-4 h-4 text-ink-300" />{friendlyDate}</p>
+            <p className="flex items-center gap-2"><Clock className="w-4 h-4 text-ink-300" />{friendlyTime}</p>
+            {event.location && <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-ink-300" />{event.location}</p>}
+            {event.description && <p className="mt-3 text-ink-600 whitespace-pre-wrap">{event.description}</p>}
           </div>
 
           {/* RSVP counts */}
-          <div className="flex gap-4 mt-5 pt-5 border-t text-sm">
-            <span className="text-green-600 font-semibold">✅ {goingCount} going</span>
-            <span className="text-yellow-600 font-semibold">🤔 {maybeCount} maybe</span>
+          <div className="flex gap-3 mt-5 pt-5 border-t border-ink-100 text-sm">
+            <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold"><Check className="w-4 h-4" />{goingCount} going</span>
+            <span className="inline-flex items-center gap-1 text-amber-600 font-semibold"><HelpCircle className="w-4 h-4" />{maybeCount} maybe</span>
           </div>
 
           {/* RSVP buttons */}
@@ -167,26 +185,27 @@ export default function EventDetail() {
             <div className="mt-4">
               {myStatus ? (
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className={`text-sm font-semibold px-3 py-1.5 rounded-xl ${STATUS_STYLES[myStatus]}`}>
-                    {STATUS_LABELS[myStatus]}
-                  </span>
-                  <span className="text-xs text-gray-400">Change:</span>
+                  <StatusPill status={myStatus} solid />
+                  <span className="text-xs text-ink-400">Change:</span>
                   {['going', 'maybe', 'not_going'].filter(s => s !== myStatus).map(s => (
                     <button key={s} onClick={() => rsvp(s)}
-                      className="text-xs text-gray-500 hover:text-gray-800 underline">
-                      {STATUS_LABELS[s]}
+                      className="text-xs text-ink-500 hover:text-ink-800 underline">
+                      {STATUS[s].label}
                     </button>
                   ))}
-                  <button onClick={removeRsvp} className="text-xs text-red-400 hover:text-red-600 underline">Remove</button>
+                  <button onClick={removeRsvp} className="text-xs text-rose-400 hover:text-rose-600 underline">Remove</button>
                 </div>
               ) : (
                 <div className="flex gap-2 flex-wrap">
-                  {['going', 'maybe', 'not_going'].map(s => (
-                    <button key={s} onClick={() => rsvp(s)}
-                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${STATUS_STYLES[s]} hover:opacity-90`}>
-                      {STATUS_LABELS[s]}
-                    </button>
-                  ))}
+                  {['going', 'maybe', 'not_going'].map(s => {
+                    const { Icon, label, solid } = STATUS[s];
+                    return (
+                      <button key={s} onClick={() => rsvp(s)}
+                        className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition ${solid} hover:opacity-90`}>
+                        <Icon className="w-4 h-4" /> {label}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -195,33 +214,33 @@ export default function EventDetail() {
 
         {/* Edit form */}
         {editing && (
-          <div className="bg-white rounded-2xl shadow p-6 mb-6">
-            <h2 className="font-bold text-gray-800 mb-4">Edit Event</h2>
+          <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+            <h2 className="font-display font-bold text-ink-900 mb-4">Edit Event</h2>
             <form onSubmit={saveEdit} className="space-y-4">
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Title</span>
-                <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.title} onChange={e => setEditForm(f => ({...f, title: e.target.value}))} required />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Title</span>
+                <input className={inputClass}
+                  value={editForm.title} onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} required />
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Date & Time</span>
-                <input type="datetime-local" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.datetime} onChange={e => setEditForm(f => ({...f, datetime: e.target.value}))} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Date & Time</span>
+                <input type="datetime-local" className={inputClass}
+                  value={editForm.datetime} onChange={e => setEditForm(f => ({ ...f, datetime: e.target.value }))} />
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Location</span>
-                <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Location</span>
+                <input className={inputClass}
                   placeholder="e.g. Hayarkon Park, Tel Aviv"
-                  value={editForm.location} onChange={e => setEditForm(f => ({...f, location: e.target.value}))} />
+                  value={editForm.location} onChange={e => setEditForm(f => ({ ...f, location: e.target.value }))} />
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Description</span>
-                <textarea rows={3} className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.description} onChange={e => setEditForm(f => ({...f, description: e.target.value}))} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Description</span>
+                <textarea rows={3} className={inputClass}
+                  value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} />
               </label>
               <div className="flex gap-3">
-                <button type="submit" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">Save</button>
-                <button type="button" onClick={() => setEditing(false)} className="text-gray-500 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition">Cancel</button>
+                <button type="submit" className="bg-brand-500 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-brand-600 transition shadow-pill">Save</button>
+                <button type="button" onClick={() => setEditing(false)} className="text-ink-500 px-4 py-2.5 rounded-full hover:bg-ink-50 transition">Cancel</button>
               </div>
             </form>
           </div>
@@ -229,22 +248,20 @@ export default function EventDetail() {
 
         {/* Attendees */}
         {rsvps.length > 0 && (
-          <div className="bg-white rounded-2xl shadow overflow-hidden mb-6">
-            <div className="px-6 py-4 border-b">
-              <h2 className="font-bold text-gray-800">Attendees</h2>
+          <div className="bg-white rounded-3xl shadow-card overflow-hidden mb-6">
+            <div className="px-6 py-4 border-b border-ink-100">
+              <h2 className="font-display font-bold text-ink-900">Attendees</h2>
             </div>
-            <ul className="divide-y divide-gray-100">
+            <ul className="divide-y divide-ink-50">
               {rsvps.map(r => (
                 <li key={r.user_id} className="flex items-center justify-between px-6 py-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                    <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm">
                       {r.name?.[0]?.toUpperCase()}
                     </div>
-                    <span className="text-sm font-medium text-gray-800">{r.name}</span>
+                    <span className="text-sm font-medium text-ink-800">{r.name}</span>
                   </div>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${r.status === 'going' ? 'bg-green-100 text-green-700' : r.status === 'maybe' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-500'}`}>
-                    {STATUS_LABELS[r.status]}
-                  </span>
+                  <StatusPill status={r.status} />
                 </li>
               ))}
             </ul>

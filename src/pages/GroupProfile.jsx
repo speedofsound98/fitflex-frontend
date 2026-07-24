@@ -2,7 +2,13 @@
 import authFetch from '../utils/authFetch';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import {
+  MessageCircle, CalendarDays, Users, Tag, MapPin, Lock, Plus,
+  ArrowLeft, AlertCircle, CheckCircle2,
+} from 'lucide-react';
 import Navbar from '../components/NavBar';
+import Toggle from '../components/Toggle';
+import { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 import GroupFeed from '../components/GroupFeed';
 
@@ -28,7 +34,6 @@ export default function GroupProfile() {
   const [msgType, setMsgType] = useState('success');
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState({});
-  const [feedPrivate, setFeedPrivate] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [eventForm, setEventForm] = useState({ title: '', description: '', datetime: '', location: '' });
 
@@ -72,7 +77,12 @@ export default function GroupProfile() {
   const isMember = !!myMembership;
   const isAdmin = myMembership?.role === 'admin';
   const [activeTab, setActiveTab] = useState('feed');
-  const tabClass = t => `px-4 py-2 text-sm font-semibold rounded-full transition ${activeTab === t ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`;
+
+  const TABS = [
+    { key: 'feed', label: 'Feed', icon: MessageCircle },
+    { key: 'events', label: 'Events', icon: CalendarDays },
+    { key: 'members', label: 'Members', icon: Users },
+  ];
 
   function flash(m, type = 'success') {
     setMsg(m); setMsgType(type);
@@ -86,7 +96,7 @@ export default function GroupProfile() {
       if (!res.ok) throw new Error(data.error);
       setMembers(prev => [...prev, { id: userId, name: localStorage.getItem('userName'), role: 'member', joined_at: new Date() }]);
       setGroup(g => ({ ...g, member_count: g.member_count + 1 }));
-      flash('You joined the group! 🎉');
+      flash('You joined the group!');
     } catch (e) { flash(e.message, 'error'); }
   }
 
@@ -113,7 +123,7 @@ export default function GroupProfile() {
       setEvents(prev => [...prev, { ...data.event, going_count: 0, maybe_count: 0 }].sort((a, b) => new Date(a.datetime) - new Date(b.datetime)));
       setShowEventForm(false);
       setEventForm({ title: '', description: '', datetime: '', location: '' });
-      flash('Event created! Members have been notified. 🎉');
+      flash('Event created! Members have been notified.');
     } catch (e) { flash(e.message, 'error'); }
   }
 
@@ -142,43 +152,46 @@ export default function GroupProfile() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
-      <div className="pt-32 text-center text-gray-400">Loading…</div>
+    <div className="min-h-screen bg-paper"><Navbar />
+      <div className="pt-32 text-center text-ink-400">Loading…</div>
     </div>
   );
 
   if (!group) return (
-    <div className="min-h-screen bg-gray-50"><Navbar />
+    <div className="min-h-screen bg-paper"><Navbar />
       <div className="pt-32 text-center">
-        <p className="text-xl font-semibold text-gray-700">Group not found.</p>
-        <Link to="/groups" className="text-blue-600 hover:underline mt-2 block">← Back to groups</Link>
+        <p className="text-xl font-display font-bold text-ink-800">Group not found.</p>
+        <Link to="/groups" className="inline-flex items-center gap-1.5 text-brand-600 font-semibold hover:underline mt-2">
+          <ArrowLeft className="w-4 h-4" /> Back to groups
+        </Link>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <Navbar />
       <div className="pt-24 pb-16 px-4 max-w-4xl mx-auto">
 
         {msg && (
-          <div className={`mb-6 p-3 rounded-xl text-sm font-medium ${msgType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          <div className={`mb-6 flex items-center gap-2 p-3 rounded-2xl text-sm font-medium ${msgType === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+            {msgType === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
             {msg}
           </div>
         )}
 
         {/* Group header */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-400 rounded-3xl p-8 text-white mb-8">
+        <div className="bg-gradient-to-br from-ink-800 to-ink-600 rounded-3xl shadow-card-lg p-8 text-white mb-8">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <span className="text-6xl">{group.cover_emoji}</span>
               <div>
-                <h1 className="text-3xl font-extrabold">{group.name}</h1>
-                <div className="flex items-center gap-3 mt-1 text-blue-100 text-sm">
-                  {group.sport_type && <span>🏷️ {group.sport_type}</span>}
-                  {group.city && <span>📍 {group.city}</span>}
-                  <span>👥 {group.member_count} member{group.member_count !== 1 ? 's' : ''}</span>
-                  {group.is_private && <span>🔒 Private</span>}
+                <h1 className="font-display font-bold text-3xl leading-tight">{group.name}</h1>
+                <div className="flex items-center gap-3 mt-2 text-white/75 text-sm flex-wrap">
+                  {group.sport_type && <span className="flex items-center gap-1"><Tag className="w-3.5 h-3.5" />{group.sport_type}</span>}
+                  {group.city && <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />{group.city}</span>}
+                  <span className="flex items-center gap-1"><Users className="w-3.5 h-3.5" />{group.member_count} member{group.member_count !== 1 ? 's' : ''}</span>
+                  {group.is_private && <span className="flex items-center gap-1"><Lock className="w-3.5 h-3.5" />Private</span>}
                 </div>
               </div>
             </div>
@@ -186,105 +199,99 @@ export default function GroupProfile() {
               {isAdmin && (
                 <>
                   <button onClick={() => setEditing(o => !o)}
-                    className="bg-white/20 hover:bg-white/30 text-white text-sm px-4 py-2 rounded-xl transition font-semibold">
+                    className="bg-white/15 hover:bg-white/25 text-white text-sm px-4 py-2 rounded-full transition font-semibold backdrop-blur-sm">
                     Edit
                   </button>
                   <button onClick={deleteGroup}
-                    className="bg-red-500/80 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-xl transition font-semibold">
+                    className="bg-rose-500/90 hover:bg-rose-600 text-white text-sm px-4 py-2 rounded-full transition font-semibold">
                     Delete
                   </button>
                 </>
               )}
               {isUser && !isMember && !group.is_private && (
                 <button onClick={join}
-                  className="bg-white text-blue-600 font-semibold px-5 py-2 rounded-xl hover:bg-blue-50 transition text-sm">
+                  className="bg-white text-ink-900 font-semibold px-5 py-2 rounded-full hover:bg-brand-50 transition text-sm shadow-pill">
                   Join Group
                 </button>
               )}
               {isUser && isMember && !isAdmin && (
                 <button onClick={leave}
-                  className="bg-white/20 hover:bg-white/30 text-white text-sm px-4 py-2 rounded-xl transition font-semibold">
+                  className="bg-white/15 hover:bg-white/25 text-white text-sm px-4 py-2 rounded-full transition font-semibold backdrop-blur-sm">
                   Leave
                 </button>
               )}
             </div>
           </div>
-          {group.description && <p className="mt-4 text-blue-50 max-w-xl">{group.description}</p>}
+          {group.description && <p className="mt-4 text-white/80 max-w-xl">{group.description}</p>}
         </div>
 
         {/* Edit form */}
         {editing && (
-          <div className="bg-white rounded-2xl shadow p-6 mb-8">
-            <h2 className="font-bold text-gray-800 mb-4">Edit Group</h2>
+          <div className="bg-white rounded-3xl shadow-card p-6 mb-8">
+            <h2 className="font-display font-bold text-ink-900 mb-4">Edit Group</h2>
             <form onSubmit={saveEdit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="flex flex-col gap-1 md:col-span-2">
-                <span className="text-sm font-medium text-gray-700">Group name</span>
-                <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.name} onChange={e => setEditForm(f => ({...f, name: e.target.value}))} />
+              <label className="flex flex-col gap-1.5 md:col-span-2">
+                <span className="text-sm font-medium text-ink-700">Group name</span>
+                <input className={inputClass}
+                  value={editForm.name} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} />
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Sport type</span>
-                <select className="border border-gray-200 p-2.5 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.sport_type} onChange={e => setEditForm(f => ({...f, sport_type: e.target.value}))}>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Sport type</span>
+                <select className={`${inputClass} !bg-white`}
+                  value={editForm.sport_type} onChange={e => setEditForm(f => ({ ...f, sport_type: e.target.value }))}>
                   <option value="">— Select —</option>
                   {SPORT_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
               </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">City</span>
-                <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.city} onChange={e => setEditForm(f => ({...f, city: e.target.value}))} />
+              <label className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">City</span>
+                <input className={inputClass}
+                  value={editForm.city} onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))} />
               </label>
-              <label className="flex flex-col gap-1 md:col-span-2">
-                <span className="text-sm font-medium text-gray-700">Description</span>
-                <textarea rows={2} className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                  value={editForm.description} onChange={e => setEditForm(f => ({...f, description: e.target.value}))} />
+              <label className="flex flex-col gap-1.5 md:col-span-2">
+                <span className="text-sm font-medium text-ink-700">Description</span>
+                <textarea rows={2} className={inputClass}
+                  value={editForm.description} onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} />
               </label>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Emoji</span>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-sm font-medium text-ink-700">Emoji</span>
                 <div className="flex flex-wrap gap-2">
                   {EMOJIS.map(emoji => (
                     <button key={emoji} type="button"
-                      onClick={() => setEditForm(f => ({...f, cover_emoji: emoji}))}
-                      className={`text-xl p-1.5 rounded-lg transition ${editForm.cover_emoji === emoji ? 'bg-blue-100 ring-2 ring-blue-400' : 'hover:bg-gray-100'}`}>
+                      onClick={() => setEditForm(f => ({ ...f, cover_emoji: emoji }))}
+                      className={`text-xl p-1.5 rounded-xl transition ${editForm.cover_emoji === emoji ? 'bg-brand-100 ring-2 ring-brand-400' : 'hover:bg-paper'}`}>
                       {emoji}
                     </button>
                   ))}
                 </div>
               </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Group visibility</span>
-                <label className="flex items-center gap-3 cursor-pointer mt-1">
-                  <div onClick={() => setEditForm(f => ({...f, is_private: !f.is_private}))}
-                    className={`w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 ${editForm.is_private ? 'bg-blue-600' : 'bg-gray-200'}`}>
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${editForm.is_private ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </div>
-                  <span className="text-sm text-gray-600">{editForm.is_private ? '🔒 Private group' : '🌐 Public group'}</span>
-                </label>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm font-medium text-gray-700">Feed visibility</span>
-                <label className="flex items-center gap-3 cursor-pointer mt-1">
-                  <div onClick={() => setEditForm(f => ({...f, is_feed_public: !f.is_feed_public}))}
-                    className={`w-11 h-6 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 ${editForm.is_feed_public ? 'bg-blue-600' : 'bg-gray-200'}`}>
-                    <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 ${editForm.is_feed_public ? 'translate-x-5' : 'translate-x-0'}`} />
-                  </div>
-                  <span className="text-sm text-gray-600">{editForm.is_feed_public ? '🌐 Public feed' : '🔒 Members only feed'}</span>
-                </label>
+              <div className="grid grid-cols-1 gap-3 md:col-span-1">
+                <div className="flex items-center justify-between p-3 bg-paper rounded-2xl">
+                  <span className="text-sm text-ink-700">{editForm.is_private ? 'Private group' : 'Public group'}</span>
+                  <Toggle checked={editForm.is_private} onChange={() => setEditForm(f => ({ ...f, is_private: !f.is_private }))} />
+                </div>
+                <div className="flex items-center justify-between p-3 bg-paper rounded-2xl">
+                  <span className="text-sm text-ink-700">{editForm.is_feed_public ? 'Public feed' : 'Members-only feed'}</span>
+                  <Toggle checked={editForm.is_feed_public} onChange={() => setEditForm(f => ({ ...f, is_feed_public: !f.is_feed_public }))} />
+                </div>
               </div>
               <div className="md:col-span-2 flex gap-3">
-                <button type="submit" className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">Save</button>
-                <button type="button" onClick={() => setEditing(false)} className="text-gray-500 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition">Cancel</button>
+                <button type="submit" className="bg-brand-500 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-brand-600 transition shadow-pill">Save</button>
+                <button type="button" onClick={() => setEditing(false)} className="text-ink-500 px-4 py-2.5 rounded-full hover:bg-ink-50 transition">Cancel</button>
               </div>
             </form>
           </div>
         )}
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 bg-white rounded-full shadow-sm p-1 w-fit">
-          <button className={tabClass('feed')} onClick={() => setActiveTab('feed')}>💬 Feed</button>
-          <button className={tabClass('events')} onClick={() => setActiveTab('events')}>📅 Events</button>
-          <button className={tabClass('members')} onClick={() => setActiveTab('members')}>👥 Members</button>
+        <div className="flex gap-1 mb-6 bg-white rounded-full shadow-card p-1 w-fit">
+          {TABS.map(({ key, label, icon: Icon }) => (
+            <button key={key} onClick={() => setActiveTab(key)}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full transition
+                ${activeTab === key ? 'bg-brand-500 text-white shadow-pill' : 'text-ink-500 hover:text-ink-800'}`}>
+              <Icon className="w-4 h-4" /> {label}
+            </button>
+          ))}
         </div>
 
         {/* Feed tab */}
@@ -294,73 +301,73 @@ export default function GroupProfile() {
 
         {/* Events tab */}
         {activeTab === 'events' && (
-        <div className="bg-white rounded-2xl shadow overflow-hidden mb-6">
-          <div className="px-6 py-4 border-b flex items-center justify-between">
-            <h2 className="font-bold text-gray-800">Events</h2>
+        <div className="bg-white rounded-3xl shadow-card overflow-hidden mb-6">
+          <div className="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
+            <h2 className="font-display font-bold text-ink-900">Events</h2>
             {isAdmin && (
-              <button onClick={() => { setShowEventForm(o => !o); setEventForm(f => ({...f, datetime: nextHour()})); }}
-                className="text-sm text-blue-600 font-semibold hover:underline">
-                + New event
+              <button onClick={() => { setShowEventForm(o => !o); setEventForm(f => ({ ...f, datetime: nextHour() })); }}
+                className="inline-flex items-center gap-1 text-sm text-brand-600 font-semibold hover:underline">
+                <Plus className="w-4 h-4" /> New event
               </button>
             )}
           </div>
 
           {/* Create event form */}
           {showEventForm && (
-            <div className="px-6 py-4 border-b bg-blue-50">
+            <div className="px-6 py-4 border-b border-ink-100 bg-paper">
               <form onSubmit={createEvent} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <label className="flex flex-col gap-1 md:col-span-2">
-                  <span className="text-xs font-medium text-gray-600">Event title *</span>
-                  <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                <label className="flex flex-col gap-1.5 md:col-span-2">
+                  <span className="text-xs font-medium text-ink-600">Event title *</span>
+                  <input className={`${inputClass} !bg-white`}
                     placeholder="e.g. Sunday morning run" value={eventForm.title}
-                    onChange={e => setEventForm(f => ({...f, title: e.target.value}))} required />
+                    onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} required />
                 </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-gray-600">Date & Time *</span>
-                  <input type="datetime-local" className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
-                    value={eventForm.datetime} onChange={e => setEventForm(f => ({...f, datetime: e.target.value}))} required />
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-ink-600">Date & Time *</span>
+                  <input type="datetime-local" className={`${inputClass} !bg-white`}
+                    value={eventForm.datetime} onChange={e => setEventForm(f => ({ ...f, datetime: e.target.value }))} required />
                 </label>
-                <label className="flex flex-col gap-1">
-                  <span className="text-xs font-medium text-gray-600">Location</span>
-                  <input className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-ink-600">Location</span>
+                  <input className={`${inputClass} !bg-white`}
                     placeholder="e.g. Hayarkon Park" value={eventForm.location}
-                    onChange={e => setEventForm(f => ({...f, location: e.target.value}))} />
+                    onChange={e => setEventForm(f => ({ ...f, location: e.target.value }))} />
                 </label>
-                <label className="flex flex-col gap-1 md:col-span-2">
-                  <span className="text-xs font-medium text-gray-600">Description</span>
-                  <textarea rows={2} className="border border-gray-200 p-2.5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                <label className="flex flex-col gap-1.5 md:col-span-2">
+                  <span className="text-xs font-medium text-ink-600">Description</span>
+                  <textarea rows={2} className={`${inputClass} !bg-white`}
                     placeholder="Details, pace, what to bring..."
-                    value={eventForm.description} onChange={e => setEventForm(f => ({...f, description: e.target.value}))} />
+                    value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} />
                 </label>
                 <div className="md:col-span-2 flex gap-2">
-                  <button type="submit" className="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-blue-700 transition">Create</button>
-                  <button type="button" onClick={() => setShowEventForm(false)} className="text-gray-500 px-4 py-2 rounded-xl text-sm hover:bg-gray-100 transition">Cancel</button>
+                  <button type="submit" className="bg-brand-500 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill">Create</button>
+                  <button type="button" onClick={() => setShowEventForm(false)} className="text-ink-500 px-4 py-2 rounded-full text-sm hover:bg-ink-50 transition">Cancel</button>
                 </div>
               </form>
             </div>
           )}
 
           {events.length === 0 ? (
-            <p className="px-6 py-8 text-sm text-gray-400">No events yet.{isAdmin ? ' Create the first one!' : ''}</p>
+            <p className="px-6 py-8 text-sm text-ink-400">No events yet.{isAdmin ? ' Create the first one!' : ''}</p>
           ) : (
-            <ul className="divide-y divide-gray-100">
+            <ul className="divide-y divide-ink-50">
               {events.map(ev => {
                 const isPast = new Date(ev.datetime) < new Date();
                 return (
                   <li key={ev.id}>
-                    <Link to={`/events/${ev.id}`} className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <Link to={`/events/${ev.id}`} className="flex items-center justify-between px-6 py-4 hover:bg-paper transition">
                       <div>
-                        <p className={`font-semibold text-sm ${isPast ? 'text-gray-400' : 'text-gray-800'}`}>{ev.title}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className={`font-semibold text-sm ${isPast ? 'text-ink-400' : 'text-ink-800'}`}>{ev.title}</p>
+                        <p className="text-xs text-ink-400 mt-0.5">
                           {new Date(ev.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                           {' · '}{new Date(ev.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           {ev.location && ` · ${ev.location}`}
                         </p>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-gray-500 ml-4 shrink-0">
-                        <span>✅ {ev.going_count}</span>
-                        <span>🤔 {ev.maybe_count}</span>
-                        {isPast && <span className="bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full font-medium">Past</span>}
+                      <div className="flex items-center gap-3 text-xs text-ink-500 ml-4 shrink-0">
+                        <span className="text-emerald-600 font-semibold">{ev.going_count} going</span>
+                        <span className="text-amber-600 font-semibold">{ev.maybe_count} maybe</span>
+                        {isPast && <span className="bg-ink-100 text-ink-400 px-2 py-0.5 rounded-full font-medium">Past</span>}
                       </div>
                     </Link>
                   </li>
@@ -373,21 +380,21 @@ export default function GroupProfile() {
 
         {/* Members tab */}
         {activeTab === 'members' && (
-        <div className="bg-white rounded-2xl shadow overflow-hidden">
-          <div className="px-6 py-4 border-b flex items-center justify-between">
-            <h2 className="font-bold text-gray-800">Members ({members.length})</h2>
+        <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
+            <h2 className="font-display font-bold text-ink-900">Members ({members.length})</h2>
           </div>
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-ink-50">
             {members.map(m => (
               <li key={m.id} className="flex items-center justify-between px-6 py-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                  <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-sm">
                     {m.name?.[0]?.toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium text-gray-800">{m.name}</span>
+                  <span className="text-sm font-medium text-ink-800">{m.name}</span>
                 </div>
                 {m.role === 'admin' && (
-                  <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded-full">Admin</span>
+                  <span className="text-xs bg-brand-100 text-brand-700 font-semibold px-2.5 py-0.5 rounded-full">Admin</span>
                 )}
               </li>
             ))}
@@ -396,7 +403,9 @@ export default function GroupProfile() {
         )}
 
         <div className="mt-6">
-          <Link to="/groups" className="text-sm text-blue-600 hover:underline">← Back to all groups</Link>
+          <Link to="/groups" className="inline-flex items-center gap-1.5 text-sm text-brand-600 font-semibold hover:underline">
+            <ArrowLeft className="w-4 h-4" /> Back to all groups
+          </Link>
         </div>
 
       </div>
