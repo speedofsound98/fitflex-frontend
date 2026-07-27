@@ -1,5 +1,10 @@
 // src/pages/WorkoutPlan.jsx
 import React, { useState, useRef, useEffect } from 'react';
+import {
+  Maximize2, Download, X, ChevronDown, ChevronRight, Loader2,
+  FileSpreadsheet, FolderOpen, Tag, CalendarDays, Activity, BarChart3,
+  Palette, Pencil, AlertCircle,
+} from 'lucide-react';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 
@@ -12,6 +17,11 @@ const PHASE_STYLE = {
   Peak:  { backgroundColor: '#fce5cd', color: '#7f3000' },
   Taper: { backgroundColor: '#e8d5f5', color: '#4a1a6a' },
 };
+
+// Token hexes for JS/inline-style use (Tailwind classes can't reach here)
+const INK_900 = '#15202b';
+const BRAND_500 = '#e8702a';
+const BRAND_600 = '#d55f1f';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function cellStyle(cell) {
@@ -106,7 +116,7 @@ function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }
   }, [editingCell]);
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm" style={{ userSelect: 'none' }}>
+    <div className="overflow-x-auto rounded-2xl shadow-card" style={{ userSelect: 'none' }}>
       <table className="border-collapse text-sm" style={{ tableLayout: 'fixed', width: 'max-content' }}>
         <colgroup>
           {Array.from({ length: colCount }, (_, ci) => (
@@ -119,7 +129,7 @@ function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }
               const cell = rows[headerRowIdx]?.[ci];
               return (
                 <th key={ci} style={{
-                  backgroundColor: cell?.bg || '#1e3a5f',
+                  backgroundColor: cell?.bg || INK_900,
                   color: cell?.fg || '#ffffff',
                   fontWeight: 'bold',
                   height: rh,
@@ -147,7 +157,7 @@ function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }
             if (ri === headerRowIdx) return null;
             if (!row.some(c => c?.v?.trim())) return null;
             return (
-              <tr key={ri} className="border-t border-gray-100">
+              <tr key={ri} className="border-t border-ink-50 bg-white">
                 {Array.from({ length: colCount }, (_, ci) => {
                   const cell = row[ci];
                   const isEditing = editingCell?.row === ri && editingCell?.col === ci;
@@ -169,7 +179,7 @@ function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }
                           onBlur={commitEdit} onKeyDown={handleKeyDown}
                           style={{
                             position: 'absolute', inset: 0, width: '100%', height: '100%',
-                            padding: '0 10px', border: '2px solid #2563eb', outline: 'none',
+                            padding: '0 10px', border: `2px solid ${BRAND_500}`, outline: 'none',
                             background: '#fff', color: '#1a1a1a', fontSize: 'inherit',
                             fontFamily: 'inherit', boxSizing: 'border-box', zIndex: 2,
                           }} />
@@ -223,6 +233,10 @@ function TrainingPlanView({ rows }) {
   const headers = rows[headerIdx] || [];
   const dataRows = rows.slice(headerIdx + 1).filter(r => r.some(c => c?.v?.trim()));
 
+  // Hooks must run unconditionally (before any early return)
+  const [activePhase, setActivePhase] = useState('');
+  const [legendOpen, setLegendOpen] = useState(false);
+
   const C = {
     wk:     colIdx(headers, ['wk', 'week #']),
     date:   colIdx(headers, ['week of', 'date']),
@@ -241,8 +255,6 @@ function TrainingPlanView({ rows }) {
   if (!hasRuns) return null;
 
   const phases = [...new Set(dataRows.map(r => cellText(r[C.phase])).filter(Boolean))];
-  const [activePhase, setActivePhase] = useState('');
-  const [legendOpen, setLegendOpen] = useState(false);
   const visible = activePhase ? dataRows.filter(r => cellText(r[C.phase]) === activePhase) : dataRows;
   const totalKm = dataRows.reduce((s, r) => s + (parseFloat(cellText(r[C.total])) || 0), 0);
 
@@ -260,16 +272,25 @@ function TrainingPlanView({ rows }) {
     });
   });
 
+  const READING_GUIDE = [
+    { Icon: Tag, title: 'Phase badge', desc: 'training block color coded from your file' },
+    { Icon: CalendarDays, title: 'Week / date', desc: 'week number and start date' },
+    { Icon: Activity, title: 'Run chips', desc: 'each chip shows distance + type for that session' },
+    { Icon: BarChart3, title: 'Total km', desc: 'weekly volume shown top-right of each card' },
+    { Icon: Palette, title: 'Colors', desc: 'preserved from your Excel file for at-a-glance intensity' },
+    { Icon: Pencil, title: 'Editing', desc: 'switch to Table view to edit cells, then export back to .xlsx' },
+  ];
+
   return (
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
-          <p className="text-3xl font-extrabold text-gray-900">{dataRows.length}</p>
-          <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">Weeks</p>
+        <div className="bg-white rounded-2xl shadow-card p-4 text-center">
+          <p className="text-3xl font-display font-bold text-ink-900">{dataRows.length}</p>
+          <p className="text-xs text-ink-400 mt-1 uppercase tracking-wide">Weeks</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-center">
-          <p className="text-3xl font-extrabold text-blue-600">{Math.round(totalKm)}</p>
-          <p className="text-xs text-gray-400 mt-1 uppercase tracking-wide">Total km</p>
+        <div className="bg-white rounded-2xl shadow-card p-4 text-center">
+          <p className="text-3xl font-display font-bold text-brand-600">{Math.round(totalKm)}</p>
+          <p className="text-xs text-ink-400 mt-1 uppercase tracking-wide">Total km</p>
         </div>
         {phases.slice(0, 2).map(p => {
           const km = dataRows.filter(r => cellText(r[C.phase]) === p)
@@ -280,8 +301,8 @@ function TrainingPlanView({ rows }) {
             ? { backgroundColor: firstRow[C.phase].bg, color: firstRow[C.phase].fg || '#1a3a5c' }
             : PHASE_STYLE[p] || { backgroundColor: '#f3f4f6', color: '#374151' };
           return (
-            <div key={p} className="rounded-2xl shadow-sm border border-gray-100 p-4 text-center" style={style}>
-              <p className="text-3xl font-extrabold">{Math.round(km)}</p>
+            <div key={p} className="rounded-2xl shadow-card p-4 text-center" style={style}>
+              <p className="text-3xl font-display font-bold">{Math.round(km)}</p>
               <p className="text-xs mt-1 uppercase tracking-wide opacity-70">{p} km</p>
             </div>
           );
@@ -292,19 +313,19 @@ function TrainingPlanView({ rows }) {
       <div className="mb-5">
         <button
           onClick={() => setLegendOpen(o => !o)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-600 hover:bg-gray-50 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-card text-sm font-semibold text-ink-600 hover:text-ink-900 transition"
         >
-          <span>{legendOpen ? '▾' : '▸'}</span>
+          {legendOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           Guide &amp; Legend
         </button>
 
         {legendOpen && (
-          <div className="mt-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 grid sm:grid-cols-2 gap-6">
+          <div className="mt-3 bg-white rounded-3xl shadow-card p-5 grid sm:grid-cols-2 gap-6">
 
             {/* Phases */}
             {phases.length > 0 && (
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Training Phases</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-ink-400 mb-3">Training Phases</p>
                 <div className="flex flex-col gap-2">
                   {phases.map(p => {
                     const firstRow = dataRows.find(r => cellText(r[C.phase]) === p);
@@ -322,8 +343,8 @@ function TrainingPlanView({ rows }) {
                     return (
                       <div key={p} className="flex items-center gap-3">
                         <span className="text-xs font-bold px-2.5 py-0.5 rounded-full flex-shrink-0 min-w-[64px] text-center" style={style}>{p}</span>
-                        <span className="text-sm text-gray-500 flex-1">{phaseDescriptions[p] || `${Math.round(km)} km total`}</span>
-                        <span className="text-xs text-gray-400 font-medium">{Math.round(km)} km</span>
+                        <span className="text-sm text-ink-500 flex-1">{phaseDescriptions[p] || `${Math.round(km)} km total`}</span>
+                        <span className="text-xs text-ink-400 font-medium">{Math.round(km)} km</span>
                       </div>
                     );
                   })}
@@ -334,7 +355,7 @@ function TrainingPlanView({ rows }) {
             {/* Run types */}
             {runTypeMap.size > 0 && (
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Run Types</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-ink-400 mb-3">Run Types</p>
                 <div className="flex flex-col gap-2">
                   {[...runTypeMap.entries()].map(([type, colors]) => {
                     const desc = getRunTypeGuide(type);
@@ -351,8 +372,8 @@ function TrainingPlanView({ rows }) {
                           {type}
                         </span>
                         {desc
-                          ? <span className="text-sm text-gray-500">{desc}</span>
-                          : <span className="text-sm text-gray-400 italic">No description available</span>
+                          ? <span className="text-sm text-ink-500">{desc}</span>
+                          : <span className="text-sm text-ink-400 italic">No description available</span>
                         }
                       </div>
                     );
@@ -362,33 +383,15 @@ function TrainingPlanView({ rows }) {
             )}
 
             {/* Reading the cards guide */}
-            <div className="sm:col-span-2 pt-4 border-t border-gray-100">
-              <p className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-3">Reading the Cards</p>
-              <div className="grid sm:grid-cols-3 gap-3 text-sm text-gray-500">
-                <div className="flex gap-2 items-start">
-                  <span className="text-base">🏷️</span>
-                  <span><strong className="text-gray-700">Phase badge</strong> — training block color coded from your file</span>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <span className="text-base">📅</span>
-                  <span><strong className="text-gray-700">Week / date</strong> — week number and start date</span>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <span className="text-base">🏃</span>
-                  <span><strong className="text-gray-700">Run chips</strong> — each chip shows distance + type for that session</span>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <span className="text-base">📊</span>
-                  <span><strong className="text-gray-700">Total km</strong> — weekly volume shown top-right of each card</span>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <span className="text-base">🎨</span>
-                  <span><strong className="text-gray-700">Colors</strong> — preserved from your Excel file for at-a-glance intensity</span>
-                </div>
-                <div className="flex gap-2 items-start">
-                  <span className="text-base">✏️</span>
-                  <span><strong className="text-gray-700">Editing</strong> — switch to Table view to edit cells, then export back to .xlsx</span>
-                </div>
+            <div className="sm:col-span-2 pt-4 border-t border-ink-100">
+              <p className="text-xs font-bold uppercase tracking-wider text-ink-400 mb-3">Reading the Cards</p>
+              <div className="grid sm:grid-cols-3 gap-3 text-sm text-ink-500">
+                {READING_GUIDE.map(({ Icon, title, desc }) => (
+                  <div key={title} className="flex gap-2 items-start">
+                    <Icon className="w-4 h-4 text-brand-500 mt-0.5 shrink-0" />
+                    <span><strong className="text-ink-700">{title}</strong> — {desc}</span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -399,15 +402,15 @@ function TrainingPlanView({ rows }) {
       {phases.length > 1 && (
         <div className="flex gap-2 mb-5 flex-wrap">
           <button onClick={() => setActivePhase('')}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
-              ${!activePhase ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+            className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
+              ${!activePhase ? 'bg-ink-900 text-white' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
             All weeks
           </button>
           {phases.map(p => (
             <button key={p} onClick={() => setActivePhase(activePhase === p ? '' : p)}
               style={activePhase === p ? (PHASE_STYLE[p] || {}) : {}}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
-                ${activePhase === p ? 'border-transparent' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
+                ${activePhase === p ? '' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
               {p}
             </button>
           ))}
@@ -429,19 +432,19 @@ function TrainingPlanView({ rows }) {
           const totalVal = cellText(totalCell);
 
           return (
-            <div key={i} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-50">
+            <div key={i} className="bg-white rounded-2xl shadow-card overflow-hidden">
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-ink-50">
                 {phase && <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={phaseStyle}>{phase}</span>}
-                {C.wk !== -1 && cellText(row[C.wk]) && <span className="font-bold text-gray-800 text-sm">Week {cellText(row[C.wk])}</span>}
-                {C.date !== -1 && cellText(row[C.date]) && <span className="text-xs text-gray-400">{cellText(row[C.date])}</span>}
+                {C.wk !== -1 && cellText(row[C.wk]) && <span className="font-bold text-ink-800 text-sm">Week {cellText(row[C.wk])}</span>}
+                {C.date !== -1 && cellText(row[C.date]) && <span className="text-xs text-ink-400">{cellText(row[C.date])}</span>}
                 {totalVal && totalVal !== '0' && (
-                  <span className="ml-auto text-sm font-bold" style={totalCell?.bg ? cellStyle(totalCell) : { color: '#2563eb' }}>
+                  <span className="ml-auto text-sm font-bold" style={totalCell?.bg ? cellStyle(totalCell) : { color: BRAND_600 }}>
                     {parseFloat(totalVal) || totalVal} km
                   </span>
                 )}
               </div>
               <div className="px-5 py-3 flex flex-col gap-2">
-                {C.focus !== -1 && cellText(row[C.focus]) && <p className="text-sm text-gray-500 italic">{cellText(row[C.focus])}</p>}
+                {C.focus !== -1 && cellText(row[C.focus]) && <p className="text-sm text-ink-500 italic">{cellText(row[C.focus])}</p>}
                 {runs.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-1">
                     {runs.map((run, j) => {
@@ -476,20 +479,20 @@ function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onF
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {isTP && (
-        <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+        <div className="flex rounded-full bg-white shadow-card overflow-hidden p-1">
           <button onClick={() => setViewMode('table')}
-            className={`px-3 py-1.5 text-xs font-semibold transition ${viewMode === 'table' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+            className={`px-3 py-1.5 text-xs font-semibold rounded-full transition ${viewMode === 'table' ? 'bg-brand-500 text-white' : 'text-ink-600 hover:text-ink-900'}`}>
             Table
           </button>
           <button onClick={() => setViewMode('cards')}
-            className={`px-3 py-1.5 text-xs font-semibold border-l transition ${viewMode === 'cards' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
+            className={`px-3 py-1.5 text-xs font-semibold rounded-full transition ${viewMode === 'cards' ? 'bg-brand-500 text-white' : 'text-ink-600 hover:text-ink-900'}`}>
             Cards
           </button>
         </div>
       )}
       {viewMode === 'table' && (
         <select value={rowHeight} onChange={e => setRowHeight(e.target.value)}
-          className="px-2 py-1.5 rounded-lg border border-gray-200 text-xs text-gray-600 bg-white">
+          className="px-3 py-1.5 rounded-full bg-white shadow-card text-xs text-ink-600 border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition">
           <option value="compact">Compact</option>
           <option value="normal">Normal</option>
           <option value="tall">Tall</option>
@@ -497,19 +500,19 @@ function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onF
       )}
       {!inFullscreen && (
         <button onClick={onFullscreen}
-          className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold bg-white text-gray-600 hover:bg-gray-50 transition"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-card text-xs font-semibold text-ink-600 hover:text-ink-900 transition"
           title="Full screen (ESC to exit)">
-          ⛶ Full screen
+          <Maximize2 className="w-3.5 h-3.5" /> Full screen
         </button>
       )}
       <button onClick={onExport} disabled={exporting}
-        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 text-white hover:bg-green-700 transition disabled:opacity-50">
-        {exporting ? 'Exporting…' : '⬇ Export .xlsx'}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-500 text-white hover:bg-brand-600 transition shadow-pill disabled:opacity-50">
+        {exporting ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Exporting…</> : <><Download className="w-3.5 h-3.5" /> Export .xlsx</>}
       </button>
       {inFullscreen && (
         <button onClick={onClose}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-white hover:bg-gray-900 transition">
-          ✕ Close
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-ink-900 text-white hover:bg-ink-800 transition">
+          <X className="w-3.5 h-3.5" /> Close
         </button>
       )}
     </div>
@@ -635,8 +638,8 @@ export default function WorkoutPlan() {
     <div className="flex gap-2 flex-wrap">
       {editedSheets.map((s, i) => (
         <button key={i} onClick={() => setActiveSheet(i)}
-          className={`px-4 py-1.5 rounded-full text-sm font-semibold transition border
-            ${activeSheet === i ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
+          className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
+            ${activeSheet === i ? 'bg-brand-500 text-white shadow-pill' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
           {s.name}
         </button>
       ))}
@@ -647,10 +650,10 @@ export default function WorkoutPlan() {
     <>
       {/* ── Fullscreen overlay ── */}
       {fullscreen && editedSheets && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#f9fafb', overflowY: 'auto' }}>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: '#f3f3f5', overflowY: 'auto' }}>
           <div style={{ padding: '16px 20px' }}>
             <div className="flex items-center gap-3 mb-4 flex-wrap">
-              <span className="font-semibold text-gray-800 text-sm truncate max-w-xs">
+              <span className="font-semibold text-ink-800 text-sm truncate max-w-xs">
                 {fileName}{editedSheets.length > 1 ? ` — ${sheet?.name}` : ''}
               </span>
               <div className="ml-auto">
@@ -667,39 +670,46 @@ export default function WorkoutPlan() {
       )}
 
       {/* ── Normal page ── */}
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-paper">
         <Navbar />
         <div className="pt-24 pb-16 px-4 max-w-5xl mx-auto">
 
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold text-gray-900">My Training Plan</h1>
-            <p className="text-gray-500 mt-1">Upload your workout or running plan — colors and formatting are preserved.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-2">Training</p>
+            <h1 className="font-display font-bold text-4xl text-ink-900 leading-tight">My Training Plan</h1>
+            <p className="text-ink-500 mt-2">Upload your workout or running plan — colors and formatting are preserved.</p>
           </div>
 
           {/* Upload zone */}
           <div onClick={() => fileInputRef.current?.click()}
-            className={`bg-white rounded-2xl border-2 border-dashed p-8 text-center mb-8 cursor-pointer transition
-              ${uploading ? 'border-blue-300 bg-blue-50' : 'border-blue-200 hover:border-blue-400 hover:bg-blue-50/30'}`}>
-            <div className="text-5xl mb-3">{uploading ? '⏳' : editedSheets ? '📊' : '📂'}</div>
-            <p className="font-semibold text-gray-700 mb-1">
+            className={`bg-white rounded-3xl border-2 border-dashed p-8 text-center mb-8 cursor-pointer transition
+              ${uploading ? 'border-brand-300 bg-brand-50' : 'border-brand-200 hover:border-brand-400 hover:bg-brand-50/40'}`}>
+            <span className="inline-grid place-items-center w-16 h-16 rounded-3xl bg-brand-50 text-brand-500 mx-auto mb-3">
+              {uploading ? <Loader2 className="w-7 h-7 animate-spin" /> : editedSheets ? <FileSpreadsheet className="w-7 h-7" /> : <FolderOpen className="w-7 h-7" />}
+            </span>
+            <p className="font-semibold text-ink-700 mb-1">
               {uploading ? 'Parsing your plan…' : editedSheets ? 'Upload a different file' : 'Upload your training plan'}
             </p>
-            <p className="text-sm text-gray-400 mb-4">Excel (.xlsx) or CSV — max 10 MB · Colors preserved</p>
+            <p className="text-sm text-ink-400 mb-4">Excel (.xlsx) or CSV — max 10 MB · Colors preserved</p>
             <button type="button" disabled={uploading}
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition disabled:opacity-50">
+              className="px-6 py-2.5 bg-brand-500 text-white rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill disabled:opacity-50">
               {uploading ? 'Loading…' : 'Choose file'}
             </button>
             <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleFile} />
           </div>
 
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-sm mb-6">{error}</div>}
+          {error && (
+            <div className="flex items-center gap-2 bg-rose-50 text-rose-700 rounded-2xl p-4 text-sm mb-6">
+              <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+            </div>
+          )}
 
           {editedSheets && (
             <>
               {/* Header: file name + sheet tabs + toolbar */}
               <div className="flex items-start justify-between mb-4 flex-wrap gap-3">
                 <div className="flex flex-col gap-2">
-                  <p className="text-sm text-gray-400">📁 {fileName}</p>
+                  <p className="text-sm text-ink-400 flex items-center gap-1.5"><FolderOpen className="w-4 h-4" /> {fileName}</p>
                   {sheetTabs}
                 </div>
                 <PlanToolbar isTP={isTP} viewMode={viewMode} setViewMode={setViewMode}
@@ -710,7 +720,7 @@ export default function WorkoutPlan() {
               </div>
 
               {viewMode === 'table' && (
-                <p className="text-xs text-gray-400 mb-3">
+                <p className="text-xs text-ink-400 mb-3">
                   Click any cell to edit · Drag column header edges to resize
                 </p>
               )}

@@ -77,9 +77,10 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 
 - [x] **Groups** + **GroupProfile** + **EventDetail** + **GroupFeed** — editorial restyle (paper bg, rounded-3xl cards, ink gradient group header, brand pill tabs/CTAs w/ lucide icons, brand avatars, shared `Toggle` + `inputClass`, RSVP/status pills via lucide Check/HelpCircle/X, token flash banners)
 
+- [x] **WorkoutPlan** (`/training-plan`) — editorial restyle (paper bg, rounded-3xl/shadow-card, brand pill toolbar + view toggle w/ lucide icons, editorial header, token upload dropzone; Excel cell colors preserved, default header/edit/total hexes → ink/brand tokens). Also fixed a rules-of-hooks bug (useState after early return in card view).
+
 ### Remaining (old blue/default style)
-- [ ] **WorkoutPlan** (`/training-plan`) — recommended next (big; 725 lines)
-- [ ] **AppointmentMatrix** component (used in studio dashboard + studio profile)
+- [ ] **AppointmentMatrix** component (used in studio dashboard + studio profile) — recommended next (last one)
 
 ### Nice-to-have / follow-ups
 - [ ] Replace the Home hero Unsplash hotlink with a real brand asset
