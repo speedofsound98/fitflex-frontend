@@ -2,6 +2,7 @@
 // Weekly appointment slot matrix — used in both StudioDashboard (manage) and StudioProfile (book)
 import authFetch from '../utils/authFetch';
 import React, { useEffect, useState, useCallback } from 'react';
+import { ChevronLeft, ChevronRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 const api = import.meta.env.VITE_API_URL;
 
@@ -104,7 +105,7 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
       const res = await authFetch(`${api}/slots/${slotId}/book`, { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      flash('Appointment booked! 🎉');
+      flash('Appointment booked!');
       fetchSlots();
     } catch (e) { flash(e.message, 'error'); }
   }
@@ -119,7 +120,8 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
   return (
     <div className="space-y-4">
       {msg && (
-        <div className={`p-3 rounded-xl text-sm font-medium ${msgType === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+        <div className={`flex items-center gap-2 p-3 rounded-2xl text-sm font-medium ${msgType === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+          {msgType === 'success' ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
           {msg}
         </div>
       )}
@@ -127,43 +129,43 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
       {/* Week navigation */}
       <div className="flex items-center justify-between">
         <button onClick={() => setWeekStart(d => addDays(d, -7))}
-          className="px-3 py-2 rounded-xl bg-white shadow text-sm font-medium hover:bg-gray-50 transition">
-          ← Prev week
+          className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
+          <ChevronLeft className="w-4 h-4" /> Prev week
         </button>
-        <span className="text-sm font-semibold text-gray-700">
+        <span className="text-sm font-semibold text-ink-700">
           {formatDate(weekStart)} – {formatDate(weekEnd)}
         </span>
         <button onClick={() => setWeekStart(d => addDays(d, 7))}
-          className="px-3 py-2 rounded-xl bg-white shadow text-sm font-medium hover:bg-gray-50 transition">
-          Next week →
+          className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
+          Next week <ChevronRight className="w-4 h-4" />
         </button>
       </div>
 
       {/* Slot settings (manage mode) */}
       {mode === 'manage' && (
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-          <p className="text-xs font-semibold text-blue-700 mb-3">New slot settings — click a cell to add</p>
+        <div className="bg-brand-50 rounded-2xl p-4">
+          <p className="text-xs font-semibold text-brand-700 mb-3">New slot settings — click a cell to add</p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <label className="flex flex-col gap-1">
-              <span className="text-xs text-gray-600">Duration (min)</span>
-              <select className="border border-gray-200 rounded-lg p-1.5 text-sm bg-white"
+              <span className="text-xs text-ink-600">Duration (min)</span>
+              <select className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 value={newSlot.duration_minutes} onChange={e => setNewSlot(f => ({...f, duration_minutes: Number(e.target.value)}))}>
                 {[30, 45, 60, 90, 120].map(m => <option key={m} value={m}>{m} min</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-xs text-gray-600">Capacity</span>
-              <input type="number" min="1" max="20" className="border border-gray-200 rounded-lg p-1.5 text-sm"
+              <span className="text-xs text-ink-600">Capacity</span>
+              <input type="number" min="1" max="20" className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 value={newSlot.capacity} onChange={e => setNewSlot(f => ({...f, capacity: Number(e.target.value)}))} />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-xs text-gray-600">Credits</span>
-              <input type="number" min="0" className="border border-gray-200 rounded-lg p-1.5 text-sm"
+              <span className="text-xs text-ink-600">Credits</span>
+              <input type="number" min="0" className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 value={newSlot.credit_cost} onChange={e => setNewSlot(f => ({...f, credit_cost: Number(e.target.value)}))} />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="text-xs text-gray-600">Note (optional)</span>
-              <input className="border border-gray-200 rounded-lg p-1.5 text-sm"
+              <span className="text-xs text-ink-600">Note (optional)</span>
+              <input className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 placeholder="e.g. 1-on-1 session"
                 value={newSlot.notes} onChange={e => setNewSlot(f => ({...f, notes: e.target.value}))} />
             </label>
@@ -172,23 +174,23 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
       )}
 
       {/* Matrix */}
-      <div className="bg-white rounded-2xl shadow overflow-x-auto">
+      <div className="bg-white rounded-2xl shadow-card overflow-x-auto">
         <table className="w-full min-w-[600px] text-sm border-collapse">
           <thead>
-            <tr className="border-b">
-              <th className="px-3 py-3 text-left text-xs text-gray-400 font-medium w-14">Time</th>
+            <tr className="border-b border-ink-100">
+              <th className="px-3 py-3 text-left text-xs text-ink-400 font-medium w-14">Time</th>
               {DAYS.map((day, i) => (
-                <th key={day} className="px-2 py-3 text-center text-xs font-semibold text-gray-600">
+                <th key={day} className="px-2 py-3 text-center text-xs font-semibold text-ink-600">
                   <div>{day}</div>
-                  <div className="text-gray-400 font-normal">{formatDate(addDays(weekStart, i))}</div>
+                  <div className="text-ink-400 font-normal">{formatDate(addDays(weekStart, i))}</div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {timeRows.map(hour => (
-              <tr key={hour} className="border-b border-gray-50">
-                <td className="px-3 py-2 text-xs text-gray-400 font-medium whitespace-nowrap">
+              <tr key={hour} className="border-b border-ink-50">
+                <td className="px-3 py-2 text-xs text-ink-400 font-medium whitespace-nowrap">
                   {hour % 12 || 12}:00 {hour < 12 ? 'AM' : 'PM'}
                 </td>
                 {DAYS.map((_, dayIdx) => {
@@ -205,13 +207,13 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
                             const isFull = slot.is_full;
                             const bookedByUser = slot.booked_by_user;
 
-                            let bg = 'bg-blue-600 hover:bg-blue-700 cursor-pointer text-white';
-                            if (isFull && !bookedByUser) bg = 'bg-gray-200 cursor-not-allowed text-gray-400';
-                            if (bookedByUser) bg = 'bg-green-600 text-white cursor-pointer';
+                            let bg = 'bg-brand-500 hover:bg-brand-600 cursor-pointer text-white';
+                            if (isFull && !bookedByUser) bg = 'bg-ink-100 cursor-not-allowed text-ink-400';
+                            if (bookedByUser) bg = 'bg-emerald-600 text-white cursor-pointer';
 
                             return (
                               <div key={slot.id}
-                                className={`rounded-lg px-2 py-1.5 text-xs transition select-none ${bg}`}
+                                className={`rounded-xl px-2 py-1.5 text-xs transition select-none ${bg}`}
                                 onClick={e => {
                                   e.stopPropagation();
                                   if (mode === 'manage') { deleteSlot(slot.id); }
@@ -234,7 +236,7 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
                         </div>
                       ) : (
                         mode === 'manage' && !isPastDay ? (
-                          <div className="h-10 rounded-lg border-2 border-dashed border-gray-100 hover:border-blue-300 hover:bg-blue-50 transition cursor-pointer" />
+                          <div className="h-10 rounded-xl border-2 border-dashed border-ink-100 hover:border-brand-300 hover:bg-brand-50 transition cursor-pointer" />
                         ) : null
                       )}
                     </td>
@@ -245,17 +247,17 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
           </tbody>
         </table>
         {mode === 'manage' && slots.length === 0 && (
-          <div className="px-6 py-4 text-center text-gray-400 text-xs">
+          <div className="px-6 py-4 text-center text-ink-400 text-xs">
             Click any cell to add a slot for that time.
           </div>
         )}
       </div>
 
       {mode === 'view' && (
-        <div className="flex gap-4 text-xs text-gray-500">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-blue-600 inline-block" /> Available</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-green-600 inline-block" /> Your booking</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-gray-200 inline-block" /> Full</span>
+        <div className="flex gap-4 text-xs text-ink-500">
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-brand-500 inline-block" /> Available</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-emerald-600 inline-block" /> Your booking</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-ink-100 inline-block" /> Full</span>
         </div>
       )}
     </div>

@@ -79,8 +79,10 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 
 - [x] **WorkoutPlan** (`/training-plan`) — editorial restyle (paper bg, rounded-3xl/shadow-card, brand pill toolbar + view toggle w/ lucide icons, editorial header, token upload dropzone; Excel cell colors preserved, default header/edit/total hexes → ink/brand tokens). Also fixed a rules-of-hooks bug (useState after early return in card view).
 
+- [x] **AppointmentMatrix** component — editorial restyle (brand slots, emerald "your booking", ink "full", token nav w/ lucide chevrons, brand-focus slot-settings inputs, token legend). Matrix booking logic untouched.
+
 ### Remaining (old blue/default style)
-- [ ] **AppointmentMatrix** component (used in studio dashboard + studio profile) — recommended next (last one)
+🎉 **None — every page and component has been migrated to the editorial design language.**
 
 ### Nice-to-have / follow-ups
 - [ ] Replace the Home hero Unsplash hotlink with a real brand asset
