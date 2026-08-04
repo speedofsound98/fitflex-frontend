@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Dumbbell, CalendarCheck, CreditCard, ArrowRight, Star } from 'lucide-react';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
+import heroBand from '../assets/hero-band.svg';
 
 const FEATURES = [
   {
@@ -126,8 +127,8 @@ export default function Home() {
           {/* Full-width photo band */}
           <div className="mt-12 sm:mt-16 rounded-t-[2.5rem] overflow-hidden h-[300px] sm:h-[420px]">
             <img
-              src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1800&q=70"
-              alt="Athlete training with a barbell in a gym"
+              src={heroBand}
+              alt="FitFlex — training in motion"
               className="w-full h-full object-cover"
             />
           </div>

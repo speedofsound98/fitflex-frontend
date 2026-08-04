@@ -85,7 +85,7 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 🎉 **None — every page and component has been migrated to the editorial design language.**
 
 ### Nice-to-have / follow-ups
-- [ ] Replace the Home hero Unsplash hotlink with a real brand asset
+- [x] Replace the Home hero Unsplash hotlink with a real brand asset — now a self-contained, bundled SVG (`src/assets/hero-band.svg`): ink gradient + ember barbell + brand arcs/swoosh, using the design tokens. Zero external dependency.
 - [ ] Consider a shared dashboard shell to avoid per-page `<Navbar/>` duplication
 - [ ] Real analytics endpoints so the derived charts can be replaced with server data
 - [ ] Dark mode (the original reference had a light/dark toggle) — tokens are ready for it

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid slice" role="img" aria-label="FitFlex — training in motion">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1e2c3a"/>
+      <stop offset="1" stop-color="#15202b"/>
+    </linearGradient>
+    <linearGradient id="ember" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ed8a4b"/>
+      <stop offset="1" stop-color="#d55f1f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.28" r="0.6">
+      <stop offset="0" stop-color="#e8702a" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#e8702a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ink base -->
+  <rect width="1200" height="420" fill="url(#bg)"/>
+  <!-- Warm glow -->
+  <rect width="1200" height="420" fill="url(#glow)"/>
+
+  <!-- Concentric brand arcs (the rounded brand language) -->
+  <g fill="none" stroke="#e8702a" stroke-opacity="0.18" stroke-width="2">
+    <circle cx="945" cy="150" r="120"/>
+    <circle cx="945" cy="150" r="190"/>
+    <circle cx="945" cy="150" r="270"/>
+  </g>
+
+  <!-- Energy swoosh -->
+  <path d="M-40 330 C 260 250, 520 360, 760 250 S 1180 120, 1260 170"
+        fill="none" stroke="url(#ember)" stroke-width="10" stroke-linecap="round" stroke-opacity="0.9"/>
+  <path d="M-40 360 C 300 300, 560 400, 820 300 S 1200 190, 1260 230"
+        fill="none" stroke="#f6c9a7" stroke-width="3" stroke-linecap="round" stroke-opacity="0.5"/>
+
+  <!-- Dot grid -->
+  <g fill="#f7f4ee" fill-opacity="0.10">
+    <circle cx="90" cy="90" r="3"/><circle cx="140" cy="90" r="3"/><circle cx="190" cy="90" r="3"/>
+    <circle cx="90" cy="135" r="3"/><circle cx="140" cy="135" r="3"/><circle cx="190" cy="135" r="3"/>
+    <circle cx="90" cy="180" r="3"/><circle cx="140" cy="180" r="3"/><circle cx="190" cy="180" r="3"/>
+  </g>
+
+  <!-- Barbell (ember plates on a cream bar), tilted for motion -->
+  <g transform="rotate(-18 600 235)">
+    <!-- bar -->
+    <rect x="360" y="226" width="480" height="14" rx="7" fill="#f7f4ee"/>
+    <!-- left plates -->
+    <rect x="382" y="196" width="26" height="74" rx="10" fill="url(#ember)"/>
+    <rect x="350" y="182" width="28" height="102" rx="12" fill="url(#ember)"/>
+    <!-- right plates -->
+    <rect x="792" y="196" width="26" height="74" rx="10" fill="url(#ember)"/>
+    <rect x="822" y="182" width="28" height="102" rx="12" fill="url(#ember)"/>
+    <!-- collars -->
+    <rect x="412" y="216" width="12" height="34" rx="4" fill="#f6c9a7"/>
+    <rect x="776" y="216" width="12" height="34" rx="4" fill="#f6c9a7"/>
+  </g>
+</svg>
