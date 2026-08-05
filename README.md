@@ -62,6 +62,7 @@ fitflex-frontend/
 │   │   ├── StudioSettings.jsx     ← /studio/settings — profile, cover photo upload, theme, hours
 │   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page (no login required)
 │   │   ├── WorkoutPlan.jsx        ← /training-plan — upload + display Excel/CSV training plans
+│   │   ├── Nutrition.jsx          ← /nutrition — daily food & macro tracker (estimate + exact modes)
 │   │   ├── Blog.jsx               ← /blog — public blog listing (featured post, tag filter)
 │   │   ├── BlogPost.jsx           ← /blog/:slug — single article (SEO meta tags, prose styling)
 │   │   ├── AdminBlog.jsx          ← /admin/blog — TipTap editor + post management (admin secret)
@@ -137,6 +138,7 @@ npm run dev
 | `/dashboard/bookings` | Booking history | Users only |
 | `/settings` | User Settings | Users only |
 | `/training-plan` | Training Plan Upload | Users only |
+| `/nutrition` | Nutrition & macro tracker | Users only |
 | `/studio` | Studio Dashboard | Studios only |
 | `/studio/settings` | Studio Settings | Studios only |
 
@@ -165,7 +167,7 @@ npm run dev
 ## NavBar & Side Drawer
 
 - **Minimal top bar** (floating pill): logo, a `Dashboard` quick link, notification bell, and an avatar/menu button.
-- **Side drawer** — the menu button opens a slide-in right drawer holding the full nav (Dashboard, Training Plan, Messages, Communities, Pricing, Blog, Settings) with Log out pinned at the bottom. Backdrop click / Esc closes it; body scroll locks while open.
+- **Side drawer** — the menu button opens a slide-in right drawer holding the full nav (Dashboard, Training Plan, Nutrition, Messages, Communities, Pricing, Blog, Settings) with Log out pinned at the bottom. Backdrop click / Esc closes it; body scroll locks while open.
 - Auth state initializes **synchronously** from `localStorage` (`useState(() => …)`), so the navbar never flashes the logged-out state on route changes/remounts.
 - Every page renders its own `<Navbar />` (there is no shared app shell), which is why the synchronous init matters.
 

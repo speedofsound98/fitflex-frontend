@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Bell, Menu, X, Dumbbell, LayoutDashboard, CreditCard, Newspaper,
-  Users, MessageSquare, Settings, ClipboardList, LogOut, ChevronRight,
+  Users, MessageSquare, Settings, ClipboardList, LogOut, ChevronRight, Utensils,
 } from 'lucide-react';
 import authFetch from '../utils/authFetch';
 
@@ -142,7 +142,10 @@ export default function Navbar() {
   const drawerLinks = authed
     ? [
         { to: dashboardPath, label: 'Dashboard', Icon: LayoutDashboard },
-        ...(role === 'user' ? [{ to: '/training-plan', label: 'Training Plan', Icon: ClipboardList }] : []),
+        ...(role === 'user' ? [
+          { to: '/training-plan', label: 'Training Plan', Icon: ClipboardList },
+          { to: '/nutrition', label: 'Nutrition', Icon: Utensils },
+        ] : []),
         { to: '/messages', label: 'Messages', Icon: MessageSquare },
         { to: '/groups', label: 'Communities', Icon: Users },
         { to: '/pricing', label: 'Pricing', Icon: CreditCard },

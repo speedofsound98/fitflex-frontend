@@ -27,6 +27,7 @@ import EventDetail from './pages/EventDetail';
 import Messages from './pages/Messages';
 import Studios from './pages/Studios';
 import WorkoutPlan from './pages/WorkoutPlan';
+import Nutrition from './pages/Nutrition';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AdminBlog from './pages/AdminBlog';
@@ -73,6 +74,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           <Route path="bookings" element={<Bookings />} />
         </Route>
         <Route path="/training-plan" element={<RoleRoute allow={['user']}><WorkoutPlan /></RoleRoute>} />
+        <Route path="/nutrition" element={<RoleRoute allow={['user']}><Nutrition /></RoleRoute>} />
         <Route path="/settings" element={<RoleRoute allow={['user']}><UserSettings /></RoleRoute>} />
       </Routes>
     </Router>
