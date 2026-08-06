@@ -2,8 +2,8 @@
 import authFetch from '../utils/authFetch';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  ChevronLeft, ChevronRight, Plus, Trash2, Target, Pencil,
-  AlertCircle, CheckCircle2, Sparkles, Calculator,
+  ChevronLeft, ChevronRight, Plus, Minus, Trash2, Target, Pencil,
+  AlertCircle, CheckCircle2, Sparkles, Calculator, Droplet,
 } from 'lucide-react';
 import Navbar from '../components/NavBar';
 import { inputClass } from '../components/AuthShell';
@@ -51,6 +51,16 @@ const PRESETS = [
   { name: 'Sweet potato', unit: '130g', p: 2, c: 26, f: 0.1, kcal: 112 },
   { name: 'Broccoli', unit: '100g', p: 2.8, c: 7, f: 0.4, kcal: 34 },
   { name: 'Bread', unit: '1 slice', p: 4, c: 14, f: 1, kcal: 80 },
+  { name: 'Carrots', unit: '100g', p: 0.9, c: 10, f: 0.2, kcal: 41 },
+  { name: 'Cucumber & tomato salad', unit: '1 bowl', p: 1.5, c: 7, f: 0.4, kcal: 40 },
+  // Composite plate: ~250g pasta + 250g tomato sauce + 125ml 15% cream + 25g parmesan + pesto/spinach
+  { name: 'Creamy tomato pasta plate', unit: 'full plate', p: 32, c: 97, f: 39, kcal: 860 },
+  { name: 'Croissant', unit: '1 pastry', p: 5, c: 26, f: 12, kcal: 272 },
+  { name: 'Sushi roll', unit: '1 roll (6–8 pc)', p: 7, c: 35, f: 5, kcal: 230 },
+  { name: 'Chocolate', unit: '25g', p: 2, c: 15, f: 7.5, kcal: 135 },
+  { name: "Ben & Jerry's ice cream", unit: '¼ can', p: 4, c: 32, f: 15, kcal: 280 },
+  { name: 'Tuna in oil', unit: '1 can (~100g)', p: 26, c: 0, f: 8, kcal: 190 },
+  { name: 'Cappuccino', unit: '100ml milk', p: 3, c: 5, f: 4, kcal: 65 },
 ];
 
 const round1 = n => Math.round(n * 10) / 10;
@@ -88,7 +98,8 @@ export default function Nutrition() {
   const [date, setDate] = useState(() => localISO(new Date()));
   const [entries, setEntries] = useState([]);
   const [totals, setTotals] = useState({ protein: 0, carbs: 0, fat: 0, calories: 0 });
-  const [goal, setGoal] = useState({ protein: 0, carbs: 0, fat: 0, calories: 0 });
+  const [goal, setGoal] = useState({ protein: 0, carbs: 0, fat: 0, calories: 0, water: 2000 });
+  const [water, setWater] = useState(0);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState('');
   const [msgType, setMsgType] = useState('success');
@@ -116,6 +127,7 @@ export default function Nutrition() {
       .then(d => {
         setEntries(d.entries || []);
         setTotals(d.totals || { protein: 0, carbs: 0, fat: 0, calories: 0 });
+        setWater(d.water || 0);
         if (d.goal) { setGoal(d.goal); setGoalForm(d.goal); }
       })
       .catch(() => flash('Could not load your log', 'error'))
@@ -192,6 +204,22 @@ export default function Nutrition() {
     } catch (e) { flash(e.message, 'error'); }
   }
 
+  async function adjustWater(delta) {
+    // Optimistic; clamp to >= 0 locally to keep the UI snappy.
+    const prev = water;
+    setWater(w => Math.max(0, w + delta));
+    try {
+      const res = await authFetch(`${api}/nutrition/water`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ delta, date }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      setWater(data.water);
+    } catch (e) { setWater(prev); flash(e.message, 'error'); }
+  }
+
   async function saveGoal(e) {
     e.preventDefault();
     try {
@@ -203,6 +231,7 @@ export default function Nutrition() {
           carbs: Number(goalForm.carbs) || 0,
           fat: Number(goalForm.fat) || 0,
           calories: Number(goalForm.calories) || 0,
+          water: Number(goalForm.water) || 0,
         }),
       });
       const data = await res.json();
@@ -274,6 +303,11 @@ export default function Nutrition() {
                     value={goalForm[m.key]} onChange={e => setGoalForm(f => ({ ...f, [m.key]: e.target.value }))} />
                 </label>
               ))}
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-medium text-ink-600">Water goal (ml)</span>
+                <input type="number" min="0" step="250" className={inputClass}
+                  value={goalForm.water ?? 2000} onChange={e => setGoalForm(f => ({ ...f, water: e.target.value }))} />
+              </label>
               <div className="col-span-2 sm:col-span-4">
                 <button type="submit" className="bg-brand-500 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill">
                   Save goals
@@ -289,6 +323,43 @@ export default function Nutrition() {
             </div>
           )}
         </div>
+
+        {/* Water */}
+        {(() => {
+          const goalMl = Number(goal.water) || 2000;
+          const pct = goalMl > 0 ? Math.min(100, Math.round((water / goalMl) * 100)) : 0;
+          return (
+            <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-display font-bold text-lg text-ink-900 flex items-center gap-2">
+                  <Droplet className="w-5 h-5 text-sky-500" /> Water
+                </h2>
+                <span className="text-sm text-ink-500">
+                  <span className="font-semibold text-ink-800">{water}</span>
+                  <span className="text-ink-400"> / {goalMl} ml</span>
+                  <span className="text-ink-400"> · {Math.round(water / 250)} cups</span>
+                </span>
+              </div>
+              <div className="h-2 rounded-full bg-ink-100 overflow-hidden mb-4">
+                <div className="h-full rounded-full bg-sky-500" style={{ width: `${pct}%` }} />
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button onClick={() => adjustWater(-250)} disabled={water <= 0}
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-paper text-ink-700 text-sm font-semibold hover:bg-ink-100 transition disabled:opacity-40">
+                  <Minus className="w-4 h-4" /> 250 ml
+                </button>
+                <button onClick={() => adjustWater(250)}
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-sky-500 text-white text-sm font-semibold hover:bg-sky-600 transition shadow-pill">
+                  <Plus className="w-4 h-4" /> 250 ml
+                </button>
+                <button onClick={() => adjustWater(500)}
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-paper text-ink-700 text-sm font-semibold hover:bg-ink-100 transition">
+                  <Plus className="w-4 h-4" /> 500 ml
+                </button>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Add entry */}
         <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
