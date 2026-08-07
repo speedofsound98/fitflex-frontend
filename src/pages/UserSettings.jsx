@@ -2,7 +2,8 @@ import authFetch from '../utils/authFetch';
 // src/pages/UserSettings.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Ticket, Bell, Lock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, Ticket, Bell, Lock, Utensils, AlertCircle, CheckCircle2 } from 'lucide-react';
+import NutritionProfileForm from '../components/NutritionProfileForm';
 import Navbar from '../components/NavBar';
 import Toggle from '../components/Toggle';
 import { inputClass } from '../components/AuthShell';
@@ -19,6 +20,7 @@ const TABS = [
   { key: 'profile', label: 'Profile', icon: User },
   { key: 'credits', label: 'Credits', icon: Ticket },
   { key: 'notifications', label: 'Notifications', icon: Bell },
+  { key: 'nutrition', label: 'Nutrition', icon: Utensils },
   { key: 'password', label: 'Password', icon: Lock },
 ];
 
@@ -313,6 +315,18 @@ export default function UserSettings() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ── Nutrition tab ── */}
+        {activeTab === 'nutrition' && (
+          <div className="bg-white rounded-3xl shadow-card p-6">
+            <h2 className="font-display font-bold text-lg text-ink-900 mb-1">Nutrition targets</h2>
+            <p className="text-sm text-ink-400 mb-5">
+              Auto-calculate your daily macros from your body &amp; weekly training. Manage your log on the{' '}
+              <a href="/nutrition" className="text-brand-600 font-semibold hover:underline">Nutrition</a> page.
+            </p>
+            <NutritionProfileForm />
           </div>
         )}
 

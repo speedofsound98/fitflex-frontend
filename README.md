@@ -57,7 +57,7 @@ fitflex-frontend/
 │   │   │   ├── BrowseClasses.jsx  ← /dashboard/classes — search + book classes
 │   │   │   ├── BrowseStudios.jsx  ← /dashboard/studios — studio directory
 │   │   │   └── Bookings.jsx       ← /dashboard/bookings — booking history + cancel
-│   │   ├── UserSettings.jsx       ← /settings — profile, credits, password
+│   │   ├── UserSettings.jsx       ← /settings — profile, credits, notifications, nutrition (private targets), password
 │   │   ├── StudioDashboard.jsx    ← /studio — Overview hub + classes (roster), appointments, analytics, profile
 │   │   ├── StudioSettings.jsx     ← /studio/settings — profile, cover photo upload, theme, hours
 │   │   ├── StudioProfile.jsx      ← /studios/:id — public studio page (no login required)

@@ -2,11 +2,12 @@
 import authFetch from '../utils/authFetch';
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-  ChevronLeft, ChevronRight, Plus, Minus, Trash2, Target, Pencil,
+  ChevronLeft, ChevronRight, ChevronDown, Plus, Minus, Trash2, Target, Pencil,
   AlertCircle, CheckCircle2, Sparkles, Calculator, Droplet,
 } from 'lucide-react';
 import Navbar from '../components/NavBar';
 import { inputClass } from '../components/AuthShell';
+import NutritionProfileForm from '../components/NutritionProfileForm';
 import usePageTitle from '../hooks/usePageTitle';
 
 const api = import.meta.env.VITE_API_URL;
@@ -61,6 +62,9 @@ const PRESETS = [
   { name: "Ben & Jerry's ice cream", unit: '¼ can', p: 4, c: 32, f: 15, kcal: 280 },
   { name: 'Tuna in oil', unit: '1 can (~100g)', p: 26, c: 0, f: 8, kcal: 190 },
   { name: 'Cappuccino', unit: '100ml milk', p: 3, c: 5, f: 4, kcal: 65 },
+  { name: 'Date', unit: '1 pitted', p: 0.4, c: 18, f: 0, kcal: 66 },
+  { name: 'Tahini', unit: '1 tbsp', p: 2.6, c: 3.2, f: 8, kcal: 89 },
+  { name: 'Eggplant', unit: '100g cooked', p: 0.8, c: 9, f: 0.2, kcal: 35 },
 ];
 
 const round1 = n => Math.round(n * 10) / 10;
@@ -112,6 +116,7 @@ export default function Nutrition() {
 
   const [editingGoal, setEditingGoal] = useState(false);
   const [goalForm, setGoalForm] = useState(goal);
+  const [showProfile, setShowProfile] = useState(false);
 
   const isToday = date === localISO(new Date());
 
@@ -320,6 +325,25 @@ export default function Nutrition() {
                 <GoalBar key={m.key} label={m.label} dot={m.dot} unit={m.unit}
                   value={totals[m.key] || 0} goal={Number(goal[m.key]) || 0} />
               ))}
+            </div>
+          )}
+        </div>
+
+        {/* Auto-calculate targets from a private profile */}
+        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+          <button onClick={() => setShowProfile(o => !o)}
+            className="w-full flex items-center justify-between text-left">
+            <span className="font-display font-bold text-lg text-ink-900 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-brand-500" /> Auto-calculate my targets
+            </span>
+            {showProfile ? <ChevronDown className="w-5 h-5 text-ink-400" /> : <ChevronRight className="w-5 h-5 text-ink-400" />}
+          </button>
+          {!showProfile && (
+            <p className="text-sm text-ink-500 mt-1">Set your body &amp; weekly training and we'll compute protein/carbs/fat/calories for you.</p>
+          )}
+          {showProfile && (
+            <div className="mt-5">
+              <NutritionProfileForm onSaved={(g) => { if (g) { setGoal(g); setGoalForm(g); } setShowProfile(false); }} />
             </div>
           )}
         </div>

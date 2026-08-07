@@ -5,9 +5,21 @@ Living doc for the `/nutrition` feature. Update as pieces ship.
 ## Shipped (v1)
 - Per-user daily food log (`nutrition_entries`) with **estimate** (preset food × servings) and **exact** (manual macros) input modes.
 - Daily totals vs. **manually-set** goals (protein / carbs / fat / calories), editable inline.
-- Backend: `GET/POST/DELETE /api/nutrition`, `PATCH /api/nutrition/goal`; `users.nutrition_goal` JSONB.
+- Water tracking (`nutrition_water`) in 250 ml increments with a configurable ml goal.
+- Backend: `GET/POST/DELETE /api/nutrition`, `POST /api/nutrition/water`, `PATCH /api/nutrition/goal`; `users.nutrition_goal` JSONB.
 
-## Planned (next): auto-configured goals from a body + training profile
+## Shipped (v2): auto-configured goals from a body + training profile
+Implemented — formula in `src/utils/nutritionCalc.js`, form in `src/components/NutritionProfileForm.jsx`
+(reused on the `/nutrition` page as a collapsible panel **and** in User Settings → Nutrition tab). Profile stored
+in `users.nutrition_profile` (private) via `PATCH /api/nutrition/profile`; the client computes the goal and the
+endpoint persists profile + goal together (water target preserved).
+
+**Decisions made on the earlier open questions:**
+- **Age** — required (needed for Mifflin-St Jeor).
+- **Goal direction** — shipped with lose / maintain / gain (−15% / 0 / +10% calories).
+- **Units** — metric-only (kg / cm) for now; imperial toggle remains a future nice-to-have.
+
+### Original spec (for reference)
 
 Instead of typing goal numbers, the user fills a short **profile** and we compute their daily targets. Manual override still allowed (computed values just pre-fill the goal, which they can then tweak).
 
