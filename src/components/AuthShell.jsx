@@ -22,7 +22,7 @@ export default function AuthShell({ eyebrow, title, subtitle, children, footer }
             {subtitle && <p className="text-ink-500 mt-2">{subtitle}</p>}
           </div>
 
-          <div className="bg-white rounded-3xl shadow-card p-8">
+          <div className="bg-surface rounded-3xl shadow-card p-8">
             {children}
           </div>
 

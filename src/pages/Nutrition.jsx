@@ -270,7 +270,7 @@ export default function Nutrition() {
         {/* Date navigation */}
         <div className="flex items-center justify-between mb-5">
           <button onClick={() => setDate(d => addDays(d, -1))}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-surface shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
             <ChevronLeft className="w-4 h-4" /> Prev
           </button>
           <div className="text-center">
@@ -282,13 +282,13 @@ export default function Nutrition() {
             )}
           </div>
           <button onClick={() => setDate(d => addDays(d, 1))} disabled={isToday}
-            className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition disabled:opacity-40">
+            className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-surface shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition disabled:opacity-40">
             Next <ChevronRight className="w-4 h-4" />
           </button>
         </div>
 
         {/* Daily totals + goals */}
-        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+        <div className="bg-surface rounded-3xl shadow-card p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-display font-bold text-lg text-ink-900 flex items-center gap-2">
               <Target className="w-5 h-5 text-brand-500" /> Daily totals
@@ -330,7 +330,7 @@ export default function Nutrition() {
         </div>
 
         {/* Auto-calculate targets from a private profile */}
-        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+        <div className="bg-surface rounded-3xl shadow-card p-6 mb-6">
           <button onClick={() => setShowProfile(o => !o)}
             className="w-full flex items-center justify-between text-left">
             <span className="font-display font-bold text-lg text-ink-900 flex items-center gap-2">
@@ -353,7 +353,7 @@ export default function Nutrition() {
           const goalMl = Number(goal.water) || 2000;
           const pct = goalMl > 0 ? Math.min(100, Math.round((water / goalMl) * 100)) : 0;
           return (
-            <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+            <div className="bg-surface rounded-3xl shadow-card p-6 mb-6">
               <div className="flex items-center justify-between mb-3">
                 <h2 className="font-display font-bold text-lg text-ink-900 flex items-center gap-2">
                   <Droplet className="w-5 h-5 text-sky-500" /> Water
@@ -386,14 +386,14 @@ export default function Nutrition() {
         })()}
 
         {/* Add entry */}
-        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+        <div className="bg-surface rounded-3xl shadow-card p-6 mb-6">
           <div className="flex gap-1 bg-paper rounded-full p-1 mb-5 w-fit">
             <button onClick={() => setMode('estimate')}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition ${mode === 'estimate' ? 'bg-white text-ink-900 shadow-card' : 'text-ink-500 hover:text-ink-700'}`}>
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition ${mode === 'estimate' ? 'bg-surface text-ink-900 shadow-card' : 'text-ink-500 hover:text-ink-700'}`}>
               <Sparkles className="w-4 h-4" /> Estimate
             </button>
             <button onClick={() => setMode('exact')}
-              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition ${mode === 'exact' ? 'bg-white text-ink-900 shadow-card' : 'text-ink-500 hover:text-ink-700'}`}>
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition ${mode === 'exact' ? 'bg-surface text-ink-900 shadow-card' : 'text-ink-500 hover:text-ink-700'}`}>
               <Pencil className="w-4 h-4" /> Exact
             </button>
           </div>
@@ -426,12 +426,12 @@ export default function Nutrition() {
                       <span className="text-sm font-semibold text-ink-800">{picked.name}</span>
                       <div className="flex items-center gap-1">
                         <button type="button" onClick={() => setServings(s => Math.max(0.5, round1((Number(s) || 1) - 0.5)))}
-                          className="w-7 h-7 grid place-items-center rounded-full bg-white shadow-card text-ink-600 hover:text-ink-900">–</button>
+                          className="w-7 h-7 grid place-items-center rounded-full bg-surface shadow-card text-ink-600 hover:text-ink-900">–</button>
                         <input type="number" step="0.5" min="0.5" value={servings}
                           onChange={e => setServings(e.target.value)}
-                          className="w-14 text-center bg-white rounded-full py-1 text-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-200" />
+                          className="w-14 text-center bg-surface rounded-full py-1 text-sm border border-transparent focus:outline-none focus:ring-2 focus:ring-brand-200" />
                         <button type="button" onClick={() => setServings(s => round1((Number(s) || 1) + 0.5))}
-                          className="w-7 h-7 grid place-items-center rounded-full bg-white shadow-card text-ink-600 hover:text-ink-900">+</button>
+                          className="w-7 h-7 grid place-items-center rounded-full bg-surface shadow-card text-ink-600 hover:text-ink-900">+</button>
                       </div>
                       <span className="text-xs text-ink-400">servings</span>
                     </div>
@@ -486,7 +486,7 @@ export default function Nutrition() {
         {loading ? (
           <p className="text-ink-400 text-sm">Loading…</p>
         ) : entries.length === 0 ? (
-          <div className="bg-white rounded-3xl shadow-card px-6 py-10 text-center">
+          <div className="bg-surface rounded-3xl shadow-card px-6 py-10 text-center">
             <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-2">
               <Target className="w-5 h-5" />
             </span>
@@ -494,7 +494,7 @@ export default function Nutrition() {
             <p className="text-sm text-ink-400 mt-1">Add your first food above.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-3xl shadow-card divide-y divide-ink-50 overflow-hidden">
+          <div className="bg-surface rounded-3xl shadow-card divide-y divide-ink-50 overflow-hidden">
             {entries.map(e => (
               <div key={e.id} className="flex items-center gap-3 px-5 py-3">
                 <div className="flex-1 min-w-0">

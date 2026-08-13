@@ -6,7 +6,7 @@ import { Building2, MapPin, CheckCircle2, CalendarDays, ArrowRight } from 'lucid
 export default function StudioCard({ studio }) {
   return (
     <Link to={`/studios/${studio.id}`}
-      className="bg-white rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-2.5">
+      className="bg-surface rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-2.5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3">
           <span className="w-11 h-11 rounded-2xl bg-ink-100 text-ink-700 grid place-items-center shrink-0">

@@ -92,11 +92,11 @@ export default function Pricing() {
                 className={`relative rounded-3xl p-8 flex flex-col items-center text-center transition duration-300 hover:-translate-y-1
                   ${popular
                     ? 'text-white shadow-card-lg'
-                    : 'bg-white text-ink-900 shadow-card'}`}
+                    : 'bg-surface text-ink-900 shadow-card'}`}
                 style={popular ? { background: 'linear-gradient(150deg,#e8702a,#d55f1f)' } : undefined}
               >
                 {popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-ink-900 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-ink-900 dark:bg-ink-100 text-white text-xs font-bold px-3 py-1 rounded-full">
                     Most Popular
                   </span>
                 )}
@@ -116,7 +116,7 @@ export default function Pricing() {
                     disabled={loading}
                     className={`mt-auto w-full py-3 rounded-full font-semibold transition disabled:opacity-50
                       ${popular
-                        ? 'bg-white text-brand-600 hover:bg-brand-50'
+                        ? 'bg-surface text-brand-600 hover:bg-brand-50'
                         : 'bg-brand-500 text-white hover:bg-brand-600 shadow-pill'}`}
                   >
                     {loading ? 'Redirecting…' : 'Buy Now'}
@@ -126,7 +126,7 @@ export default function Pricing() {
                     to="/login"
                     className={`mt-auto w-full py-3 rounded-full font-semibold transition text-center block
                       ${popular
-                        ? 'bg-white text-brand-600 hover:bg-brand-50'
+                        ? 'bg-surface text-brand-600 hover:bg-brand-50'
                         : 'bg-brand-500 text-white hover:bg-brand-600 shadow-pill'}`}
                   >
                     Log in to buy
@@ -138,7 +138,7 @@ export default function Pricing() {
         </div>
 
         {/* FAQ / info */}
-        <div className="bg-white rounded-3xl shadow-card p-8 sm:p-10">
+        <div className="bg-surface rounded-3xl shadow-card p-8 sm:p-10">
           <h2 className="font-display font-bold text-2xl text-ink-900 mb-7">How credits work</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-ink-500">
             {INFO.map(({ Icon, title, desc }) => (

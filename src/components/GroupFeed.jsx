@@ -162,7 +162,7 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
 
   if (feedLocked) {
     return (
-      <div className="bg-white rounded-3xl shadow-card px-6 py-12 text-center">
+      <div className="bg-surface rounded-3xl shadow-card px-6 py-12 text-center">
         <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-3">
           <Lock className="w-6 h-6" />
         </span>
@@ -187,7 +187,7 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
           </div>
           {showBroadcast && (
             <form onSubmit={broadcast} className="flex flex-col gap-2">
-              <textarea rows={2} className="w-full bg-white border border-amber-200 rounded-2xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+              <textarea rows={2} className="w-full bg-surface border border-amber-200 rounded-2xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
                 placeholder="Send an announcement to everyone in this group…"
                 value={broadcastText} onChange={e => setBroadcastText(e.target.value)} />
               <button type="submit" disabled={!broadcastText.trim()}
@@ -200,7 +200,7 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
       )}
 
       {isMember && (
-        <div className="bg-white rounded-3xl shadow-card p-4">
+        <div className="bg-surface rounded-3xl shadow-card p-4">
           {msg && <p className={`text-sm mb-2 ${msgOk ? 'text-emerald-600' : 'text-rose-500'}`}>{msg}</p>}
           <form onSubmit={createPost} className="flex flex-col gap-3">
             <textarea
@@ -222,7 +222,7 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
 
       {/* Posts */}
       {posts.length === 0 ? (
-        <div className="bg-white rounded-3xl shadow-card px-6 py-10 text-center">
+        <div className="bg-surface rounded-3xl shadow-card px-6 py-10 text-center">
           <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-2">
             <MessageCircle className="w-5 h-5" />
           </span>
@@ -230,7 +230,7 @@ export default function GroupFeed({ groupId, isMember, isAdmin }) {
           {isMember && <p className="text-sm text-ink-400 mt-1">Be the first to post something!</p>}
         </div>
       ) : posts.map(post => (
-        <div key={post.id} className="bg-white rounded-3xl shadow-card overflow-hidden">
+        <div key={post.id} className="bg-surface rounded-3xl shadow-card overflow-hidden">
           {/* Post header */}
           <div className="flex items-start gap-3 px-4 pt-4 pb-3">
             <Avatar name={post.user_name} />

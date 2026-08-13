@@ -62,13 +62,13 @@ export default function Blog() {
           <div className="flex gap-2 flex-wrap mb-8">
             <button onClick={() => setActiveTag('')}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
-                ${!activeTag ? 'bg-ink-900 text-white' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
+                ${!activeTag ? 'bg-ink-900 dark:bg-ink-100 text-white' : 'bg-surface text-ink-600 shadow-card hover:text-ink-900'}`}>
               All
             </button>
             {allTags.map(tag => (
               <button key={tag} onClick={() => setActiveTag(activeTag === tag ? '' : tag)}
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
-                  ${activeTag === tag ? 'bg-ink-900 text-white' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
+                  ${activeTag === tag ? 'bg-ink-900 dark:bg-ink-100 text-white' : 'bg-surface text-ink-600 shadow-card hover:text-ink-900'}`}>
                 {tag}
               </button>
             ))}
@@ -78,7 +78,7 @@ export default function Blog() {
         {loading && (
           <div className="space-y-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-3xl h-40 animate-pulse shadow-card" />
+              <div key={i} className="bg-surface rounded-3xl h-40 animate-pulse shadow-card" />
             ))}
           </div>
         )}
@@ -97,7 +97,7 @@ export default function Blog() {
           <>
             {/* Featured post */}
             <Link to={`/blog/${featured.slug}`} className="block group mb-8">
-              <div className="bg-white rounded-3xl shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-card-lg transition duration-300">
+              <div className="bg-surface rounded-3xl shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-card-lg transition duration-300">
                 {featured.cover_image && (
                   <div className="w-full h-64 overflow-hidden">
                     <img src={featured.cover_image} alt={featured.title}
@@ -128,7 +128,7 @@ export default function Blog() {
               <div className="grid sm:grid-cols-2 gap-5">
                 {rest.map(post => (
                   <Link key={post.id} to={`/blog/${post.slug}`} className="block group">
-                    <div className="bg-white rounded-3xl shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-card-lg transition duration-300 h-full flex flex-col">
+                    <div className="bg-surface rounded-3xl shadow-card overflow-hidden hover:-translate-y-1 hover:shadow-card-lg transition duration-300 h-full flex flex-col">
                       {post.cover_image && (
                         <div className="w-full h-44 overflow-hidden flex-shrink-0">
                           <img src={post.cover_image} alt={post.title}

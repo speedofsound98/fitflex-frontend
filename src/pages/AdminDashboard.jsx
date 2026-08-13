@@ -6,7 +6,7 @@ const api = import.meta.env.VITE_API_URL;
 
 function StatCard({ label, value, icon }) {
   return (
-    <div className="bg-white rounded-2xl shadow p-6 flex items-center gap-4">
+    <div className="bg-surface rounded-2xl shadow p-6 flex items-center gap-4">
       <span className="text-4xl">{icon}</span>
       <div>
         <p className="text-3xl font-bold text-gray-900">{value ?? '—'}</p>
@@ -92,7 +92,7 @@ export default function AdminDashboard() {
   if (!authed) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <form onSubmit={login} className="bg-white rounded-2xl shadow p-8 w-full max-w-sm flex flex-col gap-4">
+        <form onSubmit={login} className="bg-surface rounded-2xl shadow p-8 w-full max-w-sm flex flex-col gap-4">
           <div className="text-center">
             <span className="text-3xl">🛡️</span>
             <h1 className="text-2xl font-bold text-gray-900 mt-2">Admin Login</h1>
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b shadow-sm px-6 py-4 flex items-center justify-between">
+      <div className="bg-surface border-b shadow-sm px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-2xl">🛡️</span>
           <div>
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${tab === t.key ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'}`}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${tab === t.key ? 'bg-blue-600 text-white' : 'bg-surface text-gray-600 hover:bg-gray-100 shadow-sm'}`}
             >
               {t.label}
             </button>
@@ -196,13 +196,13 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800">Users <span className="text-gray-400 font-normal text-base">({filteredUsers.length})</span></h2>
               <input
-                className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-surface"
                 placeholder="Search by name or email…"
                 value={userSearch}
                 onChange={e => setUserSearch(e.target.value)}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow overflow-hidden overflow-x-auto">
+            <div className="bg-surface rounded-2xl shadow overflow-hidden overflow-x-auto">
               <table className="w-full text-sm min-w-[600px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
@@ -247,13 +247,13 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-bold text-gray-800">Studios <span className="text-gray-400 font-normal text-base">({filteredStudios.length})</span></h2>
               <input
-                className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white"
+                className="border border-gray-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-surface"
                 placeholder="Search by name or city…"
                 value={studioSearch}
                 onChange={e => setStudioSearch(e.target.value)}
               />
             </div>
-            <div className="bg-white rounded-2xl shadow overflow-hidden overflow-x-auto">
+            <div className="bg-surface rounded-2xl shadow overflow-hidden overflow-x-auto">
               <table className="w-full text-sm min-w-[640px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
         {tab === 'bookings' && (
           <div>
             <h2 className="text-xl font-bold text-gray-800 mb-4">All Bookings <span className="text-gray-400 font-normal text-base">({bookings.length})</span></h2>
-            <div className="bg-white rounded-2xl shadow overflow-hidden overflow-x-auto">
+            <div className="bg-surface rounded-2xl shadow overflow-hidden overflow-x-auto">
               <table className="w-full text-sm min-w-[640px]">
                 <thead className="bg-gray-50 border-b">
                   <tr>

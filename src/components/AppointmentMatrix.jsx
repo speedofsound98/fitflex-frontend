@@ -129,14 +129,14 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
       {/* Week navigation */}
       <div className="flex items-center justify-between">
         <button onClick={() => setWeekStart(d => addDays(d, -7))}
-          className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
+          className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-surface shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
           <ChevronLeft className="w-4 h-4" /> Prev week
         </button>
         <span className="text-sm font-semibold text-ink-700">
           {formatDate(weekStart)} – {formatDate(weekEnd)}
         </span>
         <button onClick={() => setWeekStart(d => addDays(d, 7))}
-          className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-white shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
+          className="inline-flex items-center gap-1 px-3 py-2 rounded-full bg-surface shadow-card text-sm font-medium text-ink-600 hover:text-ink-900 transition">
           Next week <ChevronRight className="w-4 h-4" />
         </button>
       </div>
@@ -148,24 +148,24 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <label className="flex flex-col gap-1">
               <span className="text-xs text-ink-600">Duration (min)</span>
-              <select className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+              <select className="bg-surface rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 value={newSlot.duration_minutes} onChange={e => setNewSlot(f => ({...f, duration_minutes: Number(e.target.value)}))}>
                 {[30, 45, 60, 90, 120].map(m => <option key={m} value={m}>{m} min</option>)}
               </select>
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-xs text-ink-600">Capacity</span>
-              <input type="number" min="1" max="20" className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+              <input type="number" min="1" max="20" className="bg-surface rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 value={newSlot.capacity} onChange={e => setNewSlot(f => ({...f, capacity: Number(e.target.value)}))} />
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-xs text-ink-600">Credits</span>
-              <input type="number" min="0" className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+              <input type="number" min="0" className="bg-surface rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 value={newSlot.credit_cost} onChange={e => setNewSlot(f => ({...f, credit_cost: Number(e.target.value)}))} />
             </label>
             <label className="flex flex-col gap-1">
               <span className="text-xs text-ink-600">Note (optional)</span>
-              <input className="bg-white rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+              <input className="bg-surface rounded-xl p-2 text-sm border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
                 placeholder="e.g. 1-on-1 session"
                 value={newSlot.notes} onChange={e => setNewSlot(f => ({...f, notes: e.target.value}))} />
             </label>
@@ -174,7 +174,7 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
       )}
 
       {/* Matrix */}
-      <div className="bg-white rounded-2xl shadow-card overflow-x-auto">
+      <div className="bg-surface rounded-2xl shadow-card overflow-x-auto">
         <table className="w-full min-w-[600px] text-sm border-collapse">
           <thead>
             <tr className="border-b border-ink-100">

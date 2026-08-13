@@ -31,10 +31,10 @@ export default function BlogPost() {
     <div className="min-h-screen bg-cream">
       <Navbar />
       <div className="pt-24 px-4 max-w-3xl mx-auto space-y-4">
-        <div className="h-8 bg-white rounded-full animate-pulse w-2/3 shadow-card" />
-        <div className="h-64 bg-white rounded-3xl animate-pulse shadow-card" />
-        <div className="h-4 bg-white rounded-full animate-pulse shadow-card" />
-        <div className="h-4 bg-white rounded-full animate-pulse w-4/5 shadow-card" />
+        <div className="h-8 bg-surface rounded-full animate-pulse w-2/3 shadow-card" />
+        <div className="h-64 bg-surface rounded-3xl animate-pulse shadow-card" />
+        <div className="h-4 bg-surface rounded-full animate-pulse shadow-card" />
+        <div className="h-4 bg-surface rounded-full animate-pulse w-4/5 shadow-card" />
       </div>
     </div>
   );

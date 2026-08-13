@@ -156,7 +156,7 @@ export default function EventDetail() {
         </Link>
 
         {/* Event header */}
-        <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+        <div className="bg-surface rounded-3xl shadow-card p-6 mb-6">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -214,7 +214,7 @@ export default function EventDetail() {
 
         {/* Edit form */}
         {editing && (
-          <div className="bg-white rounded-3xl shadow-card p-6 mb-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6 mb-6">
             <h2 className="font-display font-bold text-ink-900 mb-4">Edit Event</h2>
             <form onSubmit={saveEdit} className="space-y-4">
               <label className="flex flex-col gap-1.5">
@@ -248,7 +248,7 @@ export default function EventDetail() {
 
         {/* Attendees */}
         {rsvps.length > 0 && (
-          <div className="bg-white rounded-3xl shadow-card overflow-hidden mb-6">
+          <div className="bg-surface rounded-3xl shadow-card overflow-hidden mb-6">
             <div className="px-6 py-4 border-b border-ink-100">
               <h2 className="font-display font-bold text-ink-900">Attendees</h2>
             </div>

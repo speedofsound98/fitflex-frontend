@@ -49,7 +49,7 @@ export default function NutritionProfileForm({ onSaved }) {
       type="button"
       onClick={() => setForm(f => ({ ...f, [field]: value }))}
       className={`flex-1 py-2 rounded-full text-sm font-semibold transition capitalize
-        ${form[field] === value ? 'bg-white text-ink-900 shadow-card' : 'text-ink-500 hover:text-ink-700'}`}
+        ${form[field] === value ? 'bg-surface text-ink-900 shadow-card' : 'text-ink-500 hover:text-ink-700'}`}
     >
       {label}
     </button>

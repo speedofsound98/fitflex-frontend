@@ -4,10 +4,34 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   Bell, Menu, X, Dumbbell, LayoutDashboard, CreditCard, Newspaper,
   Users, MessageSquare, Settings, ClipboardList, LogOut, ChevronRight, Utensils,
+  Sun, Moon,
 } from 'lucide-react';
 import authFetch from '../utils/authFetch';
 
 const api = import.meta.env.VITE_API_URL;
+
+// Light/dark toggle — flips [data-theme] on <html> and remembers the choice.
+function ThemeToggle() {
+  const [dark, setDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme') === 'dark'
+  );
+  function toggle() {
+    const next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch { /* ignore */ }
+    setDark(!dark);
+  }
+  return (
+    <button
+      onClick={toggle}
+      className="p-2 rounded-full text-ink-500 hover:bg-ink-50 hover:text-ink-800 transition"
+      aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={dark ? 'Light mode' : 'Dark mode'}
+    >
+      {dark ? <Sun className="w-5 h-5" strokeWidth={1.9} /> : <Moon className="w-5 h-5" strokeWidth={1.9} />}
+    </button>
+  );
+}
 
 function NotificationBell({ role }) {
   const [notifications, setNotifications] = useState([]);
@@ -72,7 +96,7 @@ function NotificationBell({ role }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-3 w-80 bg-white rounded-3xl shadow-card-lg border border-ink-100 z-50 overflow-hidden">
+        <div className="absolute right-0 mt-3 w-80 bg-surface rounded-3xl shadow-card-lg border border-ink-100 z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-ink-100">
             <span className="font-semibold text-ink-800 text-sm">Notifications</span>
             {notifications.some(n => !n.read) && (
@@ -83,7 +107,7 @@ function NotificationBell({ role }) {
             {notifications.length === 0 ? (
               <p className="px-4 py-8 text-center text-ink-300 text-sm">No notifications yet</p>
             ) : notifications.map(n => (
-              <div key={n.id} className={`px-4 py-3 ${n.read ? 'bg-white' : 'bg-brand-50'}`}>
+              <div key={n.id} className={`px-4 py-3 ${n.read ? 'bg-surface' : 'bg-brand-50'}`}>
                 <div className="flex items-start gap-2">
                   <span className="text-lg flex-shrink-0">{typeIcon[n.type] || '🔔'}</span>
                   <div className="flex-1 min-w-0">
@@ -167,7 +191,7 @@ export default function Navbar() {
   return (
     <>
       <div className="fixed top-3 sm:top-4 inset-x-3 sm:inset-x-6 z-30">
-        <div className="max-w-6xl mx-auto bg-white/90 backdrop-blur-md rounded-full shadow-pill border border-ink-100/60">
+        <div className="max-w-6xl mx-auto bg-surface/90 backdrop-blur-md rounded-full shadow-pill border border-ink-100/60">
           <div className="flex justify-between items-center pl-5 pr-3 sm:pl-6 sm:pr-3 py-2.5">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 group" onClick={closeDrawer}>
@@ -179,6 +203,7 @@ export default function Navbar() {
 
             {/* Right cluster — minimal */}
             <div className="flex items-center gap-1.5 sm:gap-2">
+              <ThemeToggle />
               {authed ? (
                 <>
                   <Link
@@ -229,14 +254,14 @@ export default function Navbar() {
       {/* Backdrop */}
       <div
         onClick={closeDrawer}
-        className={`fixed inset-0 z-40 bg-ink-900/40 backdrop-blur-sm transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 bg-ink-900/40 dark:bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
           drawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         aria-hidden={!drawerOpen}
       />
       {/* Panel */}
       <aside
-        className={`fixed top-0 right-0 z-50 h-full w-[300px] max-w-[85vw] bg-white shadow-card-lg flex flex-col transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 z-50 h-full w-[300px] max-w-[85vw] bg-surface shadow-card-lg flex flex-col transition-transform duration-300 ease-out ${
           drawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"

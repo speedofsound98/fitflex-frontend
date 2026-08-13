@@ -25,8 +25,8 @@ function nextHour() {
 
 const EMPTY_FORM = { name: '', datetime: nextHour(), sport_type: '', credit_cost: 1, capacity: '' };
 
-const inputCls = 'border border-ink-100 bg-white p-2.5 rounded-2xl text-sm focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition';
-const inputSmCls = 'border border-ink-100 bg-white p-2 rounded-xl text-sm focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition';
+const inputCls = 'border border-ink-100 bg-surface p-2.5 rounded-2xl text-sm focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition';
+const inputSmCls = 'border border-ink-100 bg-surface p-2 rounded-xl text-sm focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition';
 const labelCls = 'text-sm font-medium text-ink-700';
 
 export default function StudioDashboard() {
@@ -276,7 +276,7 @@ export default function StudioDashboard() {
         {success && <div className="mb-4 p-3.5 bg-emerald-100 text-emerald-700 rounded-2xl text-sm font-medium">{success}</div>}
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-8 bg-white rounded-full shadow-card p-1.5 w-fit flex-wrap">
+        <div className="flex gap-1 mb-8 bg-surface rounded-full shadow-card p-1.5 w-fit flex-wrap">
           <button className={tabClass('overview')} onClick={() => { setActiveTab('overview'); fetchAnalytics(); }}>
             <LayoutDashboard className="w-4 h-4" /> Overview
           </button>
@@ -320,7 +320,7 @@ export default function StudioDashboard() {
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {OV_STATS.map(({ label, value, Icon, gradient, chip }) => (
                   <div key={label}
-                    className={`rounded-3xl p-5 flex items-center gap-4 shadow-card ${gradient ? 'text-white' : 'bg-white'}`}
+                    className={`rounded-3xl p-5 flex items-center gap-4 shadow-card ${gradient ? 'text-white' : 'bg-surface'}`}
                     style={gradient ? { background: 'linear-gradient(135deg,#e8702a,#f1a878)' } : undefined}>
                     <span className={`w-12 h-12 rounded-2xl grid place-items-center shrink-0 ${gradient ? 'bg-white/20' : chip}`}>
                       <Icon className="w-6 h-6" strokeWidth={1.9} />
@@ -337,7 +337,7 @@ export default function StudioDashboard() {
                 {/* Bookings per class (derived) */}
                 <section>
                   <h2 className="font-display font-bold text-xl text-ink-900 mb-4">Top classes by bookings</h2>
-                  <div className="rounded-3xl bg-white shadow-card p-6">
+                  <div className="rounded-3xl bg-surface shadow-card p-6">
                     {perClass.length === 0 ? (
                       <div className="h-[180px] grid place-items-center text-center text-ink-400 text-sm">
                         Create classes and take bookings to see your top performers here.
@@ -365,7 +365,7 @@ export default function StudioDashboard() {
                   <div className="grid grid-cols-2 gap-4">
                     {QUICK.map(({ label, desc, Icon, go }) => (
                       <button key={go} onClick={() => { setActiveTab(go); if (go === 'analytics') fetchAnalytics(); }}
-                        className="text-left bg-white rounded-3xl shadow-card p-5 hover:-translate-y-1 hover:shadow-card-lg transition duration-300 group">
+                        className="text-left bg-surface rounded-3xl shadow-card p-5 hover:-translate-y-1 hover:shadow-card-lg transition duration-300 group">
                         <span className="inline-grid place-items-center w-11 h-11 rounded-2xl bg-brand-100 text-brand-600 mb-3 group-hover:bg-brand-500 group-hover:text-white transition">
                           <Icon className="w-5 h-5" strokeWidth={1.9} />
                         </span>
@@ -384,7 +384,7 @@ export default function StudioDashboard() {
         {activeTab === 'classes' && (
           <>
             {/* Create class form */}
-            <div className="bg-white rounded-3xl shadow-card p-6 sm:p-7 mb-8">
+            <div className="bg-surface rounded-3xl shadow-card p-6 sm:p-7 mb-8">
               <h2 className="font-display font-bold text-xl text-ink-900 mb-5">Create a new class</h2>
               <form onSubmit={createClass} className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
@@ -429,7 +429,7 @@ export default function StudioDashboard() {
             </div>
 
             {/* Class list */}
-            <div className="bg-white rounded-3xl shadow-card p-6 sm:p-7">
+            <div className="bg-surface rounded-3xl shadow-card p-6 sm:p-7">
               <h2 className="font-display font-bold text-xl text-ink-900 mb-4">Your classes</h2>
               {classesLoading ? (
                 <p className="text-ink-300">Loading…</p>
@@ -529,14 +529,14 @@ export default function StudioDashboard() {
                               </p>
                               <textarea
                                 rows={3}
-                                className="w-full border border-brand-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 bg-white mb-2"
+                                className="w-full border border-brand-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-200 bg-surface mb-2"
                                 placeholder="e.g. Please bring a yoga mat and wear comfortable clothing. See you there!"
                                 value={messageText}
                                 onChange={e => setMessageText(e.target.value)}
                               />
                               <div className="flex gap-2">
                                 <button onClick={() => sendMessage(cls.id)} className="bg-brand-500 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-brand-600 transition">Send</button>
-                                <button onClick={() => setMessagingClassId(null)} className="text-ink-500 px-4 py-2 rounded-full text-sm hover:bg-white transition">Cancel</button>
+                                <button onClick={() => setMessagingClassId(null)} className="text-ink-500 px-4 py-2 rounded-full text-sm hover:bg-surface transition">Cancel</button>
                               </div>
                             </div>
                           )}
@@ -554,7 +554,7 @@ export default function StudioDashboard() {
         {activeTab === 'appointments' && (
           <div className="space-y-6">
             {/* Enable toggle */}
-            <div className="bg-white rounded-3xl shadow-card p-6 flex items-center justify-between">
+            <div className="bg-surface rounded-3xl shadow-card p-6 flex items-center justify-between">
               <div>
                 <p className="font-display font-bold text-ink-900">Appointment Slots</p>
                 <p className="text-sm text-ink-400 mt-0.5">
@@ -576,14 +576,14 @@ export default function StudioDashboard() {
                 }}
                 className={`w-12 h-7 rounded-full transition-colors duration-200 cursor-pointer flex items-center px-0.5 ${offersAppointments ? 'bg-brand-500' : 'bg-ink-200'}`}
               >
-                <div className={`w-6 h-6 bg-white rounded-full shadow transition-transform duration-200 ${offersAppointments ? 'translate-x-5' : 'translate-x-0'}`} />
+                <div className={`w-6 h-6 bg-surface rounded-full shadow transition-transform duration-200 ${offersAppointments ? 'translate-x-5' : 'translate-x-0'}`} />
               </div>
             </div>
 
             {offersAppointments ? (
               <AppointmentMatrix studioId={studioId} mode="manage" openingHour={openingHour} closingHour={closingHour} />
             ) : (
-              <div className="bg-white rounded-3xl shadow-card px-6 py-14 text-center">
+              <div className="bg-surface rounded-3xl shadow-card px-6 py-14 text-center">
                 <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 mb-4">
                   <CalendarCheck className="w-7 h-7" strokeWidth={1.8} />
                 </span>
@@ -609,7 +609,7 @@ export default function StudioDashboard() {
                   <p className="font-display font-black text-2xl">{analytics?.totalBookings ?? '—'}</p>
                 </div>
               </div>
-              <div className="bg-white rounded-3xl shadow-card p-5 flex items-center gap-4">
+              <div className="bg-surface rounded-3xl shadow-card p-5 flex items-center gap-4">
                 <span className="w-12 h-12 rounded-2xl bg-brand-100 text-brand-600 grid place-items-center shrink-0">
                   <Ticket className="w-6 h-6" strokeWidth={1.9} />
                 </span>
@@ -618,7 +618,7 @@ export default function StudioDashboard() {
                   <p className="font-display font-black text-2xl text-ink-900">{analytics?.totalRevenue ?? '—'}</p>
                 </div>
               </div>
-              <div className="bg-white rounded-3xl shadow-card p-5 flex items-center gap-4 col-span-2 md:col-span-1">
+              <div className="bg-surface rounded-3xl shadow-card p-5 flex items-center gap-4 col-span-2 md:col-span-1">
                 <span className="w-12 h-12 rounded-2xl bg-ink-100 text-ink-700 grid place-items-center shrink-0">
                   <CalendarDays className="w-6 h-6" strokeWidth={1.9} />
                 </span>
@@ -630,7 +630,7 @@ export default function StudioDashboard() {
             </div>
 
             {/* Per-class breakdown */}
-            <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+            <div className="bg-surface rounded-3xl shadow-card overflow-hidden">
               <div className="px-6 py-4 border-b border-ink-50">
                 <h2 className="font-display font-bold text-ink-900">Bookings per class</h2>
               </div>
@@ -674,7 +674,7 @@ export default function StudioDashboard() {
 
         {/* ══════════════ PROFILE TAB ══════════════ */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-3xl shadow-card p-6 sm:p-7">
+          <div className="bg-surface rounded-3xl shadow-card p-6 sm:p-7">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h2 className="font-display font-bold text-xl text-ink-900">Studio Profile</h2>

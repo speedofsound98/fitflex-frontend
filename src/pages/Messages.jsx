@@ -97,7 +97,7 @@ export default function Messages() {
 
         <div className="flex gap-4 h-[600px]">
           {/* Sidebar — conversations */}
-          <div className="w-72 bg-white rounded-3xl shadow-card flex flex-col overflow-hidden flex-shrink-0">
+          <div className="w-72 bg-surface rounded-3xl shadow-card flex flex-col overflow-hidden flex-shrink-0">
             <div className="px-5 py-4 border-b border-ink-100 font-display font-bold text-ink-900 text-sm">Conversations</div>
             <div className="flex-1 overflow-y-auto divide-y divide-ink-50">
               {conversations.length === 0 ? (
@@ -126,7 +126,7 @@ export default function Messages() {
 
           {/* Conversation panel */}
           {activeType && activeId ? (
-            <div className="flex-1 bg-white rounded-3xl shadow-card flex flex-col overflow-hidden">
+            <div className="flex-1 bg-surface rounded-3xl shadow-card flex flex-col overflow-hidden">
               {/* Header */}
               <div className="flex items-center gap-3 px-5 py-4 border-b border-ink-100">
                 <Avatar name={partnerName} size="sm" />
@@ -139,7 +139,7 @@ export default function Messages() {
                   const isMine = m.sender_type === myType && m.sender_id === myId;
                   return (
                     <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl text-sm shadow-sm ${isMine ? 'bg-brand-500 text-white rounded-br-sm' : 'bg-white text-ink-800 rounded-bl-sm'}`}>
+                      <div className={`max-w-xs lg:max-w-md px-4 py-2.5 rounded-2xl text-sm shadow-sm ${isMine ? 'bg-brand-500 text-white rounded-br-sm' : 'bg-surface text-ink-800 rounded-bl-sm'}`}>
                         <p className="whitespace-pre-wrap">{m.content}</p>
                         <p className={`text-xs mt-1 ${isMine ? 'text-brand-100' : 'text-ink-400'}`}>{timeAgo(m.created_at)}</p>
                       </div>
@@ -164,7 +164,7 @@ export default function Messages() {
               </form>
             </div>
           ) : (
-            <div className="flex-1 bg-white rounded-3xl shadow-card flex items-center justify-center">
+            <div className="flex-1 bg-surface rounded-3xl shadow-card flex items-center justify-center">
               <div className="text-center">
                 <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-3">
                   <MessageCircle className="w-6 h-6" />

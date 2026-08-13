@@ -157,7 +157,7 @@ function SpreadsheetView({ rows, colWidths, rowHeight, onCellEdit, onColResize }
             if (ri === headerRowIdx) return null;
             if (!row.some(c => c?.v?.trim())) return null;
             return (
-              <tr key={ri} className="border-t border-ink-50 bg-white">
+              <tr key={ri} className="border-t border-ink-50 bg-surface">
                 {Array.from({ length: colCount }, (_, ci) => {
                   const cell = row[ci];
                   const isEditing = editingCell?.row === ri && editingCell?.col === ci;
@@ -284,11 +284,11 @@ function TrainingPlanView({ rows }) {
   return (
     <div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div className="bg-white rounded-2xl shadow-card p-4 text-center">
+        <div className="bg-surface rounded-2xl shadow-card p-4 text-center">
           <p className="text-3xl font-display font-bold text-ink-900">{dataRows.length}</p>
           <p className="text-xs text-ink-400 mt-1 uppercase tracking-wide">Weeks</p>
         </div>
-        <div className="bg-white rounded-2xl shadow-card p-4 text-center">
+        <div className="bg-surface rounded-2xl shadow-card p-4 text-center">
           <p className="text-3xl font-display font-bold text-brand-600">{Math.round(totalKm)}</p>
           <p className="text-xs text-ink-400 mt-1 uppercase tracking-wide">Total km</p>
         </div>
@@ -313,14 +313,14 @@ function TrainingPlanView({ rows }) {
       <div className="mb-5">
         <button
           onClick={() => setLegendOpen(o => !o)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white shadow-card text-sm font-semibold text-ink-600 hover:text-ink-900 transition"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface shadow-card text-sm font-semibold text-ink-600 hover:text-ink-900 transition"
         >
           {legendOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           Guide &amp; Legend
         </button>
 
         {legendOpen && (
-          <div className="mt-3 bg-white rounded-3xl shadow-card p-5 grid sm:grid-cols-2 gap-6">
+          <div className="mt-3 bg-surface rounded-3xl shadow-card p-5 grid sm:grid-cols-2 gap-6">
 
             {/* Phases */}
             {phases.length > 0 && (
@@ -403,14 +403,14 @@ function TrainingPlanView({ rows }) {
         <div className="flex gap-2 mb-5 flex-wrap">
           <button onClick={() => setActivePhase('')}
             className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
-              ${!activePhase ? 'bg-ink-900 text-white' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
+              ${!activePhase ? 'bg-ink-900 dark:bg-ink-100 text-white' : 'bg-surface text-ink-600 shadow-card hover:text-ink-900'}`}>
             All weeks
           </button>
           {phases.map(p => (
             <button key={p} onClick={() => setActivePhase(activePhase === p ? '' : p)}
               style={activePhase === p ? (PHASE_STYLE[p] || {}) : {}}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
-                ${activePhase === p ? '' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
+                ${activePhase === p ? '' : 'bg-surface text-ink-600 shadow-card hover:text-ink-900'}`}>
               {p}
             </button>
           ))}
@@ -432,7 +432,7 @@ function TrainingPlanView({ rows }) {
           const totalVal = cellText(totalCell);
 
           return (
-            <div key={i} className="bg-white rounded-2xl shadow-card overflow-hidden">
+            <div key={i} className="bg-surface rounded-2xl shadow-card overflow-hidden">
               <div className="flex items-center gap-3 px-5 py-3 border-b border-ink-50">
                 {phase && <span className="text-xs font-bold px-2.5 py-0.5 rounded-full" style={phaseStyle}>{phase}</span>}
                 {C.wk !== -1 && cellText(row[C.wk]) && <span className="font-bold text-ink-800 text-sm">Week {cellText(row[C.wk])}</span>}
@@ -479,7 +479,7 @@ function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onF
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {isTP && (
-        <div className="flex rounded-full bg-white shadow-card overflow-hidden p-1">
+        <div className="flex rounded-full bg-surface shadow-card overflow-hidden p-1">
           <button onClick={() => setViewMode('table')}
             className={`px-3 py-1.5 text-xs font-semibold rounded-full transition ${viewMode === 'table' ? 'bg-brand-500 text-white' : 'text-ink-600 hover:text-ink-900'}`}>
             Table
@@ -492,7 +492,7 @@ function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onF
       )}
       {viewMode === 'table' && (
         <select value={rowHeight} onChange={e => setRowHeight(e.target.value)}
-          className="px-3 py-1.5 rounded-full bg-white shadow-card text-xs text-ink-600 border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition">
+          className="px-3 py-1.5 rounded-full bg-surface shadow-card text-xs text-ink-600 border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition">
           <option value="compact">Compact</option>
           <option value="normal">Normal</option>
           <option value="tall">Tall</option>
@@ -500,7 +500,7 @@ function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onF
       )}
       {!inFullscreen && (
         <button onClick={onFullscreen}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white shadow-card text-xs font-semibold text-ink-600 hover:text-ink-900 transition"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface shadow-card text-xs font-semibold text-ink-600 hover:text-ink-900 transition"
           title="Full screen (ESC to exit)">
           <Maximize2 className="w-3.5 h-3.5" /> Full screen
         </button>
@@ -511,7 +511,7 @@ function PlanToolbar({ isTP, viewMode, setViewMode, rowHeight, setRowHeight, onF
       </button>
       {inFullscreen && (
         <button onClick={onClose}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-ink-900 text-white hover:bg-ink-800 transition">
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-ink-900 dark:bg-ink-100 text-white hover:bg-ink-800 dark:hover:bg-ink-200 transition">
           <X className="w-3.5 h-3.5" /> Close
         </button>
       )}
@@ -639,7 +639,7 @@ export default function WorkoutPlan() {
       {editedSheets.map((s, i) => (
         <button key={i} onClick={() => setActiveSheet(i)}
           className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
-            ${activeSheet === i ? 'bg-brand-500 text-white shadow-pill' : 'bg-white text-ink-600 shadow-card hover:text-ink-900'}`}>
+            ${activeSheet === i ? 'bg-brand-500 text-white shadow-pill' : 'bg-surface text-ink-600 shadow-card hover:text-ink-900'}`}>
           {s.name}
         </button>
       ))}
@@ -682,7 +682,7 @@ export default function WorkoutPlan() {
 
           {/* Upload zone */}
           <div onClick={() => fileInputRef.current?.click()}
-            className={`bg-white rounded-3xl border-2 border-dashed p-8 text-center mb-8 cursor-pointer transition
+            className={`bg-surface rounded-3xl border-2 border-dashed p-8 text-center mb-8 cursor-pointer transition
               ${uploading ? 'border-brand-300 bg-brand-50' : 'border-brand-200 hover:border-brand-400 hover:bg-brand-50/40'}`}>
             <span className="inline-grid place-items-center w-16 h-16 rounded-3xl bg-brand-50 text-brand-500 mx-auto mb-3">
               {uploading ? <Loader2 className="w-7 h-7 animate-spin" /> : editedSheets ? <FileSpreadsheet className="w-7 h-7" /> : <FolderOpen className="w-7 h-7" />}

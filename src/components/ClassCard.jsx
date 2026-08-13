@@ -9,7 +9,7 @@ export default function ClassCard({ cls, onBook, bookedIds }) {
   const isPast = new Date(cls.datetime) < new Date();
 
   return (
-    <div className="bg-white rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-4">
+    <div className="bg-surface rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className={`inline-grid place-items-center w-11 h-11 rounded-2xl text-xl ${chipStyle(cls.sport_type)}`}>

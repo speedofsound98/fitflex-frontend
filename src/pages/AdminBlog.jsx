@@ -28,7 +28,7 @@ function ToolBtn({ onClick, active, title, children }) {
   return (
     <button type="button" onMouseDown={e => { e.preventDefault(); onClick(); }}
       title={title}
-      className={`inline-grid place-items-center w-8 h-8 rounded-lg transition ${active ? 'bg-brand-500 text-white' : 'text-ink-600 hover:bg-white'}`}>
+      className={`inline-grid place-items-center w-8 h-8 rounded-lg transition ${active ? 'bg-brand-500 text-white' : 'text-ink-600 hover:bg-surface'}`}>
       {children}
     </button>
   );
@@ -169,7 +169,7 @@ function PostForm({ initial, onSave, onCancel }) {
         </div>
         <div>
           <label className={label}>Status</label>
-          <select value={form.status} onChange={e => setField('status', e.target.value)} className={`${inputClass} !bg-white`}>
+          <select value={form.status} onChange={e => setField('status', e.target.value)} className={`${inputClass} !bg-surface`}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>
           </select>
@@ -275,7 +275,7 @@ export default function AdminBlog() {
 
   if (!authed) return (
     <div className="min-h-screen bg-paper flex items-center justify-center px-4">
-      <form onSubmit={handleLogin} className="bg-white rounded-3xl shadow-card p-8 w-full max-w-sm">
+      <form onSubmit={handleLogin} className="bg-surface rounded-3xl shadow-card p-8 w-full max-w-sm">
         <h2 className="font-display font-bold text-xl text-ink-900 mb-6">Blog Admin</h2>
         <label className="block text-xs font-semibold text-ink-500 uppercase tracking-[0.1em] mb-1.5">Admin secret</label>
         <input type="password" value={secret} onChange={e => setSecret(e.target.value)} className={`${inputClass} mb-4`} />
@@ -311,14 +311,14 @@ export default function AdminBlog() {
         )}
 
         {view === 'create' && (
-          <div className="bg-white rounded-3xl shadow-card p-7">
+          <div className="bg-surface rounded-3xl shadow-card p-7">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-6">New Post</h2>
             <PostForm onSave={handleCreate} onCancel={() => setView('list')} />
           </div>
         )}
 
         {view === 'edit' && editing && (
-          <div className="bg-white rounded-3xl shadow-card p-7">
+          <div className="bg-surface rounded-3xl shadow-card p-7">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-6">Edit Post</h2>
             <PostForm initial={editing} onSave={handleUpdate} onCancel={() => { setView('list'); setEditing(null); }} />
           </div>
@@ -327,7 +327,7 @@ export default function AdminBlog() {
         {view === 'list' && (
           loading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map(i => <div key={i} className="h-20 bg-white rounded-3xl animate-pulse shadow-card" />)}
+              {[1, 2, 3].map(i => <div key={i} className="h-20 bg-surface rounded-3xl animate-pulse shadow-card" />)}
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-20">
@@ -340,7 +340,7 @@ export default function AdminBlog() {
           ) : (
             <div className="space-y-3">
               {posts.map(post => (
-                <div key={post.id} className="bg-white rounded-3xl shadow-card p-5 flex items-start gap-4">
+                <div key={post.id} className="bg-surface rounded-3xl shadow-card p-5 flex items-start gap-4">
                   {post.cover_image && (
                     <img src={post.cover_image} alt="" className="w-16 h-16 rounded-2xl object-cover flex-shrink-0" />
                   )}

@@ -17,7 +17,7 @@ export default function Bookings() {
       <p className="text-sm text-ink-400 mb-4">Classes you've reserved</p>
 
       {sorted.length === 0 ? (
-        <div className="rounded-3xl bg-white shadow-card p-10 text-center">
+        <div className="rounded-3xl bg-surface shadow-card p-10 text-center">
           <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 mb-3">
             <CalendarDays className="w-7 h-7" strokeWidth={1.8} />
           </span>
@@ -28,7 +28,7 @@ export default function Bookings() {
           </Link>
         </div>
       ) : (
-        <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+        <div className="bg-surface rounded-3xl shadow-card overflow-hidden">
           <ul className="divide-y divide-ink-50">
             {sorted.map(b => {
               const isPast = new Date(b.datetime) < new Date();

@@ -63,7 +63,7 @@ export default function Overview() {
         {STATS.map(({ label, value, Icon, gradient, chip }) => (
           <div
             key={label}
-            className={`rounded-3xl p-5 flex items-center gap-4 shadow-card ${gradient ? 'text-white' : 'bg-white'}`}
+            className={`rounded-3xl p-5 flex items-center gap-4 shadow-card ${gradient ? 'text-white' : 'bg-surface'}`}
             style={gradient ? { background: 'linear-gradient(135deg,#e8702a,#f1a878)' } : undefined}
           >
             <span className={`w-12 h-12 rounded-2xl grid place-items-center shrink-0 ${gradient ? 'bg-white/20' : chip}`}>
@@ -107,7 +107,7 @@ export default function Overview() {
               </div>
             </div>
           ) : (
-            <div className="rounded-3xl p-6 bg-white shadow-card min-h-[200px] flex flex-col items-center justify-center text-center">
+            <div className="rounded-3xl p-6 bg-surface shadow-card min-h-[200px] flex flex-col items-center justify-center text-center">
               <span className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 grid place-items-center mb-3">
                 <CalendarDays className="w-7 h-7" strokeWidth={1.8} />
               </span>
@@ -126,7 +126,7 @@ export default function Overview() {
             <h2 className="font-display font-bold text-xl text-ink-900">Booking activity</h2>
             <span className="text-sm text-ink-400">Last 6 months</span>
           </div>
-          <div className="rounded-3xl p-6 bg-white shadow-card">
+          <div className="rounded-3xl p-6 bg-surface shadow-card">
             {totalBookings === 0 ? (
               <div className="h-[180px] grid place-items-center text-center text-ink-400 text-sm">
                 Your booking history will chart here once you start booking.

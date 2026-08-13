@@ -12,13 +12,13 @@ import AppointmentMatrix from '../components/AppointmentMatrix';
 import { sportIcon, chipStyle } from '../utils/sport';
 
 const COVER_GRADIENTS = {
-  blue:   'from-ink-800 to-ink-600',
+  blue:   'from-ink-800 dark:from-ink-100 to-ink-600 dark:to-ink-300',
   purple: 'from-purple-700 to-purple-500',
   green:  'from-emerald-700 to-emerald-500',
   orange: 'from-brand-600 to-brand-400',
   rose:   'from-rose-600 to-pink-500',
   teal:   'from-teal-700 to-cyan-500',
-  slate:  'from-ink-900 to-ink-700',
+  slate:  'from-ink-900 dark:from-ink-50 to-ink-700 dark:to-ink-200',
 };
 
 function formatHour(h) {
@@ -112,7 +112,7 @@ export default function StudioProfile() {
 
         {/* Guest notice toast */}
         {guestNotice && (
-          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-ink-900 text-white text-sm font-medium px-5 py-3 rounded-full shadow-card-lg flex items-center gap-2">
+          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-ink-900 dark:bg-ink-100 text-white text-sm font-medium px-5 py-3 rounded-full shadow-card-lg flex items-center gap-2">
             <Lock className="w-4 h-4 text-brand-300" /> {guestNotice}
             <Link to="/login" className="underline text-brand-300 ml-1">Log in</Link>
           </div>
@@ -152,14 +152,14 @@ export default function StudioProfile() {
           <div className="flex flex-wrap gap-2 mt-5">
             {!isLoggedIn && (
               <Link to="/login"
-                className="inline-flex items-center gap-2 bg-white text-ink-900 font-semibold px-5 py-2.5 rounded-full hover:bg-brand-50 transition text-sm shadow-pill">
+                className="inline-flex items-center gap-2 bg-surface text-ink-900 font-semibold px-5 py-2.5 rounded-full hover:bg-brand-50 transition text-sm shadow-pill">
                 <Lock className="w-4 h-4" /> Log in to book
               </Link>
             )}
             {studio.accepts_enquiries && userRole === 'user' && (
               <button
                 onClick={() => { setEnquiryOpen(o => !o); setEnquiryStatus(''); }}
-                className="inline-flex items-center gap-2 bg-white text-ink-900 font-semibold px-5 py-2.5 rounded-full hover:bg-brand-50 transition text-sm shadow-pill"
+                className="inline-flex items-center gap-2 bg-surface text-ink-900 font-semibold px-5 py-2.5 rounded-full hover:bg-brand-50 transition text-sm shadow-pill"
               >
                 <MessageCircle className="w-4 h-4" /> Enquire for custom time
               </button>
@@ -185,7 +185,7 @@ export default function StudioProfile() {
 
         {/* Enquiry form */}
         {enquiryOpen && studio.accepts_enquiries && (
-          <div className="bg-white rounded-3xl shadow-card p-6 mb-8">
+          <div className="bg-surface rounded-3xl shadow-card p-6 mb-8">
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-display font-bold text-ink-900 mb-1">Send an enquiry</h3>
@@ -232,7 +232,7 @@ export default function StudioProfile() {
               )}
             </p>
             {!isLoggedIn ? (
-              <div className="bg-white border border-brand-100 rounded-3xl shadow-card p-8 text-center">
+              <div className="bg-surface border border-brand-100 rounded-3xl shadow-card p-8 text-center">
                 <span className="inline-grid place-items-center w-12 h-12 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-3">
                   <Lock className="w-5 h-5" />
                 </span>
@@ -260,7 +260,7 @@ export default function StudioProfile() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {upcomingClasses.map(cls => (
-              <div key={cls.id} className="bg-white rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-4">
+              <div key={cls.id} className="bg-surface rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <span className={`inline-grid place-items-center w-11 h-11 rounded-2xl text-xl ${chipStyle(cls.sport_type)}`}>
@@ -303,7 +303,7 @@ export default function StudioProfile() {
 
         {/* Contact info */}
         {(studio.phone || studio.website || studio.instagram) && (
-          <div className="mt-10 bg-white rounded-3xl shadow-card p-6">
+          <div className="mt-10 bg-surface rounded-3xl shadow-card p-6">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-4">Contact & Links</h2>
             <div className="flex flex-col gap-3 text-sm text-ink-600">
               {studio.phone && (

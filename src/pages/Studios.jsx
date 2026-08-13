@@ -69,14 +69,14 @@ export default function Studios() {
               placeholder="Search by name, type, location…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-white rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+              className="w-full bg-surface rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
             />
           </div>
           {locations.length > 0 && (
             <select
               value={locationFilter}
               onChange={e => setLocationFilter(e.target.value)}
-              className="bg-white rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
+              className="bg-surface rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
             >
               <option value="">All locations</option>
               {locations.map(l => <option key={l} value={l}>{l}</option>)}

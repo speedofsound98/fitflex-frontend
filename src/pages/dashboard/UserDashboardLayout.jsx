@@ -105,7 +105,7 @@ export default function UserDashboardLayout() {
         </div>
 
         {/* Sub-nav */}
-        <div className="flex gap-1 mb-6 bg-white rounded-full shadow-card p-1.5 w-fit max-w-full overflow-x-auto">
+        <div className="flex gap-1 mb-6 bg-surface rounded-full shadow-card p-1.5 w-fit max-w-full overflow-x-auto">
           {TABS.map(({ to, label, Icon, end }) => (
             <NavLink key={to} to={to} end={end} className={tabCls}>
               <Icon className="w-4 h-4" /> {label}

@@ -22,7 +22,7 @@ const EMOJIS = ['🏃', '⚽', '🏀', '🎾', '🏊', '🚴', '🥊', '🧘', '
 function GroupCard({ group, myGroupIds, onJoin, onLeave, isLoggedIn }) {
   const isMember = myGroupIds.has(group.id);
   return (
-    <div className="bg-white rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-3">
+    <div className="bg-surface rounded-3xl shadow-card hover:-translate-y-1 hover:shadow-card-lg transition duration-300 p-6 flex flex-col gap-3">
       <Link to={`/groups/${group.id}`} className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <span className="text-4xl">{group.cover_emoji}</span>
@@ -189,7 +189,7 @@ export default function Groups() {
 
         {/* Create group form */}
         {showCreate && (
-          <div className="bg-white rounded-3xl shadow-card p-6 mb-8">
+          <div className="bg-surface rounded-3xl shadow-card p-6 mb-8">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-4">Create a new group</h2>
             <form onSubmit={createGroup} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex flex-col gap-1.5 md:col-span-2">
@@ -201,7 +201,7 @@ export default function Groups() {
 
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-ink-700">Sport type</span>
-                <select className={`${inputClass} !bg-white`}
+                <select className={`${inputClass} !bg-surface`}
                   value={form.sport_type} onChange={e => setForm(f => ({ ...f, sport_type: e.target.value }))}>
                   <option value="">— Select —</option>
                   {SPORT_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -268,15 +268,15 @@ export default function Groups() {
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-ink-300" strokeWidth={2} />
-            <input className="w-full bg-white rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+            <input className="w-full bg-surface rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
               placeholder="Search groups…" value={search} onChange={e => setSearch(e.target.value)} />
           </div>
-          <select className="bg-white rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
+          <select className="bg-surface rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
             value={sportFilter} onChange={e => setSportFilter(e.target.value)}>
             <option value="">All sports</option>
             {SPORT_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
-          <input className="bg-white rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
+          <input className="bg-surface rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
             placeholder="Filter by city" value={cityFilter} onChange={e => setCityFilter(e.target.value)} />
         </div>
 

@@ -173,13 +173,13 @@ export default function StudioSettings() {
 
   // Swatches mirror the gradients rendered on the public StudioProfile header.
   const COVER_COLORS = [
-    { key: 'blue',   label: 'Ink',    from: 'from-ink-800',    to: 'to-ink-600' },
+    { key: 'blue',   label: 'Ink',    from: 'from-ink-800 dark:from-ink-100',    to: 'to-ink-600 dark:to-ink-300' },
     { key: 'purple', label: 'Violet', from: 'from-purple-700', to: 'to-purple-500' },
     { key: 'green',  label: 'Forest', from: 'from-emerald-700', to: 'to-emerald-500' },
     { key: 'orange', label: 'Ember',  from: 'from-brand-600',  to: 'to-brand-400' },
     { key: 'rose',   label: 'Rose',   from: 'from-rose-600',   to: 'to-pink-500' },
     { key: 'teal',   label: 'Teal',   from: 'from-teal-700',   to: 'to-cyan-500' },
-    { key: 'slate',  label: 'Slate',  from: 'from-ink-900',    to: 'to-ink-700' },
+    { key: 'slate',  label: 'Slate',  from: 'from-ink-900 dark:from-ink-50',    to: 'to-ink-700 dark:to-ink-200' },
   ];
 
   return (
@@ -210,7 +210,7 @@ export default function StudioSettings() {
           </div>
         )}
 
-        <div className="flex gap-1 mb-8 bg-white rounded-full shadow-card p-1 w-fit">
+        <div className="flex gap-1 mb-8 bg-surface rounded-full shadow-card p-1 w-fit">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -225,7 +225,7 @@ export default function StudioSettings() {
 
         {/* ── Public Profile tab ── */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-3xl shadow-card p-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <h2 className="font-display font-bold text-lg text-ink-900">Public Profile</h2>
               <span className="text-xs bg-brand-50 text-brand-600 font-medium px-2.5 py-0.5 rounded-full">Visible to everyone</span>
@@ -274,7 +274,7 @@ export default function StudioSettings() {
                   {COVER_COLORS.map(c => (
                     <button key={c.key} type="button"
                       onClick={() => setProfileForm(f => ({ ...f, cover_color: c.key }))}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition bg-white
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition bg-surface
                         ${profileForm.cover_color === c.key ? 'border-ink-800' : 'border-transparent'}`}>
                       <span className={`w-4 h-4 rounded-full bg-gradient-to-br ${c.from} ${c.to}`} />
                       {c.label}
@@ -300,7 +300,7 @@ export default function StudioSettings() {
                 <div className="flex items-center gap-3">
                   <label className="flex flex-col gap-1 flex-1">
                     <span className="text-xs text-ink-500">Opens at</span>
-                    <select className={`${inputClass} !bg-white`}
+                    <select className={`${inputClass} !bg-surface`}
                       value={profileForm.opening_hour}
                       onChange={e => setProfileForm(f => ({ ...f, opening_hour: Number(e.target.value) }))}>
                       {Array.from({ length: 24 }, (_, i) => (
@@ -311,7 +311,7 @@ export default function StudioSettings() {
                   <span className="text-ink-400 mt-4">–</span>
                   <label className="flex flex-col gap-1 flex-1">
                     <span className="text-xs text-ink-500">Closes at</span>
-                    <select className={`${inputClass} !bg-white`}
+                    <select className={`${inputClass} !bg-surface`}
                       value={profileForm.closing_hour}
                       onChange={e => setProfileForm(f => ({ ...f, closing_hour: Number(e.target.value) }))}>
                       {Array.from({ length: 24 }, (_, i) => (
@@ -331,7 +331,7 @@ export default function StudioSettings() {
 
         {/* ── Account tab ── */}
         {activeTab === 'account' && (
-          <div className="bg-white rounded-3xl shadow-card p-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <h2 className="font-display font-bold text-lg text-ink-900">Account Info</h2>
               <span className="text-xs bg-ink-100 text-ink-500 font-medium px-2.5 py-0.5 rounded-full">Private</span>
@@ -357,7 +357,7 @@ export default function StudioSettings() {
 
         {/* ── Password tab ── */}
         {activeTab === 'password' && (
-          <div className="bg-white rounded-3xl shadow-card p-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-5">Change Password</h2>
             <form onSubmit={changePassword} className="space-y-4">
               <label className="flex flex-col gap-1.5">

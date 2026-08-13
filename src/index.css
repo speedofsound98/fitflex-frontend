@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* Dark mode is toggled by [data-theme="dark"] on <html> (set by a no-flash
+   script in index.html + the navbar toggle), not by the OS media query. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ─────────────────────────────────────────────
    FitFlex design tokens
    Brand: warm orange on ink & cream (editorial)
@@ -37,6 +41,7 @@
   /* Page surfaces */
   --color-cream: #f7f4ee;
   --color-paper: #f3f3f5;
+  --color-surface: #ffffff;   /* cards — swap for bg-white so dark mode can flip it */
 
   /* Elevation */
   --shadow-card: 0 20px 45px -24px rgb(21 32 43 / 0.16);
@@ -77,4 +82,34 @@ body {
 ::selection {
   background: var(--color-brand-200);
   color: var(--color-ink-900);
+}
+
+/* ─────────────────────────────────────────────
+   Dark theme — remap the token values so the whole
+   token-based UI adapts without per-element edits.
+   The `ink` ramp is inverted (900 = lightest text,
+   50/100 = darkest fills); brand orange stays put.
+   ───────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-cream: #10151b;   /* landing bg */
+  --color-paper: #0f141a;   /* app page bg */
+  --color-surface: #1a222c; /* cards */
+
+  --color-ink-50:  #15202b;
+  --color-ink-100: #1e2c3a;
+  --color-ink-200: #2c3e50;
+  --color-ink-300: #40505f;
+  --color-ink-400: #5b6b7b;
+  --color-ink-500: #8494a4;
+  --color-ink-600: #a5b2c0;
+  --color-ink-700: #ccd4dc;
+  --color-ink-800: #e6eaee;
+  --color-ink-900: #f4f6f8;
+
+  /* Deeper shadows read better on dark surfaces */
+  --shadow-card: 0 20px 45px -24px rgb(0 0 0 / 0.55);
+  --shadow-card-lg: 0 30px 60px -28px rgb(0 0 0 / 0.65);
+  --shadow-pill: 0 12px 30px -12px rgb(0 0 0 / 0.5);
 }

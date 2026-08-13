@@ -88,7 +88,7 @@ month; the studio Overview "top classes" bars come from the analytics endpoint.
 - [x] Replace the Home hero Unsplash hotlink with a real brand asset — now a self-contained, bundled SVG (`src/assets/hero-band.svg`): ink gradient + ember barbell + brand arcs/swoosh, using the design tokens. Zero external dependency.
 - [ ] Consider a shared dashboard shell to avoid per-page `<Navbar/>` duplication
 - [ ] Real analytics endpoints so the derived charts can be replaced with server data
-- [ ] Dark mode (the original reference had a light/dark toggle) — tokens are ready for it
+- [x] Dark mode — `[data-theme="dark"]` token remap in `index.css` (surfaces + inverted `ink` ramp; brand stays), `bg-white`→`bg-surface` for cards, `dark:` overrides on ink-as-surface spots (gradient headers, dark pills), navbar Sun/Moon toggle + no-flash init script in `index.html`. Verified landing/auth/directory in the browser.
 
 ## Verify before committing
 

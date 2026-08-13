@@ -172,7 +172,7 @@ export default function UserSettings() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-8 bg-white rounded-full shadow-card p-1 w-fit">
+        <div className="flex gap-1 mb-8 bg-surface rounded-full shadow-card p-1 w-fit">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -187,7 +187,7 @@ export default function UserSettings() {
 
         {/* ── Profile tab ── */}
         {activeTab === 'profile' && (
-          <div className="bg-white rounded-3xl shadow-card p-6 space-y-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6 space-y-6">
             <form onSubmit={saveProfile} className="space-y-5">
 
               <div>
@@ -256,7 +256,7 @@ export default function UserSettings() {
         {activeTab === 'credits' && (
           <div className="space-y-6">
             {/* Balance + buy link */}
-            <div className="bg-white rounded-3xl shadow-card p-6 flex items-center justify-between">
+            <div className="bg-surface rounded-3xl shadow-card p-6 flex items-center justify-between">
               <div>
                 <p className="text-sm text-ink-500 mb-1">Current balance</p>
                 <p className="text-4xl font-display font-bold text-brand-600">{user?.credits ?? '—'} <span className="text-lg font-normal text-ink-500">credits</span></p>
@@ -267,7 +267,7 @@ export default function UserSettings() {
             </div>
 
             {/* Purchase history */}
-            <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+            <div className="bg-surface rounded-3xl shadow-card overflow-hidden">
               <div className="px-6 py-4 border-b border-ink-100">
                 <h2 className="font-display font-bold text-ink-900">Purchase history</h2>
               </div>
@@ -295,7 +295,7 @@ export default function UserSettings() {
 
         {/* ── Notifications tab ── */}
         {activeTab === 'notifications' && (
-          <div className="bg-white rounded-3xl shadow-card p-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-1">Email Notifications</h2>
             <p className="text-sm text-ink-400 mb-6">
               Choose which emails you'd like to receive. Password reset and security emails are always sent.
@@ -320,7 +320,7 @@ export default function UserSettings() {
 
         {/* ── Nutrition tab ── */}
         {activeTab === 'nutrition' && (
-          <div className="bg-white rounded-3xl shadow-card p-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-1">Nutrition targets</h2>
             <p className="text-sm text-ink-400 mb-5">
               Auto-calculate your daily macros from your body &amp; weekly training. Manage your log on the{' '}
@@ -332,7 +332,7 @@ export default function UserSettings() {
 
         {/* ── Password tab ── */}
         {activeTab === 'password' && (
-          <div className="bg-white rounded-3xl shadow-card p-6">
+          <div className="bg-surface rounded-3xl shadow-card p-6">
             <h2 className="font-display font-bold text-lg text-ink-900 mb-5">Change Password</h2>
             <form onSubmit={changePassword} className="space-y-4">
               <label className="flex flex-col gap-1.5">

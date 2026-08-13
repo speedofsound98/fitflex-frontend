@@ -181,7 +181,7 @@ export default function GroupProfile() {
         )}
 
         {/* Group header */}
-        <div className="bg-gradient-to-br from-ink-800 to-ink-600 rounded-3xl shadow-card-lg p-8 text-white mb-8">
+        <div className="bg-gradient-to-br from-ink-800 dark:from-ink-100 to-ink-600 dark:to-ink-300 rounded-3xl shadow-card-lg p-8 text-white mb-8">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <span className="text-6xl">{group.cover_emoji}</span>
@@ -210,7 +210,7 @@ export default function GroupProfile() {
               )}
               {isUser && !isMember && !group.is_private && (
                 <button onClick={join}
-                  className="bg-white text-ink-900 font-semibold px-5 py-2 rounded-full hover:bg-brand-50 transition text-sm shadow-pill">
+                  className="bg-surface text-ink-900 font-semibold px-5 py-2 rounded-full hover:bg-brand-50 transition text-sm shadow-pill">
                   Join Group
                 </button>
               )}
@@ -227,7 +227,7 @@ export default function GroupProfile() {
 
         {/* Edit form */}
         {editing && (
-          <div className="bg-white rounded-3xl shadow-card p-6 mb-8">
+          <div className="bg-surface rounded-3xl shadow-card p-6 mb-8">
             <h2 className="font-display font-bold text-ink-900 mb-4">Edit Group</h2>
             <form onSubmit={saveEdit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex flex-col gap-1.5 md:col-span-2">
@@ -237,7 +237,7 @@ export default function GroupProfile() {
               </label>
               <label className="flex flex-col gap-1.5">
                 <span className="text-sm font-medium text-ink-700">Sport type</span>
-                <select className={`${inputClass} !bg-white`}
+                <select className={`${inputClass} !bg-surface`}
                   value={editForm.sport_type} onChange={e => setEditForm(f => ({ ...f, sport_type: e.target.value }))}>
                   <option value="">— Select —</option>
                   {SPORT_TYPES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -284,7 +284,7 @@ export default function GroupProfile() {
         )}
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 bg-white rounded-full shadow-card p-1 w-fit">
+        <div className="flex gap-1 mb-6 bg-surface rounded-full shadow-card p-1 w-fit">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button key={key} onClick={() => setActiveTab(key)}
               className={`inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-full transition
@@ -301,7 +301,7 @@ export default function GroupProfile() {
 
         {/* Events tab */}
         {activeTab === 'events' && (
-        <div className="bg-white rounded-3xl shadow-card overflow-hidden mb-6">
+        <div className="bg-surface rounded-3xl shadow-card overflow-hidden mb-6">
           <div className="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
             <h2 className="font-display font-bold text-ink-900">Events</h2>
             {isAdmin && (
@@ -318,24 +318,24 @@ export default function GroupProfile() {
               <form onSubmit={createEvent} className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <label className="flex flex-col gap-1.5 md:col-span-2">
                   <span className="text-xs font-medium text-ink-600">Event title *</span>
-                  <input className={`${inputClass} !bg-white`}
+                  <input className={`${inputClass} !bg-surface`}
                     placeholder="e.g. Sunday morning run" value={eventForm.title}
                     onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} required />
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-ink-600">Date & Time *</span>
-                  <input type="datetime-local" className={`${inputClass} !bg-white`}
+                  <input type="datetime-local" className={`${inputClass} !bg-surface`}
                     value={eventForm.datetime} onChange={e => setEventForm(f => ({ ...f, datetime: e.target.value }))} required />
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-ink-600">Location</span>
-                  <input className={`${inputClass} !bg-white`}
+                  <input className={`${inputClass} !bg-surface`}
                     placeholder="e.g. Hayarkon Park" value={eventForm.location}
                     onChange={e => setEventForm(f => ({ ...f, location: e.target.value }))} />
                 </label>
                 <label className="flex flex-col gap-1.5 md:col-span-2">
                   <span className="text-xs font-medium text-ink-600">Description</span>
-                  <textarea rows={2} className={`${inputClass} !bg-white`}
+                  <textarea rows={2} className={`${inputClass} !bg-surface`}
                     placeholder="Details, pace, what to bring..."
                     value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} />
                 </label>
@@ -380,7 +380,7 @@ export default function GroupProfile() {
 
         {/* Members tab */}
         {activeTab === 'members' && (
-        <div className="bg-white rounded-3xl shadow-card overflow-hidden">
+        <div className="bg-surface rounded-3xl shadow-card overflow-hidden">
           <div className="px-6 py-4 border-b border-ink-100 flex items-center justify-between">
             <h2 className="font-display font-bold text-ink-900">Members ({members.length})</h2>
           </div>

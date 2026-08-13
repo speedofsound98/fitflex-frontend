@@ -136,7 +136,7 @@ export default function Home() {
       </section>
 
       {/* ── Features ── */}
-      <section className="py-20 sm:py-24 px-4 sm:px-6 bg-white">
+      <section className="py-20 sm:py-24 px-4 sm:px-6 bg-surface">
         <div className="max-w-7xl mx-auto">
           <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">Why FitFlex</p>
           <h2 className="font-display font-bold text-3xl sm:text-4xl text-ink-900 mb-12 max-w-xl">
@@ -180,7 +180,7 @@ export default function Home() {
 
       {/* ── Studio CTA ── */}
       <section className="px-4 sm:px-6 pb-20 sm:pb-24">
-        <div className="max-w-7xl mx-auto bg-ink-900 rounded-[2.5rem] px-6 sm:px-16 py-14 sm:py-20 text-center sm:text-left sm:flex items-center justify-between gap-10">
+        <div className="max-w-7xl mx-auto bg-ink-900 dark:bg-ink-100 rounded-[2.5rem] px-6 sm:px-16 py-14 sm:py-20 text-center sm:text-left sm:flex items-center justify-between gap-10">
           <div>
             <h2 className="font-display font-bold text-3xl sm:text-4xl text-white mb-3">
               Own a fitness studio?
