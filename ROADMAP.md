@@ -79,6 +79,53 @@ A brand-new studio lands on an empty dashboard; a visitor to an empty marketplac
 
 ---
 
+### SEO / Google exposure
+Symptom: only ~2 pages indexed; GSC "sitemap couldn't fetch". Findings: the sitemap
+*is* served fine (200, `application/xml`) — the fetch error is stale/GSC-side. The real
+blocker is that the app is a **client-rendered SPA** (`<div id="root"></div>`, no HTML
+content until JS runs), so Google indexes almost nothing, and the sitemap misses all
+dynamic pages. Layered fix, by impact:
+1. **Pre-render public routes to static HTML (SSG)** — the core fix. Each public page
+   (`/`, `/studios`, `/studios/:id`, `/pricing`, `/blog`, `/blog/:slug`) ships real
+   HTML + unique `<title>`/description/canonical so Google indexes without executing JS.
+   Options for a Vite SPA: `vite-react-ssg` or a prerender step in the build.
+2. **Dynamic sitemap** — generate at build from the live API: all studios + all
+   published blog posts + the static routes (done below).
+3. **Per-page canonical + unique meta on every public route** (helmet); JSON-LD
+   (`Organization`, `LocalBusiness` per studio, `Article` per post) for rich results.
+4. **Real content** — Google won't index thin/empty pages; ties to the seed-data sprint
+   (an empty marketplace has little to index).
+5. **GSC hygiene** — property must match the exact live host; re-submit sitemap; use
+   URL Inspection → Request Indexing on key pages.
+
+### FAQ page
+A public `/faq` — helps users *and* SEO (indexable content, eligible for FAQ rich
+results). Two audiences: **members** (how credits work, booking/cancelling, refunds,
+appointments, communities) and **studios** (listing classes, rosters, messaging
+members, how they get paid, verification). Small, high-value, pairs with the SEO work.
+- Frontend: `/faq` page with an accordion (reuse tokens + `ChevronDown`), nav/footer
+  link, static Q&A arrays to start (CMS later).
+- SEO: `FAQPage` JSON-LD; add `/faq` to the sitemap's static routes.
+
+### Internationalization (i18n) — Hebrew first
+Add multi-language support, starting with Hebrew. This is one of the **larger** sprints
+— not just translating strings, but **RTL layout** and a **Hebrew-capable font**. Phase it:
+1. **Framework**: `react-i18next` + `i18next`; resource files `src/locales/en.json`,
+   `he.json`; a language switcher in the navbar (next to the theme toggle) that persists
+   to `localStorage` and can auto-detect `navigator.language`.
+2. **String extraction**: move hardcoded UI text into translation keys. Bulk of the
+   effort (~25 pages/components). Do public pages first (Home, Studios, StudioProfile,
+   Pricing, Blog, Auth, NavBar), then the app/dashboards.
+3. **RTL** (the hard part): set `dir="rtl"` on `<html>` for Hebrew; audit directional
+   utilities — migrate `ml-/mr-`→`ms-/me-`, `pl-/pr-`→`ps-/pe-`, `left/right` and
+   `text-left/right`→`text-start/end`; use Tailwind `rtl:` variants where needed; mirror
+   directional icons (ArrowLeft/ChevronRight) in RTL.
+4. **Font**: Archivo/Inter lack Hebrew glyphs — add a Hebrew webfont (Heebo / Rubik /
+   Assistant / Noto Sans Hebrew) and wire it into the font stack for `he`.
+5. **Formatting**: dates/numbers via `Intl` with the active locale.
+6. **SEO**: `<html lang>` per language, `hreflang` alternates, translated meta/canonical
+   (pairs with the prerender/SSG sprint).
+
 ## Nice-to-have / later
 
 - Favorite/follow a studio → notify on new classes.
