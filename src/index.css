@@ -11,8 +11,9 @@
    ───────────────────────────────────────────── */
 @theme {
   /* Typography */
-  --font-sans: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
-  --font-display: "Archivo", "Inter", system-ui, sans-serif;
+  /* Heebo trails the Latin faces so Hebrew glyphs (absent from Inter/Archivo) fall back to it */
+  --font-sans: "Inter", "Heebo", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-display: "Archivo", "Heebo", "Inter", system-ui, sans-serif;
 
   /* Brand orange ramp */
   --color-brand-50: #fdf3ec;

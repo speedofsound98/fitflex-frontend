@@ -1,14 +1,33 @@
 // src/components/NavBar.jsx
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Bell, Menu, X, Dumbbell, LayoutDashboard, CreditCard, Newspaper,
   Users, MessageSquare, Settings, ClipboardList, LogOut, ChevronRight, Utensils,
-  Sun, Moon,
+  Sun, Moon, Globe,
 } from 'lucide-react';
 import authFetch from '../utils/authFetch';
 
 const api = import.meta.env.VITE_API_URL;
+
+// Language toggle — switches EN ⇄ Hebrew (RTL applied globally via i18n listener).
+function LangToggle() {
+  const { i18n } = useTranslation();
+  const current = (i18n.language || 'en').startsWith('he') ? 'he' : 'en';
+  const next = current === 'he' ? 'en' : 'he';
+  const nextLabel = next === 'he' ? 'עב' : 'EN';
+  return (
+    <button
+      onClick={() => i18n.changeLanguage(next)}
+      className="inline-flex items-center gap-1 px-2.5 py-2 rounded-full text-ink-500 hover:bg-ink-50 hover:text-ink-800 transition text-sm font-semibold"
+      aria-label="Change language"
+      title={`Switch to ${next === 'he' ? 'עברית' : 'English'}`}
+    >
+      <Globe className="w-4.5 h-4.5" strokeWidth={1.9} /> {nextLabel}
+    </button>
+  );
+}
 
 // Light/dark toggle — flips [data-theme] on <html> and remembers the choice.
 function ThemeToggle() {
@@ -34,6 +53,7 @@ function ThemeToggle() {
 }
 
 function NotificationBell({ role }) {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
   const [open, setOpen] = useState(false);
@@ -98,14 +118,14 @@ function NotificationBell({ role }) {
       {open && (
         <div className="absolute right-0 mt-3 w-80 bg-surface rounded-3xl shadow-card-lg border border-ink-100 z-50 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-ink-100">
-            <span className="font-semibold text-ink-800 text-sm">Notifications</span>
+            <span className="font-semibold text-ink-800 text-sm">{t('nav.notifications')}</span>
             {notifications.some(n => !n.read) && (
-              <button onClick={markAllRead} className="text-xs text-brand-600 hover:underline">Mark all read</button>
+              <button onClick={markAllRead} className="text-xs text-brand-600 hover:underline">{t('nav.markAllRead')}</button>
             )}
           </div>
           <div className="max-h-80 overflow-y-auto divide-y divide-ink-50">
             {notifications.length === 0 ? (
-              <p className="px-4 py-8 text-center text-ink-300 text-sm">No notifications yet</p>
+              <p className="px-4 py-8 text-center text-ink-300 text-sm">{t('nav.noNotifications')}</p>
             ) : notifications.map(n => (
               <div key={n.id} className={`px-4 py-3 ${n.read ? 'bg-surface' : 'bg-brand-50'}`}>
                 <div className="flex items-start gap-2">
@@ -127,6 +147,7 @@ function NotificationBell({ role }) {
 }
 
 export default function Navbar() {
+  const { t } = useTranslation();
   // Read auth state synchronously so the navbar doesn't flash the
   // logged-out state (orange Get Started) on every route change/remount.
   const [authed, setAuthed] = useState(() => !!localStorage.getItem('userName'));
@@ -165,22 +186,22 @@ export default function Navbar() {
   // Full menu shown inside the side drawer
   const drawerLinks = authed
     ? [
-        { to: dashboardPath, label: 'Dashboard', Icon: LayoutDashboard },
+        { to: dashboardPath, label: t('nav.dashboard'), Icon: LayoutDashboard },
         ...(role === 'user' ? [
-          { to: '/training-plan', label: 'Training Plan', Icon: ClipboardList },
-          { to: '/nutrition', label: 'Nutrition', Icon: Utensils },
+          { to: '/training-plan', label: t('nav.trainingPlan'), Icon: ClipboardList },
+          { to: '/nutrition', label: t('nav.nutrition'), Icon: Utensils },
         ] : []),
-        { to: '/messages', label: 'Messages', Icon: MessageSquare },
-        { to: '/groups', label: 'Communities', Icon: Users },
-        { to: '/pricing', label: 'Pricing', Icon: CreditCard },
-        { to: '/blog', label: 'Blog', Icon: Newspaper },
-        { to: settingsPath, label: 'Settings', Icon: Settings },
+        { to: '/messages', label: t('nav.messages'), Icon: MessageSquare },
+        { to: '/groups', label: t('nav.communities'), Icon: Users },
+        { to: '/pricing', label: t('nav.pricing'), Icon: CreditCard },
+        { to: '/blog', label: t('nav.blog'), Icon: Newspaper },
+        { to: settingsPath, label: t('nav.settings'), Icon: Settings },
       ]
     : [
-        { to: '/pricing', label: 'Pricing', Icon: CreditCard },
-        { to: '/blog', label: 'Blog', Icon: Newspaper },
-        { to: '/groups', label: 'Communities', Icon: Users },
-        { to: '/studios', label: 'Browse Studios', Icon: Dumbbell },
+        { to: '/pricing', label: t('nav.pricing'), Icon: CreditCard },
+        { to: '/blog', label: t('nav.blog'), Icon: Newspaper },
+        { to: '/groups', label: t('nav.communities'), Icon: Users },
+        { to: '/studios', label: t('nav.browseStudios'), Icon: Dumbbell },
       ];
 
   const drawerItem = ({ isActive }) =>
@@ -203,6 +224,7 @@ export default function Navbar() {
 
             {/* Right cluster — minimal */}
             <div className="flex items-center gap-1.5 sm:gap-2">
+              <LangToggle />
               <ThemeToggle />
               {authed ? (
                 <>
@@ -210,7 +232,7 @@ export default function Navbar() {
                     to={dashboardPath}
                     className="hidden sm:inline-flex text-sm font-medium text-ink-600 hover:text-ink-900 px-3 py-2 transition"
                   >
-                    Dashboard
+                    {t('nav.dashboard')}
                   </Link>
                   <NotificationBell role={role} />
                   <button
@@ -229,12 +251,12 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link to="/login" className="hidden sm:inline-flex text-sm font-medium text-ink-600 hover:text-ink-900 px-3 py-2 transition">Log in</Link>
+                  <Link to="/login" className="hidden sm:inline-flex text-sm font-medium text-ink-600 hover:text-ink-900 px-3 py-2 transition">{t('common.login')}</Link>
                   <Link
                     to="/signup"
                     className="hidden sm:inline-flex px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-full hover:bg-brand-600 shadow-pill transition"
                   >
-                    Get Started
+                    {t('common.getStarted')}
                   </Link>
                   <button
                     onClick={() => setDrawerOpen(true)}
@@ -282,7 +304,7 @@ export default function Navbar() {
 
         {authed && (
           <div className="px-5 py-4 border-b border-ink-50">
-            <p className="text-xs text-ink-400">Signed in as</p>
+            <p className="text-xs text-ink-400">{t('nav.signedInAs')}</p>
             <p className="font-semibold text-ink-900">{name}</p>
             <span className="inline-block mt-1 text-xs font-medium text-brand-600 bg-brand-50 px-2 py-0.5 rounded-full capitalize">{role}</span>
           </div>
@@ -304,12 +326,12 @@ export default function Navbar() {
               onClick={handleLogout}
               className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-semibold text-red-600 hover:bg-red-50 transition"
             >
-              <LogOut className="w-5 h-5" strokeWidth={1.9} /> Log out
+              <LogOut className="w-5 h-5" strokeWidth={1.9} /> {t('common.logout')}
             </button>
           ) : (
             <div className="flex flex-col gap-2">
-              <Link to="/signup" onClick={closeDrawer} className="w-full py-3 bg-brand-500 text-white text-sm font-semibold rounded-full text-center hover:bg-brand-600 transition">Get Started</Link>
-              <Link to="/login" onClick={closeDrawer} className="w-full py-3 bg-ink-50 text-ink-800 text-sm font-semibold rounded-full text-center hover:bg-ink-100 transition">Log in</Link>
+              <Link to="/signup" onClick={closeDrawer} className="w-full py-3 bg-brand-500 text-white text-sm font-semibold rounded-full text-center hover:bg-brand-600 transition">{t('common.getStarted')}</Link>
+              <Link to="/login" onClick={closeDrawer} className="w-full py-3 bg-ink-50 text-ink-800 text-sm font-semibold rounded-full text-center hover:bg-ink-100 transition">{t('common.login')}</Link>
             </div>
           )}
         </div>

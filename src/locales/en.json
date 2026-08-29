@@ -1,0 +1,23 @@
+{
+  "common": {
+    "login": "Log in",
+    "getStarted": "Get Started",
+    "logout": "Log out",
+    "language": "Language"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "trainingPlan": "Training Plan",
+    "nutrition": "Nutrition",
+    "messages": "Messages",
+    "communities": "Communities",
+    "pricing": "Pricing",
+    "blog": "Blog",
+    "settings": "Settings",
+    "browseStudios": "Browse Studios",
+    "signedInAs": "Signed in as",
+    "notifications": "Notifications",
+    "noNotifications": "No notifications yet",
+    "markAllRead": "Mark all read"
+  }
+}

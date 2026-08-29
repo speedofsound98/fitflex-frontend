@@ -1,0 +1,23 @@
+{
+  "common": {
+    "login": "התחברות",
+    "getStarted": "הרשמה",
+    "logout": "התנתקות",
+    "language": "שפה"
+  },
+  "nav": {
+    "dashboard": "לוח בקרה",
+    "trainingPlan": "תוכנית אימונים",
+    "nutrition": "תזונה",
+    "messages": "הודעות",
+    "communities": "קהילות",
+    "pricing": "מחירים",
+    "blog": "בלוג",
+    "settings": "הגדרות",
+    "browseStudios": "עיון בסטודיואים",
+    "signedInAs": "מחובר/ת כ־",
+    "notifications": "התראות",
+    "noNotifications": "אין התראות עדיין",
+    "markAllRead": "סמן הכל כנקרא"
+  }
+}

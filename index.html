@@ -11,6 +11,11 @@
             t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
           }
           document.documentElement.setAttribute('data-theme', t);
+          // Set language direction before paint to avoid an RTL/LTR flash
+          var lng = localStorage.getItem('i18nextLng') || navigator.language || 'en';
+          var isHe = lng.indexOf('he') === 0;
+          document.documentElement.lang = isHe ? 'he' : 'en';
+          document.documentElement.dir = isHe ? 'rtl' : 'ltr';
         } catch (e) {}
       })();
     </script>
@@ -19,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Heebo:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
     <title>FitFlex — Book Fitness Classes Near You</title>
