@@ -1,11 +1,13 @@
 // src/pages/ForgotPassword.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import AuthShell, { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   usePageTitle('Forgot password');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
@@ -22,7 +24,7 @@ export default function ForgotPassword() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Request failed');
-      setMessage('If this email exists, a reset link has been sent. Check your inbox.');
+      setMessage(t('auth.resetSent'));
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,10 +34,10 @@ export default function ForgotPassword() {
 
   return (
     <AuthShell
-      eyebrow="Password help"
-      title="Forgot your password?"
-      subtitle="Enter your email and we’ll send you a reset link."
-      footer={<><Link to="/login" className="text-brand-600 font-semibold hover:underline">Back to log in</Link></>}
+      eyebrow={t('auth.passwordHelp')}
+      title={t('auth.forgotTitle')}
+      subtitle={t('auth.forgotSubtitle')}
+      footer={<><Link to="/login" className="text-brand-600 font-semibold hover:underline">{t('auth.backToLogin')}</Link></>}
     >
       {message && (
         <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm rounded-2xl px-4 py-3 mb-4">
@@ -49,15 +51,15 @@ export default function ForgotPassword() {
       )}
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">Email</label>
-          <input type="email" placeholder="you@example.com" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.email')}</label>
+          <input type="email" placeholder={t('auth.emailPlaceholder')} className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-brand-500 text-white py-3 rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill disabled:opacity-60"
         >
-          {loading ? 'Sending…' : 'Send reset link'}
+          {loading ? t('auth.sending') : t('auth.sendResetLink')}
         </button>
       </form>
     </AuthShell>

@@ -1,34 +1,11 @@
 // src/pages/Home.jsx
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Dumbbell, CalendarCheck, CreditCard, ArrowRight, Star } from 'lucide-react';
 import Navbar from '../components/NavBar';
 import usePageTitle from '../hooks/usePageTitle';
 import heroBand from '../assets/hero-band.svg';
-
-const FEATURES = [
-  {
-    Icon: Dumbbell,
-    title: 'Top Studios',
-    desc: 'Discover the best fitness studios near you — yoga, pilates, HIIT, and more.',
-  },
-  {
-    Icon: CalendarCheck,
-    title: 'Easy Booking',
-    desc: 'Browse class schedules and book a spot in seconds with your credits.',
-  },
-  {
-    Icon: CreditCard,
-    title: 'Credit System',
-    desc: 'One balance, every studio. Use your credits across any class on the platform.',
-  },
-];
-
-const HOW_IT_WORKS = [
-  { step: '01', title: 'Create an account', desc: 'Sign up as a user in under a minute.' },
-  { step: '02', title: 'Browse classes', desc: 'Explore classes by studio, sport type, and time.' },
-  { step: '03', title: 'Book & show up', desc: 'Reserve your spot with credits and enjoy the class.' },
-];
 
 const AVATAR_GRADIENTS = [
   'linear-gradient(135deg,#e8702a,#f1a878)',
@@ -38,6 +15,17 @@ const AVATAR_GRADIENTS = [
 ];
 
 export default function Home() {
+  const { t } = useTranslation();
+  const FEATURES = [
+    { Icon: Dumbbell, title: t('home.feature1Title'), desc: t('home.feature1Desc') },
+    { Icon: CalendarCheck, title: t('home.feature2Title'), desc: t('home.feature2Desc') },
+    { Icon: CreditCard, title: t('home.feature3Title'), desc: t('home.feature3Desc') },
+  ];
+  const HOW_IT_WORKS = [
+    { step: '01', title: t('home.step1Title'), desc: t('home.step1Desc') },
+    { step: '02', title: t('home.step2Title'), desc: t('home.step2Desc') },
+    { step: '03', title: t('home.step3Title'), desc: t('home.step3Desc') },
+  ];
   usePageTitle(null); // use default full title
   useEffect(() => {
     const base = import.meta.env.VITE_API_URL;
@@ -62,9 +50,9 @@ export default function Home() {
           <div className="grid lg:grid-cols-[3fr_2fr] gap-10 lg:gap-16 items-end">
             {/* Editorial headline */}
             <h1 className="font-display font-black uppercase leading-[0.88] tracking-tight">
-              <span className="block text-ink-900 text-[clamp(3.2rem,10vw,8.5rem)]">Stronger</span>
+              <span className="block text-ink-900 text-[clamp(3.2rem,10vw,8.5rem)]">{t('home.heroLine1')}</span>
               <span className="block text-brand-500 text-[clamp(2.4rem,7.5vw,6.2rem)] lg:text-right">
-                Every&nbsp;Day
+                {t('home.heroLine2')}
               </span>
             </h1>
 
@@ -82,13 +70,11 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-1 text-ink-900 font-display font-bold text-lg">
                   <Star className="w-4 h-4 text-brand-500 fill-brand-500" />
-                  Loved by our members
+                  {t('home.lovedBy')}
                 </div>
               </div>
               <p className="text-ink-500 leading-relaxed mb-6">
-                Whether you're starting out or deepening your practice, FitFlex connects you
-                with hundreds of classes at top studios — yoga, pilates, HIIT and more —
-                all on a single credit balance.
+                {t('home.heroCopy')}
               </p>
               {userName ? (
                 <div className="flex flex-wrap gap-3">
@@ -96,13 +82,13 @@ export default function Home() {
                     to={dashboardPath}
                     className="inline-flex items-center gap-2 bg-brand-500 text-white font-semibold px-7 py-3 rounded-full hover:bg-brand-600 shadow-pill transition"
                   >
-                    Go to Dashboard <ArrowRight className="w-4 h-4" />
+                    {t('home.goToDashboard')} <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     to="/studios"
                     className="inline-flex items-center gap-2 border border-ink-300 text-ink-800 font-semibold px-7 py-3 rounded-full hover:border-ink-900 transition"
                   >
-                    Browse Studios
+                    {t('home.browseStudios')}
                   </Link>
                 </div>
               ) : (
@@ -111,13 +97,13 @@ export default function Home() {
                     to="/signup"
                     className="inline-flex items-center gap-2 bg-brand-500 text-white font-semibold px-7 py-3 rounded-full hover:bg-brand-600 shadow-pill transition"
                   >
-                    Get Started — It's Free <ArrowRight className="w-4 h-4" />
+                    {t('home.getStartedFree')} <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     to="/studios"
                     className="inline-flex items-center gap-2 border border-ink-300 text-ink-800 font-semibold px-7 py-3 rounded-full hover:border-ink-900 transition"
                   >
-                    Browse Studios
+                    {t('home.browseStudios')}
                   </Link>
                 </div>
               )}
@@ -138,9 +124,9 @@ export default function Home() {
       {/* ── Features ── */}
       <section className="py-20 sm:py-24 px-4 sm:px-6 bg-surface">
         <div className="max-w-7xl mx-auto">
-          <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">Why FitFlex</p>
+          <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">{t('home.whyEyebrow')}</p>
           <h2 className="font-display font-bold text-3xl sm:text-4xl text-ink-900 mb-12 max-w-xl">
-            Everything you need for your next workout
+            {t('home.whyTitle')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {FEATURES.map(({ Icon, title, desc }) => (
@@ -162,9 +148,9 @@ export default function Home() {
       {/* ── How it works ── */}
       <section className="py-20 sm:py-24 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">Getting started</p>
+          <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">{t('home.gettingStarted')}</p>
           <h2 className="font-display font-bold text-3xl sm:text-4xl text-ink-900 mb-12 max-w-xl">
-            How it works
+            {t('home.howItWorks')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             {HOW_IT_WORKS.map(item => (
@@ -183,18 +169,17 @@ export default function Home() {
         <div className="max-w-7xl mx-auto bg-ink-900 dark:bg-ink-100 rounded-[2.5rem] px-6 sm:px-16 py-14 sm:py-20 text-center sm:text-left sm:flex items-center justify-between gap-10">
           <div>
             <h2 className="font-display font-bold text-3xl sm:text-4xl text-white mb-3">
-              Own a fitness studio?
+              {t('home.studioCtaTitle')}
             </h2>
             <p className="text-ink-300 max-w-lg leading-relaxed">
-              List your classes on FitFlex and reach thousands of fitness enthusiasts
-              looking for their next workout.
+              {t('home.studioCtaCopy')}
             </p>
           </div>
           <Link
             to="/signup?role=studio"
             className="inline-flex items-center gap-2 mt-8 sm:mt-0 shrink-0 bg-brand-500 text-white font-semibold px-8 py-3.5 rounded-full hover:bg-brand-600 transition"
           >
-            Join as a Studio <ArrowRight className="w-4 h-4" />
+            {t('home.joinAsStudio')} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </section>
@@ -209,13 +194,13 @@ export default function Home() {
             FitFlex
           </span>
           <div className="flex items-center gap-6 text-sm text-ink-500">
-            <Link to="/pricing" className="hover:text-ink-900 transition">Pricing</Link>
-            <Link to="/blog" className="hover:text-ink-900 transition">Blog</Link>
-            <Link to="/groups" className="hover:text-ink-900 transition">Communities</Link>
-            <Link to="/studios" className="hover:text-ink-900 transition">Studios</Link>
+            <Link to="/pricing" className="hover:text-ink-900 transition">{t('nav.pricing')}</Link>
+            <Link to="/blog" className="hover:text-ink-900 transition">{t('nav.blog')}</Link>
+            <Link to="/groups" className="hover:text-ink-900 transition">{t('nav.communities')}</Link>
+            <Link to="/studios" className="hover:text-ink-900 transition">{t('footer.studios')}</Link>
           </div>
           <span className="text-sm text-ink-400">
-            © {new Date().getFullYear()} FitFlex. All rights reserved.
+            {t('footer.rights', { year: new Date().getFullYear() })}
           </span>
         </div>
       </footer>

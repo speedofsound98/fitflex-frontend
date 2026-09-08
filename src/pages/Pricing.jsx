@@ -2,12 +2,14 @@ import authFetch from '../utils/authFetch';
 // src/pages/Pricing.jsx
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Ticket, CalendarDays, CreditCard, Check } from 'lucide-react';
 import Navbar from '../components/NavBar';
 
 const api = import.meta.env.VITE_API_URL;
 
 export default function Pricing() {
+  const { t } = useTranslation();
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
@@ -26,10 +28,10 @@ export default function Pricing() {
     const payment = searchParams.get('payment');
     if (payment === 'success') {
       setMsgType('success');
-      setMsg('Payment successful! Your credits have been added to your account. 🎉');
+      setMsg(t('pricing.paySuccess'));
     } else if (payment === 'cancelled') {
       setMsgType('error');
-      setMsg('Payment was cancelled. No charge was made.');
+      setMsg(t('pricing.payCancelled'));
     }
   }, []);
 
@@ -44,7 +46,7 @@ export default function Pricing() {
         body: JSON.stringify({ pack_id: packId, user_id: Number(userId) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Payment failed');
+      if (!res.ok) throw new Error(data.error || t('pricing.paymentFailed'));
       window.location.href = data.url; // redirect to Stripe Checkout
     } catch (e) {
       setMsgType('error');
@@ -59,9 +61,9 @@ export default function Pricing() {
   }
 
   const INFO = [
-    { Icon: Ticket, title: 'Use to book classes', desc: 'Each class costs a set number of credits. Credits are deducted when you book and refunded if you cancel.' },
-    { Icon: CalendarDays, title: '1-year validity', desc: 'Credits expire 1 year from the date of purchase. New purchases get their own 1-year window.' },
-    { Icon: CreditCard, title: 'Secure checkout', desc: 'Payments are processed securely via Stripe. We never store your card details.' },
+    { Icon: Ticket, title: t('pricing.info1Title'), desc: t('pricing.info1Desc') },
+    { Icon: CalendarDays, title: t('pricing.info2Title'), desc: t('pricing.info2Desc') },
+    { Icon: CreditCard, title: t('pricing.info3Title'), desc: t('pricing.info3Desc') },
   ];
 
   return (
@@ -71,9 +73,9 @@ export default function Pricing() {
 
         {/* Header */}
         <div className="text-center mb-12 max-w-xl mx-auto">
-          <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">Pricing</p>
-          <h1 className="font-display font-black text-4xl sm:text-5xl text-ink-900 tracking-tight mb-4">Buy Credits</h1>
-          <p className="text-ink-500 text-lg">Use credits to book fitness classes. Credits are valid for 1 year from purchase.</p>
+          <p className="text-sm font-semibold text-brand-600 uppercase tracking-widest mb-3">{t('pricing.eyebrow')}</p>
+          <h1 className="font-display font-black text-4xl sm:text-5xl text-ink-900 tracking-tight mb-4">{t('pricing.title')}</h1>
+          <p className="text-ink-500 text-lg">{t('pricing.subtitle')}</p>
         </div>
 
         {msg && (
@@ -97,17 +99,17 @@ export default function Pricing() {
               >
                 {popular && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-ink-900 dark:bg-ink-100 text-white text-xs font-bold px-3 py-1 rounded-full">
-                    Most Popular
+                    {t('pricing.mostPopular')}
                   </span>
                 )}
                 <div className={`font-display font-black text-5xl mb-1 ${popular ? 'text-white' : 'text-brand-500'}`}>{pack.credits}</div>
-                <div className={`mb-5 ${popular ? 'text-white/80' : 'text-ink-400'}`}>credits</div>
+                <div className={`mb-5 ${popular ? 'text-white/80' : 'text-ink-400'}`}>{t('pricing.credits')}</div>
                 <div className={`font-display font-bold text-3xl mb-1 ${popular ? 'text-white' : 'text-ink-900'}`}>{formatPrice(pack.price_cents)}</div>
                 <div className={`text-sm mb-5 ${popular ? 'text-white/70' : 'text-ink-400'}`}>
-                  {formatPrice(Math.round(pack.price_cents / pack.credits * 10) / 10)} per credit
+                  {t('pricing.perCredit', { price: formatPrice(Math.round(pack.price_cents / pack.credits * 10) / 10) })}
                 </div>
                 <div className={`flex items-center gap-1.5 text-xs mb-6 ${popular ? 'text-white/80' : 'text-ink-400'}`}>
-                  <Check className="w-3.5 h-3.5" /> Valid for 1 year
+                  <Check className="w-3.5 h-3.5" /> {t('pricing.validYear')}
                 </div>
 
                 {isUser ? (
@@ -119,7 +121,7 @@ export default function Pricing() {
                         ? 'bg-surface text-brand-600 hover:bg-brand-50'
                         : 'bg-brand-500 text-white hover:bg-brand-600 shadow-pill'}`}
                   >
-                    {loading ? 'Redirecting…' : 'Buy Now'}
+                    {loading ? t('pricing.redirecting') : t('pricing.buyNow')}
                   </button>
                 ) : (
                   <Link
@@ -129,7 +131,7 @@ export default function Pricing() {
                         ? 'bg-surface text-brand-600 hover:bg-brand-50'
                         : 'bg-brand-500 text-white hover:bg-brand-600 shadow-pill'}`}
                   >
-                    Log in to buy
+                    {t('pricing.loginToBuy')}
                   </Link>
                 )}
               </div>
@@ -139,7 +141,7 @@ export default function Pricing() {
 
         {/* FAQ / info */}
         <div className="bg-surface rounded-3xl shadow-card p-8 sm:p-10">
-          <h2 className="font-display font-bold text-2xl text-ink-900 mb-7">How credits work</h2>
+          <h2 className="font-display font-bold text-2xl text-ink-900 mb-7">{t('pricing.howCreditsWork')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-ink-500">
             {INFO.map(({ Icon, title, desc }) => (
               <div key={title}>

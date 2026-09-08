@@ -1,11 +1,13 @@
 // src/pages/Studios.jsx — public studio directory
 import React, { useEffect, useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import Navbar from '../components/NavBar';
 import StudioCard from '../components/StudioCard';
 import usePageTitle from '../hooks/usePageTitle';
 
 export default function Studios() {
+  const { t } = useTranslation();
   usePageTitle('Browse Studios');
   const api = import.meta.env.VITE_API_URL;
   const [studios, setStudios] = useState([]);
@@ -51,12 +53,12 @@ export default function Studios() {
       <div className="pt-24 pb-16 px-4 max-w-5xl mx-auto">
 
         <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-2">Directory</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-2">{t('studios.directory')}</p>
           <h1 className="font-display font-bold text-4xl sm:text-5xl text-ink-900 leading-[1.05]">
-            Find your studio.
+            {t('studios.findYourStudio')}
           </h1>
           <p className="text-ink-500 mt-3 text-lg max-w-xl">
-            Discover fitness studios near you — browse classes, hours, and appointments. No account needed.
+            {t('studios.subtitle')}
           </p>
         </div>
 
@@ -66,7 +68,7 @@ export default function Studios() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-ink-300" strokeWidth={2} />
             <input
               type="text"
-              placeholder="Search by name, type, location…"
+              placeholder={t('studios.searchPlaceholder')}
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="w-full bg-surface rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
@@ -78,22 +80,22 @@ export default function Studios() {
               onChange={e => setLocationFilter(e.target.value)}
               className="bg-surface rounded-full px-5 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 text-ink-600 transition"
             >
-              <option value="">All locations</option>
+              <option value="">{t('studios.allLocations')}</option>
               {locations.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
           )}
         </div>
 
         {loading ? (
-          <p className="text-ink-400 text-center pt-12">Loading…</p>
+          <p className="text-ink-400 text-center pt-12">{t('common.loading')}</p>
         ) : filtered.length === 0 ? (
-          <p className="text-ink-500 text-center pt-12">No studios found{search ? ` for "${search}"` : ''}.</p>
+          <p className="text-ink-500 text-center pt-12">{search ? t('studios.noStudiosFor', { q: search }) : t('studios.noStudios')}</p>
         ) : (
           <>
             <h2 className="font-display font-bold text-xl text-ink-900 mb-4">
-              {filtered.length} studio{filtered.length !== 1 ? 's' : ''}
-              {search && ` for "${search}"`}
-              {locationFilter && ` in ${locationFilter}`}
+              {t('studios.countStudios', { count: filtered.length })}
+              {search && ` · "${search}"`}
+              {locationFilter && ` · ${locationFilter}`}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {filtered.map(s => <StudioCard key={s.id} studio={s} />)}

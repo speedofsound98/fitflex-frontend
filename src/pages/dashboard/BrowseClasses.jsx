@@ -1,10 +1,12 @@
 // src/pages/dashboard/BrowseClasses.jsx
 import React, { useState, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import ClassCard from '../../components/ClassCard';
 
 export default function BrowseClasses() {
+  const { t } = useTranslation();
   const { classes, studios, bookedIds, book } = useOutletContext();
   const [search, setSearch] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
@@ -38,7 +40,7 @@ export default function BrowseClasses() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-ink-300" strokeWidth={2} />
           <input
             className="w-full bg-surface rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
-            placeholder="Search classes, studios or sport types..."
+            placeholder={t('dashboard.searchClasses')}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -48,19 +50,19 @@ export default function BrowseClasses() {
           value={locationFilter}
           onChange={e => setLocationFilter(e.target.value)}
         >
-          <option value="">All locations</option>
+          <option value="">{t('studios.allLocations')}</option>
           {locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
         </select>
       </div>
 
       <h2 className="font-display font-bold text-xl text-ink-900 mb-4">
-        {filtered.length} class{filtered.length !== 1 ? 'es' : ''}
-        {search && ` for "${search}"`}
-        {locationFilter && ` in ${locationFilter}`}
+        {t('dashboard.countClasses', { count: filtered.length })}
+        {search && ` · "${search}"`}
+        {locationFilter && ` · ${locationFilter}`}
       </h2>
 
       {filtered.length === 0 ? (
-        <p className="text-ink-500">No classes match your search.</p>
+        <p className="text-ink-500">{t('dashboard.noClassesMatch')}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filtered.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}

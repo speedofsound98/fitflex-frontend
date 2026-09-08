@@ -1,11 +1,13 @@
 // src/pages/Login.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle } from 'lucide-react';
 import AuthShell, { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 export default function Login() {
+  const { t } = useTranslation();
   usePageTitle('Log in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +27,7 @@ export default function Login() {
         body: JSON.stringify({ email, password }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Login failed');
+      if (!res.ok) throw new Error(data.error || t('auth.loginFailed'));
       localStorage.setItem('userName', data.user.name || 'User');
       localStorage.setItem('userRole', data.user.role || 'user');
       localStorage.setItem('userId', data.user.id);
@@ -41,10 +43,10 @@ export default function Login() {
 
   return (
     <AuthShell
-      eyebrow="Welcome back"
-      title="Log in to FitFlex"
-      subtitle="Book classes, manage your studio, and track your progress."
-      footer={<>New here? <Link to="/signup" className="text-brand-600 font-semibold hover:underline">Create an account</Link></>}
+      eyebrow={t('auth.welcomeBack')}
+      title={t('auth.loginTitle')}
+      subtitle={t('auth.loginSubtitle')}
+      footer={<>{t('auth.newHere')} <Link to="/signup" className="text-brand-600 font-semibold hover:underline">{t('auth.createAccount')}</Link></>}
     >
       {error && (
         <div className="flex items-center gap-2 bg-rose-50 text-rose-700 text-sm rounded-2xl px-4 py-3 mb-4">
@@ -53,13 +55,13 @@ export default function Login() {
       )}
       <form className="flex flex-col gap-4" onSubmit={handleLogin}>
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">Email</label>
-          <input type="email" placeholder="you@example.com" className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.email')}</label>
+          <input type="email" placeholder={t('auth.emailPlaceholder')} className={inputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <label className="block text-sm font-medium text-ink-700">Password</label>
-            <Link to="/forgot" className="text-xs text-brand-600 font-semibold hover:underline">Forgot?</Link>
+            <label className="block text-sm font-medium text-ink-700">{t('auth.password')}</label>
+            <Link to="/forgot" className="text-xs text-brand-600 font-semibold hover:underline">{t('auth.forgot')}</Link>
           </div>
           <input type="password" placeholder="••••••••" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
@@ -68,7 +70,7 @@ export default function Login() {
           disabled={loading}
           className="w-full bg-brand-500 text-white py-3 rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill disabled:opacity-60"
         >
-          {loading ? 'Logging in…' : 'Log in'}
+          {loading ? t('auth.loggingIn') : t('auth.login')}
         </button>
       </form>
     </AuthShell>

@@ -1,6 +1,7 @@
 // src/pages/BlogPost.jsx
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, FileText } from 'lucide-react';
 import Navbar from '../components/NavBar';
@@ -10,6 +11,7 @@ import { chipStyle } from '../utils/sport';
 const api = import.meta.env.VITE_API_URL;
 
 export default function BlogPost() {
+  const { t, i18n } = useTranslation();
   const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -46,16 +48,16 @@ export default function BlogPost() {
         <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-4">
           <FileText className="w-6 h-6" />
         </span>
-        <h2 className="font-display font-bold text-2xl text-ink-900 mb-2">Post not found</h2>
+        <h2 className="font-display font-bold text-2xl text-ink-900 mb-2">{t('blog.postNotFound')}</h2>
         <Link to="/blog" className="inline-flex items-center gap-1.5 text-brand-600 font-semibold hover:underline text-sm">
-          <ArrowLeft className="w-4 h-4" /> Back to Blog
+          <ArrowLeft className="w-4 h-4" /> {t('blog.backToBlog')}
         </Link>
       </div>
     </div>
   );
 
   const dateStr = post.published_at
-    ? new Date(post.published_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? new Date(post.published_at).toLocaleDateString(i18n.language === 'he' ? 'he-IL' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
     : '';
 
   const siteUrl = 'https://your-portfolio-g56q.vercel.app';
@@ -89,7 +91,7 @@ export default function BlogPost() {
 
         {/* Back */}
         <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-ink-500 hover:text-brand-600 transition mb-8">
-          <ArrowLeft className="w-4 h-4" /> Back to Blog
+          <ArrowLeft className="w-4 h-4" /> {t('blog.backToBlog')}
         </Link>
 
         {/* Cover */}

@@ -1,11 +1,13 @@
 // src/pages/Signup.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, User, Building2 } from 'lucide-react';
 import AuthShell, { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 export default function Signup() {
+  const { t } = useTranslation();
   usePageTitle('Sign up');
   const [searchParams] = useSearchParams();
   const [role, setRole] = useState(searchParams.get('role') === 'studio' ? 'studio' : 'user');
@@ -19,7 +21,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isValidPassword(formData.password)) {
-      setError('Password must be at least 8 characters and include letters and numbers.');
+      setError(t('auth.pwInvalid'));
       return;
     }
     setError('');
@@ -33,7 +35,7 @@ export default function Signup() {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Signup failed');
+      if (!res.ok) throw new Error(data.error || t('auth.signupFailed'));
       localStorage.setItem('userName', data.user?.name || formData.name);
       localStorage.setItem('userRole', data.user?.role || role);
       localStorage.setItem('userId', data.user?.id);
@@ -59,15 +61,15 @@ export default function Signup() {
 
   return (
     <AuthShell
-      eyebrow="Get started"
-      title="Create your account"
-      subtitle="Join FitFlex as a member or list your studio."
-      footer={<>Already have an account? <Link to="/login" className="text-brand-600 font-semibold hover:underline">Log in</Link></>}
+      eyebrow={t('auth.getStartedEyebrow')}
+      title={t('auth.signupTitle')}
+      subtitle={t('auth.signupSubtitle')}
+      footer={<>{t('auth.haveAccount')} <Link to="/login" className="text-brand-600 font-semibold hover:underline">{t('auth.login')}</Link></>}
     >
       {/* Role toggle */}
       <div className="flex gap-1 bg-paper rounded-full p-1 mb-5">
-        {roleTab('user', 'I’m a member', User)}
-        {roleTab('studio', 'I’m a studio', Building2)}
+        {roleTab('user', t('auth.imMember'), User)}
+        {roleTab('studio', t('auth.imStudio'), Building2)}
       </div>
 
       {error && (
@@ -78,30 +80,30 @@ export default function Signup() {
 
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">{role === 'user' ? 'Name' : 'Studio name'}</label>
-          <input type="text" placeholder={role === 'user' ? 'Jane Doe' : 'Downtown Yoga'} className={inputClass} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{role === 'user' ? t('auth.name') : t('auth.studioName')}</label>
+          <input type="text" placeholder={role === 'user' ? t('auth.namePlaceholderUser') : t('auth.namePlaceholderStudio')} className={inputClass} value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required />
         </div>
         {role === 'studio' && (
           <div>
-            <label className="block text-sm font-medium text-ink-700 mb-1.5">Location</label>
-            <input type="text" placeholder="City / neighbourhood" className={inputClass} value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
+            <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.location')}</label>
+            <input type="text" placeholder={t('auth.locationPlaceholder')} className={inputClass} value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} />
           </div>
         )}
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">Email</label>
-          <input type="email" placeholder="you@example.com" className={inputClass} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.email')}</label>
+          <input type="email" placeholder={t('auth.emailPlaceholder')} className={inputClass} value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
         </div>
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">Password</label>
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.password')}</label>
           <input type="password" placeholder="••••••••" className={inputClass} value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
-          <p className="text-xs text-ink-400 mt-1.5">At least 8 characters, with letters and numbers.</p>
+          <p className="text-xs text-ink-400 mt-1.5">{t('auth.passwordHint')}</p>
         </div>
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-brand-500 text-white py-3 rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill disabled:opacity-60"
         >
-          {loading ? 'Creating account…' : `Sign up as ${role === 'user' ? 'a member' : 'a studio'}`}
+          {loading ? t('auth.creatingAccount') : (role === 'user' ? t('auth.signupAsMember') : t('auth.signupAsStudio'))}
         </button>
       </form>
     </AuthShell>

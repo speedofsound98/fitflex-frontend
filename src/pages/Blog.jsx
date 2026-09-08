@@ -1,6 +1,7 @@
 // src/pages/Blog.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
 import { FileText } from 'lucide-react';
 import Navbar from '../components/NavBar';
@@ -9,19 +10,19 @@ import { chipStyle } from '../utils/sport';
 
 const api = import.meta.env.VITE_API_URL;
 
-function timeAgo(date) {
+export function relativeTime(date, t) {
   if (!date) return '';
   const d = new Date(date);
-  const now = new Date();
-  const days = Math.floor((now - d) / 86400000);
-  if (days === 0) return 'Today';
-  if (days === 1) return 'Yesterday';
-  if (days < 30) return `${days} days ago`;
-  if (days < 365) return `${Math.floor(days / 30)} months ago`;
-  return `${Math.floor(days / 365)} years ago`;
+  const days = Math.floor((new Date() - d) / 86400000);
+  if (days === 0) return t('blog.today');
+  if (days === 1) return t('blog.yesterday');
+  if (days < 30) return t('blog.daysAgo', { count: days });
+  if (days < 365) return t('blog.monthsAgo', { count: Math.floor(days / 30) });
+  return t('blog.yearsAgo', { count: Math.floor(days / 365) });
 }
 
 export default function Blog() {
+  const { t } = useTranslation();
   usePageTitle('Blog — FitFlex');
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -52,9 +53,9 @@ export default function Blog() {
       <div className="pt-24 pb-16 px-4 max-w-5xl mx-auto">
 
         <div className="mb-10">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-2">The Journal</p>
-          <h1 className="font-display font-bold text-4xl sm:text-5xl text-ink-900 leading-[1.05]">FitFlex Blog</h1>
-          <p className="text-ink-500 mt-3 text-lg max-w-xl">Training tips, running routes, and fitness inspiration.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-500 mb-2">{t('blog.theJournal')}</p>
+          <h1 className="font-display font-bold text-4xl sm:text-5xl text-ink-900 leading-[1.05]">{t('blog.title')}</h1>
+          <p className="text-ink-500 mt-3 text-lg max-w-xl">{t('blog.subtitle')}</p>
         </div>
 
         {/* Tag filter */}
@@ -63,7 +64,7 @@ export default function Blog() {
             <button onClick={() => setActiveTag('')}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold transition
                 ${!activeTag ? 'bg-ink-900 dark:bg-ink-100 text-white' : 'bg-surface text-ink-600 shadow-card hover:text-ink-900'}`}>
-              All
+              {t('blog.all')}
             </button>
             {allTags.map(tag => (
               <button key={tag} onClick={() => setActiveTag(activeTag === tag ? '' : tag)}
@@ -88,8 +89,8 @@ export default function Blog() {
             <span className="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brand-50 text-brand-500 mx-auto mb-4">
               <FileText className="w-6 h-6" />
             </span>
-            <p className="font-display font-bold text-ink-800">No posts yet</p>
-            <p className="text-sm text-ink-400 mt-1">Check back soon.</p>
+            <p className="font-display font-bold text-ink-800">{t('blog.noPosts')}</p>
+            <p className="text-sm text-ink-400 mt-1">{t('blog.checkBack')}</p>
           </div>
         )}
 
@@ -117,7 +118,7 @@ export default function Blog() {
                   <div className="flex items-center gap-2 text-xs text-ink-400">
                     <span className="font-semibold text-ink-600">{featured.author_name}</span>
                     <span>·</span>
-                    <span>{timeAgo(featured.published_at)}</span>
+                    <span>{relativeTime(featured.published_at, t)}</span>
                   </div>
                 </div>
               </div>
@@ -148,7 +149,7 @@ export default function Blog() {
                         <div className="flex items-center gap-2 text-xs text-ink-400 mt-3">
                           <span className="font-semibold text-ink-600">{post.author_name}</span>
                           <span>·</span>
-                          <span>{timeAgo(post.published_at)}</span>
+                          <span>{relativeTime(post.published_at, t)}</span>
                         </div>
                       </div>
                     </div>

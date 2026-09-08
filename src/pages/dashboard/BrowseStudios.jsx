@@ -1,10 +1,12 @@
 // src/pages/dashboard/BrowseStudios.jsx
 import React, { useState, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Search } from 'lucide-react';
 import StudioCard from '../../components/StudioCard';
 
 export default function BrowseStudios() {
+  const { t } = useTranslation();
   const { studios } = useOutletContext();
   const [search, setSearch] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
@@ -34,7 +36,7 @@ export default function BrowseStudios() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-ink-300" strokeWidth={2} />
           <input
             className="w-full bg-surface rounded-full pl-11 pr-4 py-3 text-sm shadow-card border border-transparent focus:outline-none focus:border-brand-300 focus:ring-2 focus:ring-brand-200 transition"
-            placeholder="Search studios..."
+            placeholder={t('dashboard.searchStudios')}
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -44,19 +46,19 @@ export default function BrowseStudios() {
           value={locationFilter}
           onChange={e => setLocationFilter(e.target.value)}
         >
-          <option value="">All locations</option>
+          <option value="">{t('studios.allLocations')}</option>
           {locations.map(loc => <option key={loc} value={loc}>{loc}</option>)}
         </select>
       </div>
 
       <h2 className="font-display font-bold text-xl text-ink-900 mb-4">
-        {filtered.length} studio{filtered.length !== 1 ? 's' : ''}
-        {search && ` for "${search}"`}
-        {locationFilter && ` in ${locationFilter}`}
+        {t('studios.countStudios', { count: filtered.length })}
+        {search && ` · "${search}"`}
+        {locationFilter && ` · ${locationFilter}`}
       </h2>
 
       {filtered.length === 0 ? (
-        <p className="text-ink-500">No studios match your search.</p>
+        <p className="text-ink-500">{t('dashboard.noStudiosMatch')}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(s => <StudioCard key={s.id} studio={s} />)}

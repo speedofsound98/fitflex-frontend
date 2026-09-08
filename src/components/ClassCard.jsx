@@ -1,10 +1,13 @@
 // src/components/ClassCard.jsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { CalendarDays, Clock, MapPin, Tag, Users } from 'lucide-react';
 import { sportIcon, chipStyle } from '../utils/sport';
 
 export default function ClassCard({ cls, onBook, bookedIds }) {
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language === 'he' ? 'he-IL' : 'en-US';
   const alreadyBooked = bookedIds.has(cls.id);
   const isPast = new Date(cls.datetime) < new Date();
 
@@ -21,18 +24,18 @@ export default function ClassCard({ cls, onBook, bookedIds }) {
           </Link>
         </div>
         <span className="bg-brand-50 text-brand-700 text-xs font-bold px-2.5 py-1 rounded-full whitespace-nowrap">
-          {cls.credit_cost} cr
+          {t('dashboard.crCost', { count: cls.credit_cost })}
         </span>
       </div>
 
       <div className="text-sm text-ink-500 space-y-1.5">
         <p className="flex items-center gap-2">
           <CalendarDays className="w-4 h-4 text-ink-300" />
-          {new Date(cls.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+          {new Date(cls.datetime).toLocaleDateString(dateLocale, { weekday: 'short', month: 'short', day: 'numeric' })}
         </p>
         <p className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-ink-300" />
-          {new Date(cls.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+          {new Date(cls.datetime).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })}
         </p>
         {cls.studio_location && (
           <p className="flex items-center gap-2"><MapPin className="w-4 h-4 text-ink-300" />{cls.studio_location}</p>
@@ -41,7 +44,7 @@ export default function ClassCard({ cls, onBook, bookedIds }) {
           <p className="flex items-center gap-2"><Tag className="w-4 h-4 text-ink-300" />{cls.sport_type}</p>
         )}
         {cls.capacity && (
-          <p className="flex items-center gap-2"><Users className="w-4 h-4 text-ink-300" />{cls.capacity} spots</p>
+          <p className="flex items-center gap-2"><Users className="w-4 h-4 text-ink-300" />{t('dashboard.spots', { count: cls.capacity })}</p>
         )}
       </div>
 
@@ -53,7 +56,7 @@ export default function ClassCard({ cls, onBook, bookedIds }) {
           : isPast ? 'bg-ink-50 text-ink-300 cursor-default'
           : 'bg-brand-500 text-white hover:bg-brand-600 shadow-pill'}`}
       >
-        {alreadyBooked ? '✓ Booked' : isPast ? 'Past' : 'Book Class'}
+        {alreadyBooked ? t('dashboard.booked') : isPast ? t('dashboard.past') : t('dashboard.bookClass')}
       </button>
     </div>
   );

@@ -1,11 +1,13 @@
 // src/pages/ResetPassword.jsx
 import React, { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import AuthShell, { inputClass } from '../components/AuthShell';
 import usePageTitle from '../hooks/usePageTitle';
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   usePageTitle('Reset password');
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -21,8 +23,8 @@ export default function ResetPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); setMessage('');
-    if (password !== confirm) return setError('Passwords do not match');
-    if (!isValidPassword(password)) return setError('Password must be 8+ chars with letters & numbers');
+    if (password !== confirm) return setError(t('auth.pwNoMatch'));
+    if (!isValidPassword(password)) return setError(t('auth.pwWeak'));
     setLoading(true);
     try {
       const base = import.meta.env.VITE_API_URL.replace(/\/api$/, '');
@@ -31,7 +33,7 @@ export default function ResetPassword() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Reset failed');
-      setMessage('Password reset successful. Redirecting to log in…');
+      setMessage(t('auth.resetSuccess'));
       setTimeout(() => navigate('/login'), 1200);
     } catch (err) {
       setError(err.message);
@@ -42,10 +44,10 @@ export default function ResetPassword() {
 
   return (
     <AuthShell
-      eyebrow="Password help"
-      title="Set a new password"
-      subtitle="Choose a strong password you don’t use elsewhere."
-      footer={<><Link to="/login" className="text-brand-600 font-semibold hover:underline">Back to log in</Link></>}
+      eyebrow={t('auth.passwordHelp')}
+      title={t('auth.setNewTitle')}
+      subtitle={t('auth.setNewSubtitle')}
+      footer={<><Link to="/login" className="text-brand-600 font-semibold hover:underline">{t('auth.backToLogin')}</Link></>}
     >
       {message && (
         <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 text-sm rounded-2xl px-4 py-3 mb-4">
@@ -59,11 +61,11 @@ export default function ResetPassword() {
       )}
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">New password</label>
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.newPassword')}</label>
           <input type="password" placeholder="••••••••" className={inputClass} value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         <div>
-          <label className="block text-sm font-medium text-ink-700 mb-1.5">Confirm password</label>
+          <label className="block text-sm font-medium text-ink-700 mb-1.5">{t('auth.confirmPassword')}</label>
           <input type="password" placeholder="••••••••" className={inputClass} value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
         </div>
         <button
@@ -71,7 +73,7 @@ export default function ResetPassword() {
           disabled={loading}
           className="w-full bg-brand-500 text-white py-3 rounded-full text-sm font-semibold hover:bg-brand-600 transition shadow-pill disabled:opacity-60"
         >
-          {loading ? 'Resetting…' : 'Reset password'}
+          {loading ? t('auth.resetting') : t('auth.resetPassword')}
         </button>
       </form>
     </AuthShell>

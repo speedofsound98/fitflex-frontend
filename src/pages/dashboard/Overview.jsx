@@ -1,15 +1,16 @@
 // src/pages/dashboard/Overview.jsx
 import React, { useMemo } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   CalendarDays, Dumbbell, Building2, Ticket, Sparkles, ArrowRight, Clock, MapPin,
 } from 'lucide-react';
 import ClassCard from '../../components/ClassCard';
-import { sportIcon, chipStyle } from '../../utils/sport';
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+import { sportIcon } from '../../utils/sport';
 
 export default function Overview() {
+  const { t, i18n } = useTranslation();
+  const dateLocale = i18n.language === 'he' ? 'he-IL' : 'en-US';
   const { classes, studios, bookings, bookedIds, book } = useOutletContext();
 
   const now = new Date();
@@ -35,7 +36,7 @@ export default function Overview() {
     const buckets = [];
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: MONTHS[d.getMonth()], count: 0 });
+      buckets.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString(dateLocale, { month: 'short' }), count: 0 });
     }
     const index = new Map(buckets.map((b, i) => [b.key, i]));
     bookings.forEach(b => {
@@ -50,10 +51,10 @@ export default function Overview() {
   const totalBookings = bookings.length;
 
   const STATS = [
-    { label: 'Upcoming bookings', value: upcoming.length, Icon: CalendarDays, gradient: true },
-    { label: 'Classes available', value: classes.length, Icon: Dumbbell, chip: 'bg-brand-100 text-brand-600' },
-    { label: 'Studios on FitFlex', value: studios.length, Icon: Building2, chip: 'bg-ink-100 text-ink-700' },
-    { label: 'Total bookings', value: totalBookings, Icon: Ticket, chip: 'bg-emerald-100 text-emerald-700' },
+    { label: t('dashboard.statUpcoming'), value: upcoming.length, Icon: CalendarDays, gradient: true },
+    { label: t('dashboard.statAvailable'), value: classes.length, Icon: Dumbbell, chip: 'bg-brand-100 text-brand-600' },
+    { label: t('dashboard.statStudios'), value: studios.length, Icon: Building2, chip: 'bg-ink-100 text-ink-700' },
+    { label: t('dashboard.statTotal'), value: totalBookings, Icon: Ticket, chip: 'bg-emerald-100 text-emerald-700' },
   ];
 
   return (
@@ -80,7 +81,7 @@ export default function Overview() {
       <div className="grid lg:grid-cols-[1fr_1.4fr] gap-6">
         {/* Next class */}
         <section>
-          <h2 className="font-display font-bold text-xl text-ink-900 mb-4">Your next class</h2>
+          <h2 className="font-display font-bold text-xl text-ink-900 mb-4">{t('dashboard.yourNextClass')}</h2>
           {nextClass ? (
             <div className="rounded-3xl p-6 text-white shadow-card h-[calc(100%-2.75rem)] flex flex-col justify-between min-h-[200px]"
               style={{ background: 'linear-gradient(150deg,#6b4bff,#9b7bff)' }}>
@@ -89,7 +90,7 @@ export default function Overview() {
                   {sportIcon(nextClass.sport_type)}
                 </span>
                 <span className="bg-white/20 text-xs font-semibold px-3 py-1 rounded-full">
-                  {nextClass.sport_type || 'Class'}
+                  {nextClass.sport_type || t('dashboard.classLabel')}
                 </span>
               </div>
               <div>
@@ -97,9 +98,9 @@ export default function Overview() {
                 <p className="opacity-90 text-sm mt-1">{nextClass.studio_name}</p>
                 <div className="flex flex-wrap gap-4 mt-4 text-sm">
                   <span className="flex items-center gap-1.5"><CalendarDays className="w-4 h-4" />
-                    {new Date(nextClass.datetime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
+                    {new Date(nextClass.datetime).toLocaleDateString(dateLocale, { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                   <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" />
-                    {new Date(nextClass.datetime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</span>
+                    {new Date(nextClass.datetime).toLocaleTimeString(dateLocale, { hour: '2-digit', minute: '2-digit' })}</span>
                   {nextClass.studio_location && (
                     <span className="flex items-center gap-1.5"><MapPin className="w-4 h-4" />{nextClass.studio_location}</span>
                   )}
@@ -111,10 +112,10 @@ export default function Overview() {
               <span className="w-14 h-14 rounded-2xl bg-brand-100 text-brand-600 grid place-items-center mb-3">
                 <CalendarDays className="w-7 h-7" strokeWidth={1.8} />
               </span>
-              <p className="font-semibold text-ink-800">No upcoming classes</p>
-              <p className="text-sm text-ink-400 mt-1 mb-4">Book a class to see it here.</p>
+              <p className="font-semibold text-ink-800">{t('dashboard.noUpcomingClasses')}</p>
+              <p className="text-sm text-ink-400 mt-1 mb-4">{t('dashboard.bookToSee')}</p>
               <Link to="/dashboard/classes" className="inline-flex items-center gap-1.5 bg-brand-500 text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:bg-brand-600 shadow-pill transition">
-                Browse classes <ArrowRight className="w-4 h-4" />
+                {t('dashboard.browseClasses')} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           )}
@@ -123,13 +124,13 @@ export default function Overview() {
         {/* Booking activity chart (derived) */}
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-bold text-xl text-ink-900">Booking activity</h2>
-            <span className="text-sm text-ink-400">Last 6 months</span>
+            <h2 className="font-display font-bold text-xl text-ink-900">{t('dashboard.bookingActivity')}</h2>
+            <span className="text-sm text-ink-400">{t('dashboard.last6')}</span>
           </div>
           <div className="rounded-3xl p-6 bg-surface shadow-card">
             {totalBookings === 0 ? (
               <div className="h-[180px] grid place-items-center text-center text-ink-400 text-sm">
-                Your booking history will chart here once you start booking.
+                {t('dashboard.chartEmpty')}
               </div>
             ) : (
               <div className="flex items-end justify-between gap-3 h-[180px]">
@@ -157,14 +158,14 @@ export default function Overview() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-display font-bold text-xl text-ink-900 flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-brand-500" /> Recommended for you
+            <Sparkles className="w-5 h-5 text-brand-500" /> {t('dashboard.recommended')}
           </h2>
           <Link to="/dashboard/classes" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline">
-            View all <ArrowRight className="w-4 h-4" />
+            {t('dashboard.viewAll')} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         {recommended.length === 0 ? (
-          <p className="text-ink-500">No upcoming classes to recommend right now.</p>
+          <p className="text-ink-500">{t('dashboard.noRecommend')}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {recommended.map(c => <ClassCard key={c.id} cls={c} onBook={book} bookedIds={bookedIds} />)}

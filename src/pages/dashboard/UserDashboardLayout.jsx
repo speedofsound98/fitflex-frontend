@@ -2,18 +2,19 @@
 import authFetch from '../../utils/authFetch';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useNavigate, NavLink, Outlet } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { LayoutDashboard, Dumbbell, Building2, Ticket } from 'lucide-react';
 import Navbar from '../../components/NavBar';
 import usePageTitle from '../../hooks/usePageTitle';
 
-const TABS = [
-  { to: '/dashboard', label: 'Overview', Icon: LayoutDashboard, end: true },
-  { to: '/dashboard/classes', label: 'Classes', Icon: Dumbbell },
-  { to: '/dashboard/studios', label: 'Studios', Icon: Building2 },
-  { to: '/dashboard/bookings', label: 'Bookings', Icon: Ticket },
-];
-
 export default function UserDashboardLayout() {
+  const { t } = useTranslation();
+  const TABS = [
+    { to: '/dashboard', label: t('dashboard.tabOverview'), Icon: LayoutDashboard, end: true },
+    { to: '/dashboard/classes', label: t('dashboard.tabClasses'), Icon: Dumbbell },
+    { to: '/dashboard/studios', label: t('dashboard.tabStudios'), Icon: Building2 },
+    { to: '/dashboard/bookings', label: t('dashboard.tabBookings'), Icon: Ticket },
+  ];
   const navigate = useNavigate();
   const userName = localStorage.getItem('userName') || 'User';
   const userId = localStorage.getItem('userId');
@@ -68,19 +69,19 @@ export default function UserDashboardLayout() {
         body: JSON.stringify({ user_id: Number(userId), class_id: Number(classId) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Booking failed');
-      flash('Class booked! 🎉');
+      if (!res.ok) throw new Error(data.error || t('dashboard.bookingFailed'));
+      flash(t('dashboard.classBooked'));
       refreshBookings();
     } catch (e) { flash(e.message, 'error'); }
   }, [api, userId, refreshBookings]);
 
   const cancelBooking = useCallback(async (bookingId) => {
-    if (!confirm('Cancel this booking? Your credits will be refunded.')) return;
+    if (!confirm(t('dashboard.cancelBookingConfirm'))) return;
     try {
       const res = await authFetch(`${api}/bookings/${bookingId}`, { method: 'DELETE' });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Cancellation failed');
-      flash('Booking cancelled. Credits refunded! 💸');
+      if (!res.ok) throw new Error(data.error || t('dashboard.cancellationFailed'));
+      flash(t('dashboard.bookingCancelled'));
       refreshBookings();
     } catch (e) { flash(e.message, 'error'); }
   }, [api, refreshBookings]);
@@ -99,9 +100,9 @@ export default function UserDashboardLayout() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="font-display font-black text-3xl sm:text-4xl text-ink-900 tracking-tight">
-            Welcome back, {userName} 👋
+            {t('dashboard.welcomeBack', { name: userName })}
           </h1>
-          <p className="text-ink-500 mt-1.5">Find and book your next fitness class.</p>
+          <p className="text-ink-500 mt-1.5">{t('dashboard.findBook')}</p>
         </div>
 
         {/* Sub-nav */}
