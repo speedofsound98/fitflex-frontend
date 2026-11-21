@@ -29,7 +29,7 @@ function CommentThread({ postId, isMember, currentUserId, isAdmin }) {
   const [text, setText] = useState('');
 
   useEffect(() => {
-    fetch(`${api}/posts/${postId}/comments`)
+    authFetch(`${api}/posts/${postId}/comments`)
       .then(r => r.json())
       .then(d => { setComments(d.comments || []); setLoaded(true); });
   }, [postId]);

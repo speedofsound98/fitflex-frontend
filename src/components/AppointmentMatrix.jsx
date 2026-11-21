@@ -56,8 +56,8 @@ export default function AppointmentMatrix({ studioId, mode = 'view', userId, ope
   const fetchSlots = useCallback(() => {
     const from = weekStart.toISOString();
     const to = weekEnd.toISOString();
-    const userParam = userId ? `&userId=${userId}` : '';
-    fetch(`${api}/studios/${studioId}/slots?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}${userParam}`)
+    // "Booked by me" is worked out server-side from the session, so send credentials.
+    authFetch(`${api}/studios/${studioId}/slots?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`)
       .then(r => r.json())
       .then(d => setSlots(d.slots || []));
   }, [studioId, weekStart, userId]);
