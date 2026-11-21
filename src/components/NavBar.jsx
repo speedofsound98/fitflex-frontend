@@ -52,7 +52,7 @@ function ThemeToggle() {
   );
 }
 
-function NotificationBell({ role }) {
+function NotificationBell() {
   const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [unread, setUnread] = useState(0);
@@ -151,7 +151,7 @@ export default function Navbar() {
   // Read auth state synchronously so the navbar doesn't flash the
   // logged-out state (orange Get Started) on every route change/remount.
   const [authed, setAuthed] = useState(() => !!localStorage.getItem('userName'));
-  const [name, setName] = useState(() => localStorage.getItem('userName') || '');
+  const [name] = useState(() => localStorage.getItem('userName') || '');
   const [role, setRole] = useState(() => localStorage.getItem('userRole') || '');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
@@ -234,7 +234,7 @@ export default function Navbar() {
                   >
                     {t('nav.dashboard')}
                   </Link>
-                  <NotificationBell role={role} />
+                  <NotificationBell />
                   <button
                     onClick={() => setDrawerOpen(true)}
                     className="flex items-center gap-2 pl-1 pr-1 sm:pr-2 py-1 rounded-full hover:bg-ink-50 transition"

@@ -27,10 +27,6 @@ function formatDate(date) {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
-function toISODate(date) {
-  return date.toISOString().split('T')[0];
-}
-
 function getTimeRows(openingHour, closingHour) {
   return Array.from({ length: closingHour - openingHour }, (_, i) => i + openingHour);
 }
