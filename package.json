@@ -20,7 +20,7 @@
     "@tiptap/pm": "^3.35.0",
     "@tiptap/react": "^3.35.0",
     "@tiptap/starter-kit": "^3.35.0",
-    "i18next": "^26.4.0",
+    "i18next": "^27.1.5",
     "i18next-browser-languagedetector": "^8.2.1",
     "lucide-react": "^1.23.0",
     "react": "^19.1.1",
