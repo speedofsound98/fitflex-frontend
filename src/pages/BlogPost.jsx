@@ -129,6 +129,8 @@ export default function BlogPost() {
             prose-strong:text-ink-900
             prose-ul:text-ink-700 prose-ol:text-ink-700
             prose-blockquote:border-brand-400 prose-blockquote:text-ink-500"
+          // Safe: blog HTML is sanitized server-side on write (sanitize-html in the backend).
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: post.content }}
         />
       </div>

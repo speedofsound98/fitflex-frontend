@@ -10,7 +10,7 @@ import { chipStyle } from '../utils/sport';
 
 const api = import.meta.env.VITE_API_URL;
 
-export function relativeTime(date, t) {
+function relativeTime(date, t) {
   if (!date) return '';
   const d = new Date(date);
   const days = Math.floor((new Date() - d) / 86400000);
