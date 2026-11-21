@@ -65,7 +65,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/groups" element={<Groups />} />
         <Route path="/groups/:id" element={<GroupProfile />} />
         <Route path="/events/:eventId" element={<EventDetail />} />
-        <Route path="/messages" element={<Messages />} />
+
+        {/* Logged-in (any role) */}
+        <Route path="/messages" element={<RoleRoute allow={['user', 'studio']}><Messages /></RoleRoute>} />
 
         {/* User-only routes */}
         <Route path="/dashboard" element={<RoleRoute allow={['user']}><UserDashboardLayout /></RoleRoute>}>
